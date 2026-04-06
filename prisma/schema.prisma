@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -10,4 +5,90 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pond {
+  id          String         @id @default(cuid())
+  name        String
+  code        String         @unique
+  type        PondType
+  lengthM     Float?
+  widthM      Float?
+  depthM      Float?
+  capacity    Int?
+  status      PondStatus     @default(ACTIVE)
+  notes       String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  cycles      CultureCycle[]
+}
+
+model CultureCycle {
+  id                 String          @id @default(cuid())
+  pondId             String
+  pond               Pond            @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  cycleName          String
+  startDate          DateTime
+  endDate            DateTime?
+  seedCount          Int
+  initialAvgWeightG  Float?
+  targetHarvestDate  DateTime?
+  status             CycleStatus     @default(ACTIVE)
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  feedLogs           FeedLog[]
+  mortalityLogs      MortalityLog[]
+}
+
+model FeedLog {
+  id             String       @id @default(cuid())
+  cultureCycleId String
+  cultureCycle   CultureCycle @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  logDate        DateTime
+  feedName       String
+  quantityKg     Float
+  priceTotal     Decimal?     @db.Decimal(12, 2)
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model MortalityLog {
+  id             String       @id @default(cuid())
+  cultureCycleId String
+  cultureCycle   CultureCycle @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  logDate        DateTime
+  deadCount      Int
+  cause          String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+enum PondType {
+  TERPAL
+  BETON
+  TANAH
+}
+
+enum PondStatus {
+  ACTIVE
+  EMPTY
+  MAINTENANCE
+}
+
+enum CycleStatus {
+  ACTIVE
+  HARVESTED
+  FAILED
+  CLOSED
 }
