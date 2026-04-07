@@ -8,45 +8,48 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?  @unique
+  passwordHash String   @default("") @map("password")
+  role         UserRole @default(WORKER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Pond {
-  id          String         @id @default(cuid())
-  name        String
-  code        String         @unique
-  type        PondType
-  lengthM     Float?
-  widthM      Float?
-  depthM      Float?
-  capacity    Int?
-  status      PondStatus     @default(ACTIVE)
-  notes       String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  cycles      CultureCycle[]
+  id        String         @id @default(cuid())
+  name      String
+  code      String         @unique
+  type      PondType
+  lengthM   Float?
+  widthM    Float?
+  depthM    Float?
+  capacity  Int?
+  status    PondStatus     @default(ACTIVE)
+  notes     String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  cycles    CultureCycle[]
 }
 
 model CultureCycle {
-  id                 String          @id @default(cuid())
-  pondId             String
-  pond               Pond            @relation(fields: [pondId], references: [id], onDelete: Cascade)
-  cycleName          String
-  startDate          DateTime
-  endDate            DateTime?
-  seedCount          Int
-  initialAvgWeightG  Float?
-  targetHarvestDate  DateTime?
-  status             CycleStatus     @default(ACTIVE)
-  notes              String?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-  feedLogs           FeedLog[]
-  mortalityLogs      MortalityLog[]
+  id                String         @id @default(cuid())
+  pondId            String
+  pond              Pond           @relation(fields: [pondId], references: [id], onDelete: Cascade)
+  cycleName         String
+  startDate         DateTime
+  endDate           DateTime?
+  seedCount         Int
+  initialAvgWeightG Float?
+  targetHarvestDate DateTime?
+  status            CycleStatus    @default(ACTIVE)
+  notes             String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  feedLogs          FeedLog[]
+  mortalityLogs     MortalityLog[]
 }
 
 model FeedLog {
@@ -91,4 +94,11 @@ enum CycleStatus {
   HARVESTED
   FAILED
   CLOSED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  OWNER
+  ADMIN
+  WORKER
 }
