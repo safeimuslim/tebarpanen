@@ -1,10 +1,18 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import { auth } from "@/auth"
+import { redirect } from "next/navigation"
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const session = await auth()
+
+  if (!session?.user) {
+    redirect("/login")
+  }
+
   return (
     <main className="bg-background text-foreground min-h-screen md:flex">
       <AppSidebar />
