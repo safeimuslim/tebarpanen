@@ -1,6 +1,16 @@
 import Link from "next/link"
-import { Fish, Home, ShieldCheck, SlidersHorizontal, Users, Waves, Wrench } from "lucide-react"
+import {
+  Fish,
+  Home,
+  LogOut,
+  ShieldCheck,
+  User,
+  Users,
+  Waves,
+  Wrench,
+} from "lucide-react"
 
+import { signOut } from "@/auth"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -66,9 +76,36 @@ export function AppSidebar() {
           </div>
         ))}
 
-        <div className="text-muted-foreground mt-auto flex items-center gap-2 px-3 text-xs">
-          <SlidersHorizontal className="size-3.5" />
-          MVP operasional
+        <div className="border-border mt-auto space-y-1 border-t pt-3">
+          <Link
+            href="/profile"
+            className={cn(
+              buttonVariants({ variant: "ghost" }),
+              "h-10 justify-start gap-3 px-3 w-full"
+            )}
+          >
+            <User className="size-4" />
+            Profile
+          </Link>
+
+          <form
+            action={async () => {
+              "use server"
+
+              await signOut({ redirectTo: "/login" })
+            }}
+          >
+            <button
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                "h-10 justify-start gap-3 px-3 w-full"
+              )}
+              type="submit"
+            >
+              <LogOut className="size-4" />
+              Logout
+            </button>
+          </form>
         </div>
       </nav>
     </aside>

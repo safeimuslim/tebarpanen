@@ -14,6 +14,7 @@ export const config = {
     "/biaya/:path*",
     "/panen/:path*",
     "/laporan/:path*",
+    "/profile/:path*",
     "/pengaturan/:path*",
   ],
 }
