@@ -15,7 +15,7 @@ type TopBarProps = {
 
 export function TopBar({ user }: TopBarProps) {
   return (
-    <header className="border-border bg-background/95 supports-[backdrop-filter]:bg-background/80 fixed left-0 right-0 top-0 z-50 flex min-h-20 items-center justify-between gap-3 border-b px-4 py-3 backdrop-blur md:px-6">
+    <header className="border-border fixed left-0 right-0 top-0 z-50 flex min-h-20 items-center justify-between gap-3 border-b bg-[#ffffff] px-4 py-3 md:px-6">
       <div className="flex min-w-0 items-center gap-3">
         <label
           className={cn(

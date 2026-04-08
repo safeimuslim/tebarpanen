@@ -29,11 +29,11 @@ export default async function AppLayout({
         className="bg-foreground/40 fixed inset-x-0 bottom-0 top-20 z-30 hidden peer-checked:block md:hidden"
         htmlFor="mobile-sidebar-toggle"
       />
-      <section className="min-h-screen md:pl-72">
+      <section className="min-h-screen bg-[#F9FAFB] md:pl-72">
         <div className="p-4 pt-24 md:p-6 md:pt-28">
-          <div className="mx-auto max-w-5xl">{children}</div>
+          <div className="mx-auto px-4">{children}</div>
         </div>
       </section>
     </main>
-  )
+  );
 }
