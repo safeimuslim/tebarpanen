@@ -1,0 +1,6 @@
+-- CreateEnum
+CREATE TYPE "PondShape" AS ENUM ('RECTANGLE', 'CIRCLE', 'IRREGULAR');
+
+-- AlterTable
+ALTER TABLE "Pond" ADD COLUMN "shape" "PondShape" NOT NULL DEFAULT 'RECTANGLE',
+ADD COLUMN "location" TEXT;

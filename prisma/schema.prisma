@@ -19,19 +19,24 @@ model User {
 }
 
 model Pond {
-  id        String         @id @default(cuid())
-  name      String
-  code      String         @unique
-  type      PondType
-  lengthM   Float?
-  widthM    Float?
-  depthM    Float?
-  capacity  Int?
-  status    PondStatus     @default(ACTIVE)
-  notes     String?
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  cycles    CultureCycle[]
+  id                 String         @id @default(cuid())
+  name               String
+  code               String         @unique
+  type               PondType
+  shape              PondShape      @default(RECTANGLE)
+  lengthM            Float?
+  widthM             Float?
+  diameterM          Float?
+  depthM             Float?
+  capacity           Int?
+  purchasePrice      Decimal?       @db.Decimal(14, 2)
+  installedAt        DateTime?
+  depreciationMonths Int?
+  status             PondStatus     @default(ACTIVE)
+  notes              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  cycles             CultureCycle[]
 }
 
 model CultureCycle {
@@ -81,6 +86,12 @@ enum PondType {
   TERPAL
   BETON
   TANAH
+}
+
+enum PondShape {
+  RECTANGLE
+  CIRCLE
+  IRREGULAR
 }
 
 enum PondStatus {

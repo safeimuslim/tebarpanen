@@ -1,39 +1,46 @@
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import { Eye, Pencil, Plus, Trash2, Waves } from "lucide-react"
 
+import { auth } from "@/auth"
+import { PondShape, PondStatus, PondType } from "@/app/generated/prisma/enums"
+import { prisma } from "@/app/lib/prisma"
+import { PondShapeDimensionFields } from "@/components/pond-shape-dimension-fields"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const ponds = [
-  {
-    name: "Kolam A1",
-    type: "Terpal",
-    shape: "Persegi",
-    size: "8m x 4m x 1,2m",
-    capacity: "4.000 ekor",
-    status: "Aktif",
-    location: "Farm Utama",
-  },
-  {
-    name: "Kolam A2",
-    type: "Beton",
-    shape: "Bulat",
-    size: "10m x 5m x 1,5m",
-    capacity: "6.500 ekor",
-    status: "Aktif",
-    location: "Farm Utama",
-  },
-  {
-    name: "Kolam B1",
-    type: "Tanah",
-    shape: "Persegi",
-    size: "14m x 8m x 1,3m",
-    capacity: "9.000 ekor",
-    status: "Perawatan",
-    location: "Farm Timur",
-  },
-]
+const pondTypeLabels: Record<PondType, string> = {
+  TERPAL: "Terpal",
+  BETON: "Beton",
+  TANAH: "Tanah",
+}
 
-export default function KolamPage() {
+const pondShapeLabels: Record<PondShape, string> = {
+  RECTANGLE: "Persegi",
+  CIRCLE: "Bulat",
+  IRREGULAR: "Tidak beraturan",
+}
+
+const pondStatusLabels: Record<PondStatus, string> = {
+  ACTIVE: "Aktif",
+  EMPTY: "Kosong",
+  MAINTENANCE: "Perawatan",
+}
+
+export default async function KolamPage() {
+  const ponds = await prisma.pond.findMany({
+    orderBy: [{ createdAt: "desc" }, { name: "asc" }],
+  })
+
+  const activeCount = ponds.filter((pond) => pond.status === "ACTIVE").length
+  const maintenanceCount = ponds.filter(
+    (pond) => pond.status === "MAINTENANCE"
+  ).length
+  const totalPurchasePrice = ponds.reduce(
+    (total, pond) => total + decimalToNumber(pond.purchasePrice),
+    0
+  )
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -55,10 +62,14 @@ export default function KolamPage() {
         </button>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <SummaryCard label="Total Kolam" value="12" />
-        <SummaryCard label="Aktif" value="8" />
-        <SummaryCard label="Perawatan" value="2" />
+      <section className="grid gap-4 md:grid-cols-4">
+        <SummaryCard label="Total Kolam" value={String(ponds.length)} />
+        <SummaryCard label="Aktif" value={String(activeCount)} />
+        <SummaryCard label="Perawatan" value={String(maintenanceCount)} />
+        <SummaryCard
+          label="Nilai Pembelian Kolam"
+          value={formatCurrency(totalPurchasePrice)}
+        />
       </section>
 
       <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
@@ -66,7 +77,7 @@ export default function KolamPage() {
           <div>
             <h2 className="font-semibold">List Kolam</h2>
             <p className="text-muted-foreground text-sm">
-              Wireframe master kolam, belum terhubung ke database.
+              Data master kolam yang sudah tersimpan di database.
             </p>
           </div>
           <span className="text-muted-foreground text-sm">
@@ -74,123 +85,378 @@ export default function KolamPage() {
           </span>
         </div>
 
-        <div className="divide-border divide-y">
-          {ponds.map((pond) => (
-            <article
-              className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]"
-              key={pond.name}
-            >
-              <div className="min-w-0 space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-                    <Waves className="size-5" />
+        {ponds.length ? (
+          <div className="divide-border divide-y">
+            {ponds.map((pond) => (
+              <article
+                className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]"
+                key={pond.id}
+              >
+                <div className="min-w-0 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
+                      <Waves className="size-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">{pond.name}</h3>
+                      <p className="text-muted-foreground text-sm">{pond.code}</p>
+                    </div>
+                    <span className="border-border bg-muted rounded-full border px-2 py-0.5 text-xs font-medium">
+                      {pondStatusLabels[pond.status]}
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{pond.name}</h3>
-                    <p className="text-muted-foreground text-sm">
-                      {pond.location}
-                    </p>
-                  </div>
-                  <span className="border-border bg-muted rounded-full border px-2 py-0.5 text-xs font-medium">
-                    {pond.status}
-                  </span>
                 </div>
-              </div>
 
-              <dl className="grid grid-cols-3 gap-3 text-sm lg:grid-cols-1">
-                <MasterMetric label="Jenis" value={pond.type} />
-                <MasterMetric label="Bentuk" value={pond.shape} />
-                <MasterMetric label="Kapasitas" value={pond.capacity} />
-              </dl>
+                <dl className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4 lg:grid-cols-1">
+                  <MasterMetric label="Jenis" value={pondTypeLabels[pond.type]} />
+                  <MasterMetric label="Bentuk" value={pondShapeLabels[pond.shape]} />
+                  <MasterMetric label="Kapasitas" value={formatCapacity(pond.capacity)} />
+                  <MasterMetric
+                    label="Harga Pembelian"
+                    value={formatCurrency(pond.purchasePrice)}
+                  />
+                </dl>
 
-              <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-                <Button className="gap-2" size="sm" type="button" variant="outline">
-                  <Eye className="size-4" />
-                  Detail
-                </Button>
-                <Button className="gap-2" size="sm" type="button" variant="outline">
-                  <Pencil className="size-4" />
-                  Edit
-                </Button>
-                <Button
-                  className="gap-2"
-                  size="sm"
-                  type="button"
-                  variant="destructive"
-                >
-                  <Trash2 className="size-4" />
-                  Delete
-                </Button>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="flex flex-wrap items-start gap-2 lg:justify-end">
+                  <button
+                    className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
+                    popoverTarget={`detail-pond-${pond.id}`}
+                    type="button"
+                  >
+                    <Eye className="size-4" />
+                    Detail
+                  </button>
+                  <button
+                    className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
+                    popoverTarget={`edit-pond-${pond.id}`}
+                    type="button"
+                  >
+                    <Pencil className="size-4" />
+                    Edit
+                  </button>
+                  <form action={deletePond}>
+                    <input name="id" type="hidden" value={pond.id} />
+                    <Button
+                      className="gap-2"
+                      size="sm"
+                      type="submit"
+                      variant="destructive"
+                    >
+                      <Trash2 className="size-4" />
+                      Delete
+                    </Button>
+                  </form>
+                </div>
+
+                <PondDetailModal pond={pond} />
+                <PondEditModal pond={pond} />
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center">
+            <div className="bg-muted mx-auto flex size-12 items-center justify-center rounded-lg">
+              <Waves className="size-6" />
+            </div>
+            <h2 className="mt-4 font-semibold">Belum ada kolam</h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Tambahkan kolam pertama untuk mulai menyusun data master.
+            </p>
+          </div>
+        )}
       </section>
 
       <div
-        className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit w-[min(92vw,42rem)] rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
+        className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit max-h-[90vh] w-[min(92vw,42rem)] overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
         id="create-pond-modal"
         popover="auto"
       >
         <div className="w-full">
           <div className="border-border border-b p-5">
-            <p className="text-muted-foreground text-sm">Wireframe Form</p>
+            <p className="text-muted-foreground text-sm">Form Master Data</p>
             <h2 className="mt-1 text-xl font-semibold">Tambah Kolam</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Form ini belum menyimpan data ke database.
+              Data kolam akan tersimpan ke database.
             </p>
           </div>
 
-          <form className="space-y-5 p-5">
-            <div className="grid gap-4 md:grid-cols-2">
-              <FormField label="Nama Kolam" name="name" />
-              <FormField label="Kode Kolam" name="code" />
-              <SelectField
-                label="Jenis Kolam"
-                name="type"
-                options={["Terpal", "Beton", "Tanah"]}
-              />
-              <SelectField
-                label="Bentuk Kolam"
-                name="shape"
-                options={["Persegi", "Bulat"]}
-              />
-              <SelectField
-                label="Status"
-                name="status"
-                options={["Aktif", "Kosong", "Perawatan"]}
-              />
-              <FormField label="Panjang (m)" name="length" type="number" />
-              <FormField label="Lebar (m)" name="width" type="number" />
-              <FormField label="Kedalaman (m)" name="depth" type="number" />
-              <FormField label="Kapasitas" name="capacity" type="number" />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="notes">
-                Catatan
-              </label>
-              <textarea
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
-                id="notes"
-                name="notes"
-                placeholder="Catatan kolam"
-              />
-            </div>
-
-            <div className="border-border flex justify-end gap-2 border-t pt-4">
-              <button
-                className={cn(buttonVariants({ variant: "outline" }))}
-                popoverTarget="create-pond-modal"
-                popoverTargetAction="hide"
-                type="button"
-              >
-                Batal
-              </button>
-              <Button type="button">Simpan Wireframe</Button>
-            </div>
-          </form>
+          <PondForm action={createPond} submitLabel="Simpan Kolam" />
         </div>
+      </div>
+    </div>
+  )
+}
+
+async function createPond(formData: FormData) {
+  "use server"
+
+  await requireAuthenticatedUser()
+
+  const name = readRequiredString(formData, "name")
+  const shape = readEnum(formData, "shape", PondShape)
+
+  await prisma.pond.create({
+    data: {
+      name,
+      code: await createUniquePondCode(name),
+      type: readEnum(formData, "type", PondType),
+      shape,
+      status: readEnum(formData, "status", PondStatus),
+      lengthM:
+        shape === "RECTANGLE" ? readOptionalFloat(formData, "lengthM") : null,
+      widthM:
+        shape === "RECTANGLE" ? readOptionalFloat(formData, "widthM") : null,
+      diameterM:
+        shape === "CIRCLE" ? readOptionalFloat(formData, "diameterM") : null,
+      depthM: readOptionalFloat(formData, "depthM"),
+      capacity: readOptionalInt(formData, "capacity"),
+      purchasePrice: readOptionalDecimal(formData, "purchasePrice"),
+      installedAt: readOptionalDate(formData, "installedAt"),
+      depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
+      notes: readOptionalString(formData, "notes"),
+    },
+  })
+
+  revalidatePath("/kolam")
+}
+
+async function updatePond(formData: FormData) {
+  "use server"
+
+  await requireAuthenticatedUser()
+
+  const shape = readEnum(formData, "shape", PondShape)
+
+  await prisma.pond.update({
+    where: {
+      id: readRequiredString(formData, "id"),
+    },
+    data: {
+      name: readRequiredString(formData, "name"),
+      type: readEnum(formData, "type", PondType),
+      shape,
+      status: readEnum(formData, "status", PondStatus),
+      lengthM:
+        shape === "RECTANGLE" ? readOptionalFloat(formData, "lengthM") : null,
+      widthM:
+        shape === "RECTANGLE" ? readOptionalFloat(formData, "widthM") : null,
+      diameterM:
+        shape === "CIRCLE" ? readOptionalFloat(formData, "diameterM") : null,
+      depthM: readOptionalFloat(formData, "depthM"),
+      capacity: readOptionalInt(formData, "capacity"),
+      purchasePrice: readOptionalDecimal(formData, "purchasePrice"),
+      installedAt: readOptionalDate(formData, "installedAt"),
+      depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
+      notes: readOptionalString(formData, "notes"),
+    },
+  })
+
+  revalidatePath("/kolam")
+}
+
+async function deletePond(formData: FormData) {
+  "use server"
+
+  await requireAuthenticatedUser()
+
+  const id = readRequiredString(formData, "id")
+  const activeCycles = await prisma.cultureCycle.count({
+    where: {
+      pondId: id,
+    },
+  })
+
+  if (activeCycles > 0) {
+    return
+  }
+
+  await prisma.pond.delete({
+    where: {
+      id,
+    },
+  })
+
+  revalidatePath("/kolam")
+}
+
+async function requireAuthenticatedUser() {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    redirect("/login")
+  }
+}
+
+async function createUniquePondCode(name: string) {
+  const baseCode = slugify(name) || "kolam"
+  let code = baseCode
+  let index = 2
+
+  while (await prisma.pond.findUnique({ where: { code } })) {
+    code = `${baseCode}-${index}`
+    index += 1
+  }
+
+  return code
+}
+
+function PondForm({
+  action,
+  pond,
+  submitLabel,
+}: {
+  action: (formData: FormData) => Promise<void>
+  pond?: PondFormData
+  submitLabel: string
+}) {
+  return (
+    <form action={action} className="space-y-5 p-5">
+      {pond ? <input name="id" type="hidden" value={pond.id} /> : null}
+      <div className="grid gap-4 md:grid-cols-2">
+        <FormField label="Nama Kolam" name="name" defaultValue={pond?.name} />
+        <SelectField
+          defaultValue={pond?.type}
+          label="Jenis Kolam"
+          name="type"
+          options={pondTypeLabels}
+        />
+        <SelectField
+          defaultValue={pond?.status}
+          label="Status"
+          name="status"
+          options={pondStatusLabels}
+        />
+        <PondShapeDimensionFields
+          defaultDepthM={formatNumberInput(pond?.depthM)}
+          defaultDiameterM={formatNumberInput(pond?.diameterM)}
+          defaultLengthM={formatNumberInput(pond?.lengthM)}
+          defaultShape={pond?.shape}
+          defaultWidthM={formatNumberInput(pond?.widthM)}
+          shapeOptions={pondShapeLabels}
+        />
+        <FormField
+          defaultValue={formatNumberInput(pond?.capacity)}
+          label="Kapasitas"
+          name="capacity"
+          type="number"
+        />
+        <FormField
+          defaultValue={formatDecimalInput(pond?.purchasePrice)}
+          label="Harga Pembelian (Rp)"
+          name="purchasePrice"
+          step="0.01"
+          type="number"
+        />
+        <FormField
+          defaultValue={formatDateInput(pond?.installedAt)}
+          label="Tanggal Pasang"
+          name="installedAt"
+          type="date"
+        />
+        <FormField
+          defaultValue={formatNumberInput(pond?.depreciationMonths)}
+          label="Masa Penyusutan (bulan)"
+          name="depreciationMonths"
+          type="number"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium" htmlFor={pond ? `notes-${pond.id}` : "notes"}>
+          Catatan
+        </label>
+        <textarea
+          className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+          defaultValue={pond?.notes ?? ""}
+          id={pond ? `notes-${pond.id}` : "notes"}
+          name="notes"
+          placeholder="Catatan kolam"
+        />
+      </div>
+
+      <div className="border-border flex justify-end gap-2 border-t pt-4">
+        <button
+          className={cn(buttonVariants({ variant: "outline" }))}
+          popoverTarget={pond ? `edit-pond-${pond.id}` : "create-pond-modal"}
+          popoverTargetAction="hide"
+          type="button"
+        >
+          Batal
+        </button>
+        <Button type="submit">{submitLabel}</Button>
+      </div>
+    </form>
+  )
+}
+
+function PondDetailModal({ pond }: { pond: PondFormData }) {
+  return (
+    <div
+      className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit w-[min(92vw,42rem)] rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
+      id={`detail-pond-${pond.id}`}
+      popover="auto"
+    >
+      <div className="w-full">
+        <div className="border-border border-b p-5">
+          <p className="text-muted-foreground text-sm">Detail Kolam</p>
+          <h2 className="mt-1 text-xl font-semibold">{pond.name}</h2>
+          <p className="text-muted-foreground mt-1 text-sm">{pond.code}</p>
+        </div>
+        <dl className="grid gap-4 p-5 md:grid-cols-2">
+          <MasterMetric label="Kode" value={pond.code} />
+          <MasterMetric label="Jenis" value={pondTypeLabels[pond.type]} />
+          <MasterMetric label="Bentuk" value={pondShapeLabels[pond.shape]} />
+          <MasterMetric label="Status" value={pondStatusLabels[pond.status]} />
+          <MasterMetric label="Dimensi" value={formatPondSize(pond)} />
+          <MasterMetric label="Kapasitas" value={formatCapacity(pond.capacity)} />
+          <MasterMetric
+            label="Harga Pembelian"
+            value={formatCurrency(pond.purchasePrice)}
+          />
+          <MasterMetric
+            label="Tanggal Pasang"
+            value={formatDateDisplay(pond.installedAt)}
+          />
+          <MasterMetric
+            label="Masa Penyusutan"
+            value={formatDepreciationMonths(pond.depreciationMonths)}
+          />
+          <div className="md:col-span-2">
+            <MasterMetric label="Catatan" value={pond.notes ?? "-"} />
+          </div>
+        </dl>
+        <div className="border-border flex justify-end border-t p-5">
+          <button
+            className={cn(buttonVariants({ variant: "outline" }))}
+            popoverTarget={`detail-pond-${pond.id}`}
+            popoverTargetAction="hide"
+            type="button"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PondEditModal({ pond }: { pond: PondFormData }) {
+  return (
+    <div
+      className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit max-h-[90vh] w-[min(92vw,42rem)] overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
+      id={`edit-pond-${pond.id}`}
+      popover="auto"
+    >
+      <div className="w-full">
+        <div className="border-border border-b p-5">
+          <p className="text-muted-foreground text-sm">Form Master Data</p>
+          <h2 className="mt-1 text-xl font-semibold">Edit Kolam</h2>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Perbarui data kolam yang tersimpan di database.
+          </p>
+        </div>
+
+        <PondForm action={updatePond} pond={pond} submitLabel="Simpan Perubahan" />
       </div>
     </div>
   )
@@ -215,12 +481,18 @@ function MasterMetric({ label, value }: { label: string; value: string }) {
 }
 
 function FormField({
+  defaultValue,
   label,
   name,
+  placeholder,
+  step,
   type = "text",
 }: {
+  defaultValue?: string
   label: string
   name: string
+  placeholder?: string
+  step?: string
   type?: string
 }) {
   return (
@@ -230,22 +502,27 @@ function FormField({
       </label>
       <input
         className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+        defaultValue={defaultValue}
         id={name}
         name={name}
+        placeholder={placeholder}
+        step={step}
         type={type}
       />
     </div>
   )
 }
 
-function SelectField({
+function SelectField<TValue extends string>({
+  defaultValue,
   label,
   name,
   options,
 }: {
+  defaultValue?: TValue
   label: string
   name: string
-  options: string[]
+  options: Record<TValue, string>
 }) {
   return (
     <div className="space-y-2">
@@ -254,13 +531,214 @@ function SelectField({
       </label>
       <select
         className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+        defaultValue={defaultValue}
         id={name}
         name={name}
       >
-        {options.map((option) => (
-          <option key={option}>{option}</option>
+        {Object.entries(options).map(([value, label]) => (
+          <option key={value} value={value}>
+            {label as string}
+          </option>
         ))}
       </select>
     </div>
   )
+}
+
+type PondFormData = Awaited<ReturnType<typeof prisma.pond.findMany>>[number]
+
+function readRequiredString(formData: FormData, key: string) {
+  const value = readOptionalString(formData, key)
+
+  if (!value) {
+    throw new Error(`${key} wajib diisi`)
+  }
+
+  return value
+}
+
+function readOptionalString(formData: FormData, key: string) {
+  const value = formData.get(key)
+
+  if (typeof value !== "string") {
+    return null
+  }
+
+  const trimmed = value.trim()
+  return trimmed || null
+}
+
+function readOptionalFloat(formData: FormData, key: string) {
+  const value = readOptionalString(formData, key)
+
+  if (!value) {
+    return null
+  }
+
+  const number = Number(value.replace(",", "."))
+
+  if (!Number.isFinite(number)) {
+    throw new Error(`${key} harus berupa angka`)
+  }
+
+  return number
+}
+
+function readOptionalInt(formData: FormData, key: string) {
+  const value = readOptionalString(formData, key)
+
+  if (!value) {
+    return null
+  }
+
+  const number = Number(value)
+
+  if (!Number.isInteger(number)) {
+    throw new Error(`${key} harus berupa angka bulat`)
+  }
+
+  return number
+}
+
+function readOptionalDecimal(formData: FormData, key: string) {
+  const value = readOptionalString(formData, key)
+
+  if (!value) {
+    return null
+  }
+
+  const normalized = value.replace(",", ".")
+  const number = Number(normalized)
+
+  if (!Number.isFinite(number)) {
+    throw new Error(`${key} harus berupa angka`)
+  }
+
+  return normalized
+}
+
+function readOptionalDate(formData: FormData, key: string) {
+  const value = readOptionalString(formData, key)
+
+  if (!value) {
+    return null
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`)
+
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`${key} harus berupa tanggal valid`)
+  }
+
+  return date
+}
+
+function readEnum<TEnum extends Record<string, string>>(
+  formData: FormData,
+  key: string,
+  enumObject: TEnum
+) {
+  const value = readRequiredString(formData, key)
+  const enumValues = Object.values(enumObject)
+
+  if (!enumValues.includes(value)) {
+    throw new Error(`${key} tidak valid`)
+  }
+
+  return value as TEnum[keyof TEnum]
+}
+
+function slugify(value: string) {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+}
+
+function formatPondSize(pond: PondFormData) {
+  const depth = formatDimension(pond.depthM)
+
+  if (pond.shape === "CIRCLE") {
+    const diameter = formatDimension(pond.diameterM)
+
+    if (diameter === "-" && depth === "-") {
+      return "-"
+    }
+
+    return `Diameter ${diameter} x kedalaman ${depth}`
+  }
+
+  if (pond.shape === "IRREGULAR") {
+    return depth === "-" ? "-" : `Kedalaman ${depth}`
+  }
+
+  const length = formatDimension(pond.lengthM)
+  const width = formatDimension(pond.widthM)
+
+  if (length === "-" && width === "-" && depth === "-") {
+    return "-"
+  }
+
+  return `${length} x ${width} x ${depth}`
+}
+
+function formatDimension(value: number | null) {
+  return value === null ? "-" : `${formatNumber(value)} m`
+}
+
+function formatCapacity(value: number | null) {
+  return value === null ? "-" : `${formatNumber(value)} ekor`
+}
+
+function formatCurrency(value: DecimalLike | number | null) {
+  const number = typeof value === "number" ? value : decimalToNumber(value)
+
+  if (!number) {
+    return "-"
+  }
+
+  return new Intl.NumberFormat("id-ID", {
+    currency: "IDR",
+    maximumFractionDigits: 0,
+    style: "currency",
+  }).format(number)
+}
+
+function formatNumber(value: number) {
+  return new Intl.NumberFormat("id-ID").format(value)
+}
+
+function formatNumberInput(value: number | null | undefined) {
+  return value === null || value === undefined ? "" : String(value)
+}
+
+function formatDecimalInput(value: DecimalLike | null | undefined) {
+  return value === null || value === undefined ? "" : value.toString()
+}
+
+function formatDateInput(value: Date | null | undefined) {
+  return value ? value.toISOString().slice(0, 10) : ""
+}
+
+function formatDateDisplay(value: Date | null) {
+  return value
+    ? new Intl.DateTimeFormat("id-ID", {
+        dateStyle: "medium",
+        timeZone: "UTC",
+      }).format(value)
+    : "-"
+}
+
+function formatDepreciationMonths(value: number | null) {
+  return value === null ? "-" : `${formatNumber(value)} bulan`
+}
+
+function decimalToNumber(value: DecimalLike | null) {
+  return value ? Number(value.toString()) : 0
+}
+
+type DecimalLike = {
+  toString(): string
 }
