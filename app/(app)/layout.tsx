@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import { TopBar } from "@/components/top-bar"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 
@@ -14,10 +15,24 @@ export default async function AppLayout({
   }
 
   return (
-    <main className="bg-background text-foreground min-h-screen md:flex">
+    <main className="bg-background text-foreground min-h-screen">
+      <input
+        aria-hidden="true"
+        className="peer sr-only md:hidden"
+        id="mobile-sidebar-toggle"
+        type="checkbox"
+      />
+      <TopBar user={session.user} />
       <AppSidebar />
-      <section className="flex-1 p-6">
-        <div className="mx-auto max-w-5xl">{children}</div>
+      <label
+        aria-label="Tutup menu"
+        className="bg-foreground/40 fixed inset-x-0 bottom-0 top-20 z-30 hidden peer-checked:block md:hidden"
+        htmlFor="mobile-sidebar-toggle"
+      />
+      <section className="min-h-screen md:pl-72">
+        <div className="p-4 pt-24 md:p-6 md:pt-28">
+          <div className="mx-auto max-w-5xl">{children}</div>
+        </div>
       </section>
     </main>
   )

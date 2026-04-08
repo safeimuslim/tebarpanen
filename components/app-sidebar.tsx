@@ -2,15 +2,12 @@ import Link from "next/link"
 import {
   Fish,
   Home,
-  LogOut,
   ShieldCheck,
-  User,
   Users,
   Waves,
   Wrench,
 } from "lucide-react"
 
-import { signOut } from "@/auth"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -31,7 +28,7 @@ const menuGroups = [
   {
     title: "Pengaturan",
     items: [
-      { title: "User Karyawan", href: "/pengaturan/user-karyawan", icon: Users },
+      { title: "User", href: "/pengaturan/user", icon: Users },
       { title: "Role & Akses", href: "/pengaturan/role-akses", icon: ShieldCheck },
     ],
   },
@@ -39,13 +36,13 @@ const menuGroups = [
 
 export function AppSidebar() {
   return (
-    <aside className="border-border bg-sidebar text-sidebar-foreground flex min-h-screen w-full flex-col border-r md:w-72">
+    <aside className="border-border bg-sidebar text-sidebar-foreground fixed bottom-0 left-0 top-20 z-40 flex w-72 -translate-x-full flex-col border-r transition-transform peer-checked:translate-x-0 md:translate-x-0">
       <div className="border-border border-b px-5 py-4">
         <p className="text-lg font-semibold">Tebar Panen</p>
         <p className="text-muted-foreground mt-1 text-sm">Operasional budidaya</p>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-5 p-3">
+      <nav className="flex flex-1 flex-col gap-5 overflow-y-auto p-3">
         {menuGroups.map((group, index) => (
           <div key={group.title ?? index} className="space-y-1">
             {group.title ? (
@@ -76,36 +73,8 @@ export function AppSidebar() {
           </div>
         ))}
 
-        <div className="border-border mt-auto space-y-1 border-t pt-3">
-          <Link
-            href="/profile"
-            className={cn(
-              buttonVariants({ variant: "ghost" }),
-              "h-10 justify-start gap-3 px-3 w-full"
-            )}
-          >
-            <User className="size-4" />
-            Profile
-          </Link>
-
-          <form
-            action={async () => {
-              "use server"
-
-              await signOut({ redirectTo: "/login" })
-            }}
-          >
-            <button
-              className={cn(
-                buttonVariants({ variant: "ghost" }),
-                "h-10 justify-start gap-3 px-3 w-full"
-              )}
-              type="submit"
-            >
-              <LogOut className="size-4" />
-              Logout
-            </button>
-          </form>
+        <div className="text-muted-foreground mt-auto px-3 text-xs">
+          MVP operasional
         </div>
       </nav>
     </aside>
