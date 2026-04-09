@@ -39,6 +39,23 @@ model Pond {
   cycles             CultureCycle[]
 }
 
+model Equipment {
+  id                 String             @id @default(cuid())
+  name               String
+  type               EquipmentType
+  quantity           Int                @default(1)
+  brand              String?
+  serialNumber       String?
+  calibrationDate    DateTime?
+  condition          EquipmentCondition @default(READY)
+  purchasePrice      Decimal?           @db.Decimal(14, 2)
+  purchasedAt        DateTime?
+  depreciationMonths Int?
+  notes              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+}
+
 model CultureCycle {
   id                String         @id @default(cuid())
   pondId            String
@@ -98,6 +115,24 @@ enum PondStatus {
   ACTIVE
   EMPTY
   MAINTENANCE
+}
+
+enum EquipmentType {
+  WATER_QUALITY_METER
+  SCALE
+  HARVEST_EQUIPMENT
+  FEED_EQUIPMENT
+  AERATION_OXYGEN
+  PUMP_CIRCULATION
+  CONTAINER_STORAGE
+  CLEANING_EQUIPMENT
+  OTHER
+}
+
+enum EquipmentCondition {
+  READY
+  NEEDS_CHECK
+  BROKEN
 }
 
 enum CycleStatus {

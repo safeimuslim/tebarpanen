@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col" cz-shortcut-listen="true">{children}</body>
+      <body className="min-h-full flex flex-col" cz-shortcut-listen="true">
+        {children}
+        <Toaster position="top-right" richColors />
+      </body>
     </html>
   );
 }

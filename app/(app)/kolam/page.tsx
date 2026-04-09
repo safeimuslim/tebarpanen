@@ -1,12 +1,20 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { Eye, Pencil, Plus, Trash2, Waves } from "lucide-react"
+import { Eye, Pencil, Plus, Waves } from "lucide-react"
 
 import { auth } from "@/auth"
 import { PondShape, PondStatus, PondType } from "@/app/generated/prisma/enums"
+import {
+  actionError,
+  actionSuccess,
+  type ActionState,
+} from "@/app/lib/action-state"
 import { prisma } from "@/app/lib/prisma"
+import { ActionForm } from "@/components/action-form"
+import { DeleteConfirmButton } from "@/components/delete-confirm-button"
+import { FormSubmitButton } from "@/components/form-submit-button"
 import { PondShapeDimensionFields } from "@/components/pond-shape-dimension-fields"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const pondTypeLabels: Record<PondType, string> = {
@@ -134,18 +142,12 @@ export default async function KolamPage() {
                     <Pencil className="size-4" />
                     Edit
                   </button>
-                  <form action={deletePond}>
-                    <input name="id" type="hidden" value={pond.id} />
-                    <Button
-                      className="gap-2"
-                      size="sm"
-                      type="submit"
-                      variant="destructive"
-                    >
-                      <Trash2 className="size-4" />
-                      Delete
-                    </Button>
-                  </form>
+                  <DeleteConfirmButton
+                    action={deletePond}
+                    description="Data kolam yang dihapus tidak bisa dikembalikan untuk"
+                    id={pond.id}
+                    itemName={pond.name}
+                  />
                 </div>
 
                 <PondDetailModal pond={pond} />
@@ -187,96 +189,122 @@ export default async function KolamPage() {
   )
 }
 
-async function createPond(formData: FormData) {
+async function createPond(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
   "use server"
 
   await requireAuthenticatedUser()
 
-  const name = readRequiredString(formData, "name")
-  const shape = readEnum(formData, "shape", PondShape)
+  try {
+    const name = readRequiredString(formData, "name")
+    const shape = readEnum(formData, "shape", PondShape)
 
-  await prisma.pond.create({
-    data: {
-      name,
-      code: await createUniquePondCode(name),
-      type: readEnum(formData, "type", PondType),
-      shape,
-      status: readEnum(formData, "status", PondStatus),
-      lengthM:
-        shape === "RECTANGLE" ? readOptionalFloat(formData, "lengthM") : null,
-      widthM:
-        shape === "RECTANGLE" ? readOptionalFloat(formData, "widthM") : null,
-      diameterM:
-        shape === "CIRCLE" ? readOptionalFloat(formData, "diameterM") : null,
-      depthM: readOptionalFloat(formData, "depthM"),
-      capacity: readOptionalInt(formData, "capacity"),
-      purchasePrice: readOptionalDecimal(formData, "purchasePrice"),
-      installedAt: readOptionalDate(formData, "installedAt"),
-      depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
-      notes: readOptionalString(formData, "notes"),
-    },
-  })
+    await prisma.pond.create({
+      data: {
+        name,
+        code: await createUniquePondCode(name),
+        type: readEnum(formData, "type", PondType),
+        shape,
+        status: readEnum(formData, "status", PondStatus),
+        lengthM:
+          shape === "RECTANGLE" ? readOptionalFloat(formData, "lengthM") : null,
+        widthM:
+          shape === "RECTANGLE" ? readOptionalFloat(formData, "widthM") : null,
+        diameterM:
+          shape === "CIRCLE" ? readOptionalFloat(formData, "diameterM") : null,
+        depthM: readOptionalFloat(formData, "depthM"),
+        capacity: readOptionalInt(formData, "capacity"),
+        purchasePrice: readOptionalDecimal(formData, "purchasePrice"),
+        installedAt: readOptionalDate(formData, "installedAt"),
+        depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
+        notes: readOptionalString(formData, "notes"),
+      },
+    })
 
-  revalidatePath("/kolam")
-}
-
-async function updatePond(formData: FormData) {
-  "use server"
-
-  await requireAuthenticatedUser()
-
-  const shape = readEnum(formData, "shape", PondShape)
-
-  await prisma.pond.update({
-    where: {
-      id: readRequiredString(formData, "id"),
-    },
-    data: {
-      name: readRequiredString(formData, "name"),
-      type: readEnum(formData, "type", PondType),
-      shape,
-      status: readEnum(formData, "status", PondStatus),
-      lengthM:
-        shape === "RECTANGLE" ? readOptionalFloat(formData, "lengthM") : null,
-      widthM:
-        shape === "RECTANGLE" ? readOptionalFloat(formData, "widthM") : null,
-      diameterM:
-        shape === "CIRCLE" ? readOptionalFloat(formData, "diameterM") : null,
-      depthM: readOptionalFloat(formData, "depthM"),
-      capacity: readOptionalInt(formData, "capacity"),
-      purchasePrice: readOptionalDecimal(formData, "purchasePrice"),
-      installedAt: readOptionalDate(formData, "installedAt"),
-      depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
-      notes: readOptionalString(formData, "notes"),
-    },
-  })
-
-  revalidatePath("/kolam")
-}
-
-async function deletePond(formData: FormData) {
-  "use server"
-
-  await requireAuthenticatedUser()
-
-  const id = readRequiredString(formData, "id")
-  const activeCycles = await prisma.cultureCycle.count({
-    where: {
-      pondId: id,
-    },
-  })
-
-  if (activeCycles > 0) {
-    return
+    revalidatePath("/kolam")
+    return actionSuccess("Kolam berhasil ditambahkan.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
   }
+}
 
-  await prisma.pond.delete({
-    where: {
-      id,
-    },
-  })
+async function updatePond(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  "use server"
 
-  revalidatePath("/kolam")
+  await requireAuthenticatedUser()
+
+  try {
+    const shape = readEnum(formData, "shape", PondShape)
+
+    await prisma.pond.update({
+      where: {
+        id: readRequiredString(formData, "id"),
+      },
+      data: {
+        name: readRequiredString(formData, "name"),
+        type: readEnum(formData, "type", PondType),
+        shape,
+        status: readEnum(formData, "status", PondStatus),
+        lengthM:
+          shape === "RECTANGLE" ? readOptionalFloat(formData, "lengthM") : null,
+        widthM:
+          shape === "RECTANGLE" ? readOptionalFloat(formData, "widthM") : null,
+        diameterM:
+          shape === "CIRCLE" ? readOptionalFloat(formData, "diameterM") : null,
+        depthM: readOptionalFloat(formData, "depthM"),
+        capacity: readOptionalInt(formData, "capacity"),
+        purchasePrice: readOptionalDecimal(formData, "purchasePrice"),
+        installedAt: readOptionalDate(formData, "installedAt"),
+        depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
+        notes: readOptionalString(formData, "notes"),
+      },
+    })
+
+    revalidatePath("/kolam")
+    return actionSuccess("Kolam berhasil diperbarui.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+async function deletePond(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  "use server"
+
+  await requireAuthenticatedUser()
+
+  try {
+    const id = readRequiredString(formData, "id")
+    const activeCycles = await prisma.cultureCycle.count({
+      where: {
+        pondId: id,
+      },
+    })
+
+    if (activeCycles > 0) {
+      return actionError(
+        "Kolam tidak bisa dihapus karena masih dipakai di siklus budidaya."
+      )
+    }
+
+    await prisma.pond.delete({
+      where: {
+        id,
+      },
+    })
+
+    revalidatePath("/kolam")
+    return actionSuccess("Kolam berhasil dihapus.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
 }
 
 async function requireAuthenticatedUser() {
@@ -305,12 +333,20 @@ function PondForm({
   pond,
   submitLabel,
 }: {
-  action: (formData: FormData) => Promise<void>
+  action: (
+    previousState: ActionState,
+    formData: FormData
+  ) => Promise<ActionState>
   pond?: PondFormData
   submitLabel: string
 }) {
   return (
-    <form action={action} className="space-y-5 p-5">
+    <ActionForm
+      action={action}
+      className="space-y-5 p-5"
+      closePopoverId={pond ? `edit-pond-${pond.id}` : "create-pond-modal"}
+      resetOnSuccess={!pond}
+    >
       {pond ? <input name="id" type="hidden" value={pond.id} /> : null}
       <div className="grid gap-4 md:grid-cols-2">
         <FormField label="Nama Kolam" name="name" defaultValue={pond?.name} />
@@ -383,9 +419,11 @@ function PondForm({
         >
           Batal
         </button>
-        <Button type="submit">{submitLabel}</Button>
+        <FormSubmitButton pendingLabel="Menyimpan..." type="submit">
+          {submitLabel}
+        </FormSubmitButton>
       </div>
-    </form>
+    </ActionForm>
   )
 }
 
@@ -566,6 +604,14 @@ function readOptionalString(formData: FormData, key: string) {
 
   const trimmed = value.trim()
   return trimmed || null
+}
+
+function getActionErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message) {
+    return error.message
+  }
+
+  return "Terjadi kesalahan saat memproses data kolam."
 }
 
 function readOptionalFloat(formData: FormData, key: string) {
