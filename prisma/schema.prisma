@@ -40,26 +40,26 @@ model Farm {
 }
 
 model Pond {
-  id                 String         @id @default(cuid())
+  id                 String      @id @default(cuid())
   farmId             String?
-  farm               Farm?          @relation(fields: [farmId], references: [id], onDelete: SetNull)
+  farm               Farm?       @relation(fields: [farmId], references: [id], onDelete: SetNull)
   name               String
-  code               String         @unique
+  code               String      @unique
   type               PondType
-  shape              PondShape      @default(RECTANGLE)
+  shape              PondShape   @default(RECTANGLE)
   lengthM            Float?
   widthM             Float?
   diameterM          Float?
   depthM             Float?
   capacity           Int?
-  purchasePrice      Decimal?       @db.Decimal(14, 2)
+  purchasePrice      Decimal?    @db.Decimal(14, 2)
   installedAt        DateTime?
   depreciationMonths Int?
-  status             PondStatus     @default(ACTIVE)
+  status             PondStatus  @default(ACTIVE)
   notes              String?
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-  cycles             CultureCycle[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  cyclePonds         CyclePond[]
 }
 
 model Equipment {
@@ -85,20 +85,32 @@ model CultureCycle {
   id                String         @id @default(cuid())
   farmId            String?
   farm              Farm?          @relation(fields: [farmId], references: [id], onDelete: SetNull)
-  pondId            String
-  pond              Pond           @relation(fields: [pondId], references: [id], onDelete: Cascade)
   cycleName         String
   startDate         DateTime
   endDate           DateTime?
   seedCount         Int
   initialAvgWeightG Float?
+  seedPriceTotal    Decimal?       @db.Decimal(14, 2)
   targetHarvestDate DateTime?
   status            CycleStatus    @default(ACTIVE)
   notes             String?
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  ponds             CyclePond[]
   feedLogs          FeedLog[]
   mortalityLogs     MortalityLog[]
+}
+
+model CyclePond {
+  cycleId   String
+  pondId    String
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  cycle     CultureCycle @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  pond      Pond         @relation(fields: [pondId], references: [id], onDelete: Cascade)
+
+  @@id([cycleId, pondId])
+  @@index([pondId])
 }
 
 model FeedLog {

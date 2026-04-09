@@ -140,14 +140,14 @@ export async function deletePond(
       return actionError("Kolam tidak ditemukan atau tidak dapat diakses.")
     }
 
-    const activeCycles = await prisma.cultureCycle.count({
+    const relatedCycles = await prisma.cyclePond.count({
       where: {
-        ...getFarmScopeWhere(user),
         pondId: pond.id,
+        cycle: getFarmScopeWhere(user),
       },
     })
 
-    if (activeCycles > 0) {
+    if (relatedCycles > 0) {
       return actionError(
         "Kolam tidak bisa dihapus karena masih dipakai di siklus budidaya."
       )
