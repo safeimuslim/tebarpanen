@@ -4,8 +4,7 @@ import { NextResponse } from "next/server"
 
 import { prisma } from "@/app/lib/prisma"
 import { verifyPassword } from "@/app/lib/password"
-
-type AppRole = "SUPER_ADMIN" | "OWNER" | "ADMIN" | "WORKER"
+import type { AppRole } from "@/app/lib/authz"
 
 declare module "next-auth" {
   interface Session {
@@ -13,12 +12,18 @@ declare module "next-auth" {
       id: string
       phone?: string | null
       role: AppRole
+      farmId?: string | null
+      farmName?: string | null
+      isActive: boolean
     } & DefaultSession["user"]
   }
 
   interface User {
     phone?: string | null
     role: AppRole
+    farmId?: string | null
+    farmName?: string | null
+    isActive: boolean
   }
 }
 
@@ -26,6 +31,9 @@ declare module "@auth/core/jwt" {
   interface JWT {
     phone?: string | null
     role?: AppRole
+    farmId?: string | null
+    farmName?: string | null
+    isActive?: boolean
   }
 }
 
@@ -59,9 +67,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: {
             OR: [{ email: identifier.toLowerCase() }, { phone: identifier }],
           },
+          include: {
+            farm: true,
+          },
         })
 
-        if (!user || !verifyPassword(password, user.passwordHash)) {
+        if (
+          !user ||
+          !user.isActive ||
+          !verifyPassword(password, user.passwordHash)
+        ) {
           return null
         }
 
@@ -71,6 +86,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           phone: user.phone,
           role: user.role,
+          farmId: user.farmId,
+          farmName: user.farm?.name ?? null,
+          isActive: user.isActive,
         }
       },
     }),
@@ -93,6 +111,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.phone = user.phone
         token.role = user.role
+        token.farmId = user.farmId
+        token.farmName = user.farmName
+        token.isActive = user.isActive
       }
 
       return token
@@ -103,6 +124,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         typeof token.phone === "string" ? token.phone : null
       session.user.role =
         typeof token.role === "string" ? (token.role as AppRole) : "WORKER"
+      session.user.farmId =
+        typeof token.farmId === "string" ? token.farmId : null
+      session.user.farmName =
+        typeof token.farmName === "string" ? token.farmName : null
+      session.user.isActive = token.isActive !== false
 
       return session
     },

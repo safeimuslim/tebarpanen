@@ -14,12 +14,35 @@ model User {
   phone        String?  @unique
   passwordHash String   @default("") @map("password")
   role         UserRole @default(WORKER)
+  isActive     Boolean  @default(true)
+  farmId       String?
+  farm         Farm?    @relation("FarmMembers", fields: [farmId], references: [id], onDelete: SetNull)
+  managedFarm  Farm?    @relation("FarmManager")
+  createdById  String?
+  createdBy    User?    @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdUsers User[]   @relation("UserCreatedBy")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
 
+model Farm {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  managerId   String         @unique
+  manager     User           @relation("FarmManager", fields: [managerId], references: [id], onDelete: Cascade)
+  users       User[]         @relation("FarmMembers")
+  ponds       Pond[]
+  equipment   Equipment[]
+  cycles      CultureCycle[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
 model Pond {
   id                 String         @id @default(cuid())
+  farmId             String?
+  farm               Farm?          @relation(fields: [farmId], references: [id], onDelete: SetNull)
   name               String
   code               String         @unique
   type               PondType
@@ -41,6 +64,8 @@ model Pond {
 
 model Equipment {
   id                 String             @id @default(cuid())
+  farmId             String?
+  farm               Farm?              @relation(fields: [farmId], references: [id], onDelete: SetNull)
   name               String
   type               EquipmentType
   quantity           Int                @default(1)
@@ -58,6 +83,8 @@ model Equipment {
 
 model CultureCycle {
   id                String         @id @default(cuid())
+  farmId            String?
+  farm              Farm?          @relation(fields: [farmId], references: [id], onDelete: SetNull)
   pondId            String
   pond              Pond           @relation(fields: [pondId], references: [id], onDelete: Cascade)
   cycleName         String
@@ -144,7 +171,6 @@ enum CycleStatus {
 
 enum UserRole {
   SUPER_ADMIN
-  OWNER
-  ADMIN
+  FARM_ADMIN
   WORKER
 }

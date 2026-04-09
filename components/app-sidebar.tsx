@@ -106,10 +106,10 @@ export function AppSidebar({
                       href={item.href}
                       className={cn(
                         buttonVariants({ variant: "ghost" }),
-                        "h-11 w-full gap-3 px-3",
+                        "h-11 w-full gap-3 px-3 hover:bg-primary/15 hover:text-primary",
                         isCompact ? "justify-center px-0" : "justify-start",
                         isActive &&
-                          "bg-primary/15 text-primary hover:bg-primary/20 hover:text-primary"
+                          "bg-primary/15 text-primary hover:bg-primary/20 hover:text-primary",
                       )}
                       onClick={onNavigate}
                       title={isCompact ? item.title : undefined}
@@ -119,7 +119,7 @@ export function AppSidebar({
                         <span className="truncate">{item.title}</span>
                       ) : null}
                     </Link>
-                  )
+                  );
                 })}
               </div>
             </div>

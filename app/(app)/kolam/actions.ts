@@ -1,9 +1,12 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 
-import { auth } from "@/auth"
+import {
+  getFarmScopeWhere,
+  requireFarmId,
+  requireSessionUser,
+} from "@/app/lib/authz"
 import { PondShape, PondStatus, PondType } from "@/app/generated/prisma/enums"
 import { actionError, actionSuccess, type ActionState } from "@/app/lib/action-state"
 import { prisma } from "@/app/lib/prisma"
@@ -24,14 +27,16 @@ export async function createPond(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireAuthenticatedUser()
+  const user = await requireSessionUser()
 
   try {
+    const farmId = requireFarmId(user)
     const name = readRequiredString(formData, "name")
     const shape = readEnum(formData, "shape", PondShape)
 
     await prisma.pond.create({
       data: {
+        farmId,
         name,
         code: await createUniquePondCode(name),
         type: readEnum(formData, "type", PondType),
@@ -63,14 +68,28 @@ export async function updatePond(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireAuthenticatedUser()
+  const user = await requireSessionUser()
 
   try {
     const shape = readEnum(formData, "shape", PondShape)
+    const id = readRequiredString(formData, "id")
+    const pond = await prisma.pond.findFirst({
+      where: {
+        ...getFarmScopeWhere(user),
+        id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!pond) {
+      return actionError("Kolam tidak ditemukan atau tidak dapat diakses.")
+    }
 
     await prisma.pond.update({
       where: {
-        id: readRequiredString(formData, "id"),
+        id: pond.id,
       },
       data: {
         name: readRequiredString(formData, "name"),
@@ -103,13 +122,28 @@ export async function deletePond(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireAuthenticatedUser()
+  const user = await requireSessionUser()
 
   try {
     const id = readRequiredString(formData, "id")
+    const pond = await prisma.pond.findFirst({
+      where: {
+        ...getFarmScopeWhere(user),
+        id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!pond) {
+      return actionError("Kolam tidak ditemukan atau tidak dapat diakses.")
+    }
+
     const activeCycles = await prisma.cultureCycle.count({
       where: {
-        pondId: id,
+        ...getFarmScopeWhere(user),
+        pondId: pond.id,
       },
     })
 
@@ -121,7 +155,7 @@ export async function deletePond(
 
     await prisma.pond.delete({
       where: {
-        id,
+        id: pond.id,
       },
     })
 
@@ -129,14 +163,6 @@ export async function deletePond(
     return actionSuccess("Kolam berhasil dihapus.")
   } catch (error) {
     return actionError(getActionErrorMessage(error))
-  }
-}
-
-async function requireAuthenticatedUser() {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    redirect("/login")
   }
 }
 

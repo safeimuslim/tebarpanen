@@ -1,5 +1,10 @@
 import { type Prisma } from "@/app/generated/prisma/client"
 import { PondShape, PondStatus, PondType } from "@/app/generated/prisma/enums"
+import {
+  getFarmScopeWhere,
+  requireSessionUser,
+  type SessionAppUser,
+} from "@/app/lib/authz"
 import { prisma } from "@/app/lib/prisma"
 
 import { PONDS_PER_PAGE } from "./constants"
@@ -15,9 +20,10 @@ import {
 export async function getPondPageData(
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 ): Promise<PondPageData> {
+  const user = await requireSessionUser()
   const filters = await readPondFilters(searchParams)
   const requestedPage = getCurrentPage(filters.page)
-  const where = buildPondWhere(filters)
+  const where = buildPondWhere(filters, user)
   const [totalCount, activeCount, maintenanceCount, purchaseAggregate] =
     await Promise.all([
       prisma.pond.count({ where }),
@@ -66,8 +72,12 @@ export async function readPondFilters(
   }
 }
 
-function buildPondWhere(filters: PondWhereFilters) {
+function buildPondWhere(
+  filters: PondWhereFilters,
+  user: Pick<SessionAppUser, "role" | "farmId">
+) {
   return {
+    ...getFarmScopeWhere<Prisma.PondWhereInput>(user),
     ...(filters.query
       ? {
           OR: [

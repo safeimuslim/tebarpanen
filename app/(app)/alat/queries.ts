@@ -3,6 +3,11 @@ import {
   EquipmentCondition,
   EquipmentType,
 } from "@/app/generated/prisma/enums"
+import {
+  getFarmScopeWhere,
+  requireSessionUser,
+  type SessionAppUser,
+} from "@/app/lib/authz"
 import { prisma } from "@/app/lib/prisma"
 
 import { EQUIPMENT_PER_PAGE } from "./constants"
@@ -18,9 +23,10 @@ import {
 export async function getEquipmentPageData(
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 ): Promise<EquipmentPageData> {
+  const user = await requireSessionUser()
   const filters = await readEquipmentFilters(searchParams)
   const requestedPage = getCurrentPage(filters.page)
-  const where = buildEquipmentWhere(filters)
+  const where = buildEquipmentWhere(filters, user)
   const [totalCount, readyCount, needsCheckCount, purchaseAggregate] =
     await Promise.all([
       prisma.equipment.count({ where }),
@@ -68,8 +74,12 @@ export async function readEquipmentFilters(
   }
 }
 
-function buildEquipmentWhere(filters: EquipmentWhereFilters) {
+function buildEquipmentWhere(
+  filters: EquipmentWhereFilters,
+  user: Pick<SessionAppUser, "role" | "farmId">
+) {
   return {
+    ...getFarmScopeWhere<Prisma.EquipmentWhereInput>(user),
     ...(filters.query
       ? {
           OR: [

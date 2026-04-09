@@ -1,9 +1,12 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 
-import { auth } from "@/auth"
+import {
+  getFarmScopeWhere,
+  requireFarmId,
+  requireSessionUser,
+} from "@/app/lib/authz"
 import {
   EquipmentCondition,
   EquipmentType,
@@ -26,11 +29,14 @@ export async function createEquipment(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireAuthenticatedUser()
+  const user = await requireSessionUser()
 
   try {
     await prisma.equipment.create({
-      data: readEquipmentFormData(formData),
+      data: {
+        farmId: requireFarmId(user),
+        ...readEquipmentFormData(formData),
+      },
     })
 
     revalidatePath("/alat")
@@ -44,12 +50,27 @@ export async function updateEquipment(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireAuthenticatedUser()
+  const user = await requireSessionUser()
 
   try {
+    const id = readRequiredString(formData, "id")
+    const equipment = await prisma.equipment.findFirst({
+      where: {
+        ...getFarmScopeWhere(user),
+        id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!equipment) {
+      return actionError("Alat tidak ditemukan atau tidak dapat diakses.")
+    }
+
     await prisma.equipment.update({
       where: {
-        id: readRequiredString(formData, "id"),
+        id: equipment.id,
       },
       data: readEquipmentFormData(formData),
     })
@@ -65,12 +86,27 @@ export async function deleteEquipment(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  await requireAuthenticatedUser()
+  const user = await requireSessionUser()
 
   try {
+    const id = readRequiredString(formData, "id")
+    const equipment = await prisma.equipment.findFirst({
+      where: {
+        ...getFarmScopeWhere(user),
+        id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!equipment) {
+      return actionError("Alat tidak ditemukan atau tidak dapat diakses.")
+    }
+
     await prisma.equipment.delete({
       where: {
-        id: readRequiredString(formData, "id"),
+        id: equipment.id,
       },
     })
 
@@ -94,13 +130,5 @@ function readEquipmentFormData(formData: FormData) {
     purchasedAt: readOptionalDate(formData, "purchasedAt"),
     depreciationMonths: readOptionalInt(formData, "depreciationMonths"),
     notes: readOptionalString(formData, "notes"),
-  }
-}
-
-async function requireAuthenticatedUser() {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    redirect("/login")
   }
 }

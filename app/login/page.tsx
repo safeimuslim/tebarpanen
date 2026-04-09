@@ -1,3 +1,4 @@
+import Link from "next/link"
 import type { Metadata } from "next"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
@@ -14,6 +15,7 @@ type LoginSearchParams = Promise<{
   callbackUrl?: string
   error?: string
   code?: string
+  registered?: string
 }>
 
 function getSafeRedirectPath(value?: string) {
@@ -39,6 +41,7 @@ export default async function LoginPage({
 
   const loginFailed =
     params.error === "CredentialsSignin" || params.code === "credentials"
+  const registrationSuccess = params.registered === "1"
 
   return (
     <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-10">
@@ -50,6 +53,12 @@ export default async function LoginPage({
             Gunakan email atau nomor HP yang terdaftar.
           </p>
         </div>
+
+        {registrationSuccess ? (
+          <p className="border-border bg-muted text-foreground mb-4 rounded-md border px-3 py-2 text-sm">
+            Registrasi berhasil. Silakan masuk dengan akun farm Anda.
+          </p>
+        ) : null}
 
         {loginFailed ? (
           <p className="bg-destructive/10 text-destructive mb-4 rounded-md px-3 py-2 text-sm">
@@ -121,6 +130,13 @@ export default async function LoginPage({
             Masuk
           </Button>
         </form>
+
+        <p className="text-muted-foreground mt-4 text-center text-sm">
+          Belum punya akun farm?{" "}
+          <Link className="text-primary font-medium" href="/register">
+            Registrasi di sini
+          </Link>
+        </p>
       </section>
     </main>
   )
