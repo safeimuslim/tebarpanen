@@ -58,7 +58,10 @@ function closeTarget(id: string) {
     return
   }
 
-  if (typeof element.hidePopover === "function") {
+  if (
+    element.hasAttribute("popover") &&
+    typeof element.hidePopover === "function"
+  ) {
     element.hidePopover()
     return
   }
