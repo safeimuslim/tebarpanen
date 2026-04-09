@@ -10,14 +10,14 @@ type ActionFormProps = Omit<React.ComponentProps<"form">, "action"> & {
     previousState: ActionState,
     formData: FormData
   ) => Promise<ActionState>
-  closePopoverId?: string
+  closeTargetId?: string
   resetOnSuccess?: boolean
 }
 
 export function ActionForm({
   action,
   children,
-  closePopoverId,
+  closeTargetId,
   resetOnSuccess = false,
   ...props
 }: ActionFormProps) {
@@ -32,15 +32,15 @@ export function ActionForm({
         formRef.current?.reset()
       }
 
-      if (closePopoverId) {
-        hidePopover(closePopoverId)
+      if (closeTargetId) {
+        closeTarget(closeTargetId)
       }
     }
 
     if (state.status === "error") {
       toast.error(state.message)
     }
-  }, [closePopoverId, resetOnSuccess, state])
+  }, [closeTargetId, resetOnSuccess, state])
 
   return (
     <form ref={formRef} action={formAction} {...props}>
@@ -49,10 +49,19 @@ export function ActionForm({
   )
 }
 
-function hidePopover(id: string) {
+function closeTarget(id: string) {
   const element = document.getElementById(id) as
-    | (HTMLElement & { hidePopover?: () => void })
+    | (HTMLElement & { hidePopover?: () => void; click?: () => void })
     | null
 
-  element?.hidePopover?.()
+  if (!element) {
+    return
+  }
+
+  if (typeof element.hidePopover === "function") {
+    element.hidePopover()
+    return
+  }
+
+  element.click?.()
 }

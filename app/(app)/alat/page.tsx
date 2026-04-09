@@ -1,6 +1,8 @@
+import Form from "next/form"
+import Link from "next/link"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { ClipboardCheck, Eye, Pencil, Plus, Wrench } from "lucide-react"
+import { ClipboardCheck, Plus, Search, Wrench } from "lucide-react"
 
 import { auth } from "@/auth"
 import {
@@ -14,9 +16,18 @@ import {
 } from "@/app/lib/action-state"
 import { prisma } from "@/app/lib/prisma"
 import { ActionForm } from "@/components/action-form"
-import { DeleteConfirmButton } from "@/components/delete-confirm-button"
+import { CrudRowActions } from "@/components/crud-row-actions"
 import { FormSubmitButton } from "@/components/form-submit-button"
-import { buttonVariants } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const equipmentTypeLabels: Record<EquipmentType, string> = {
@@ -37,8 +48,41 @@ const equipmentConditionLabels: Record<EquipmentCondition, string> = {
   BROKEN: "Rusak",
 }
 
-export default async function AlatPage() {
+export default async function AlatPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const filters = await readEquipmentFilters(searchParams)
   const equipment = await prisma.equipment.findMany({
+    where: {
+      ...(filters.query
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: filters.query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                brand: {
+                  contains: filters.query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                serialNumber: {
+                  contains: filters.query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          }
+        : {}),
+      ...(filters.type ? { type: filters.type } : {}),
+      ...(filters.condition ? { condition: filters.condition } : {}),
+    },
     orderBy: [{ createdAt: "desc" }, { name: "asc" }],
   })
 
@@ -62,14 +106,32 @@ export default async function AlatPage() {
           </p>
         </div>
 
-        <button
-          className={cn(buttonVariants({ size: "lg" }), "gap-2")}
-          popoverTarget="create-equipment-modal"
-          type="button"
-        >
-          <Plus className="size-4" />
-          Tambah Alat
-        </button>
+        <Dialog>
+          <DialogTrigger
+            render={<Button className="gap-2" size="lg" type="button" />}
+          >
+            <Plus className="size-4" />
+            Tambah Alat
+          </DialogTrigger>
+          <DialogContent
+            className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto p-0 sm:max-w-3xl"
+            showCloseButton={false}
+          >
+            <DialogHeader className="border-border border-b p-5">
+              <p className="text-muted-foreground text-sm">Form Master Data</p>
+              <DialogTitle>Tambah Alat</DialogTitle>
+              <DialogDescription>
+                Data alat akan tersimpan ke database.
+              </DialogDescription>
+            </DialogHeader>
+
+            <EquipmentForm
+              action={createEquipment}
+              closeTargetId="create-equipment-dialog-close"
+              submitLabel="Simpan Alat"
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <section className="grid gap-4 md:grid-cols-4">
@@ -82,6 +144,59 @@ export default async function AlatPage() {
         />
       </section>
 
+      <section className="border-border bg-card rounded-lg border p-4 shadow-sm">
+        <Form
+          action=""
+          className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,0.8fr))_auto_auto]"
+          replace
+          scroll={false}
+        >
+          <div className="relative">
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <input
+              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border pr-3 pl-9 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+              defaultValue={filters.query}
+              name="query"
+              placeholder="Cari nama, merek, atau nomor seri"
+            />
+          </div>
+          <select
+            className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+            defaultValue={filters.type}
+            name="type"
+          >
+            <option value="">Semua jenis</option>
+            {Object.entries(equipmentTypeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+            defaultValue={filters.condition}
+            name="condition"
+          >
+            <option value="">Semua kondisi</option>
+            {Object.entries(equipmentConditionLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <Button className="gap-2" type="submit">
+            <Search className="size-4" />
+            Filter
+          </Button>
+          <Link
+            className={cn(buttonVariants({ variant: "outline" }), "justify-center")}
+            href="/alat"
+          >
+            Reset
+          </Link>
+        </Form>
+      </section>
+
       <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
         <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -91,7 +206,7 @@ export default async function AlatPage() {
             </p>
           </div>
           <span className="text-muted-foreground text-sm">
-            {equipment.length} alat
+            {equipment.length} alat ditemukan
           </span>
         </div>
 
@@ -132,39 +247,25 @@ export default async function AlatPage() {
                   />
                 </dl>
 
-                <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-                  <button
-                    className={cn(
-                      buttonVariants({ size: "sm", variant: "outline" }),
-                      "gap-2"
-                    )}
-                    popoverTarget={`detail-equipment-${item.id}`}
-                    type="button"
-                  >
-                    <Eye className="size-4" />
-                    Detail
-                  </button>
-                  <button
-                    className={cn(
-                      buttonVariants({ size: "sm", variant: "outline" }),
-                      "gap-2"
-                    )}
-                    popoverTarget={`edit-equipment-${item.id}`}
-                    type="button"
-                  >
-                    <Pencil className="size-4" />
-                    Edit
-                  </button>
-                  <DeleteConfirmButton
-                    action={deleteEquipment}
-                    description="Data alat yang dihapus tidak bisa dikembalikan untuk"
-                    id={item.id}
-                    itemName={item.name}
-                  />
-                </div>
-
-                <EquipmentDetailModal equipment={item} />
-                <EquipmentEditModal equipment={item} />
+                <CrudRowActions
+                  deleteAction={deleteEquipment}
+                  deleteDescription="Data alat yang dihapus tidak bisa dikembalikan untuk"
+                  detailContent={<EquipmentDetailContent equipment={item} />}
+                  detailDescription={equipmentTypeLabels[item.type]}
+                  detailTitle={item.name}
+                  editContent={
+                    <EquipmentForm
+                      action={updateEquipment}
+                      closeTargetId={`edit-equipment-dialog-close-${item.id}`}
+                      equipment={item}
+                      submitLabel="Simpan Perubahan"
+                    />
+                  }
+                  editDescription="Perbarui data alat yang tersimpan di database."
+                  editTitle="Edit Alat"
+                  itemId={item.id}
+                  itemName={item.name}
+                />
               </article>
             ))}
           </div>
@@ -181,23 +282,6 @@ export default async function AlatPage() {
         )}
       </section>
 
-      <div
-        className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit max-h-[90vh] w-[min(92vw,42rem)] overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
-        id="create-equipment-modal"
-        popover="auto"
-      >
-        <div className="w-full">
-          <div className="border-border border-b p-5">
-            <p className="text-muted-foreground text-sm">Form Master Data</p>
-            <h2 className="mt-1 text-xl font-semibold">Tambah Alat</h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Data alat akan tersimpan ke database.
-            </p>
-          </div>
-
-          <EquipmentForm action={createEquipment} submitLabel="Simpan Alat" />
-        </div>
-      </div>
     </div>
   )
 }
@@ -293,6 +377,7 @@ function readEquipmentFormData(formData: FormData) {
 
 function EquipmentForm({
   action,
+  closeTargetId,
   equipment,
   submitLabel,
 }: {
@@ -300,6 +385,7 @@ function EquipmentForm({
     previousState: ActionState,
     formData: FormData
   ) => Promise<ActionState>
+  closeTargetId: string
   equipment?: EquipmentFormData
   submitLabel: string
 }) {
@@ -307,9 +393,7 @@ function EquipmentForm({
     <ActionForm
       action={action}
       className="space-y-5 p-5"
-      closePopoverId={
-        equipment ? `edit-equipment-${equipment.id}` : "create-equipment-modal"
-      }
+      closeTargetId={closeTargetId}
       resetOnSuccess={!equipment}
     >
       {equipment ? <input name="id" type="hidden" value={equipment.id} /> : null}
@@ -391,16 +475,17 @@ function EquipmentForm({
       </div>
 
       <div className="border-border flex justify-end gap-2 border-t pt-4">
-        <button
-          className={cn(buttonVariants({ variant: "outline" }))}
-          popoverTarget={
-            equipment ? `edit-equipment-${equipment.id}` : "create-equipment-modal"
+        <DialogClose
+          id={closeTargetId}
+          render={
+            <button
+              className={cn(buttonVariants({ variant: "outline" }))}
+              type="button"
+            />
           }
-          popoverTargetAction="hide"
-          type="button"
         >
           Batal
-        </button>
+        </DialogClose>
         <FormSubmitButton className="gap-2" pendingLabel="Menyimpan..." type="submit">
           <ClipboardCheck className="size-4" />
           {submitLabel}
@@ -410,95 +495,51 @@ function EquipmentForm({
   )
 }
 
-function EquipmentDetailModal({
+function EquipmentDetailContent({
   equipment,
 }: {
   equipment: EquipmentFormData
 }) {
   return (
-    <div
-      className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit w-[min(92vw,42rem)] rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
-      id={`detail-equipment-${equipment.id}`}
-      popover="auto"
-    >
-      <div className="w-full">
-        <div className="border-border border-b p-5">
-          <p className="text-muted-foreground text-sm">Detail Alat</p>
-          <h2 className="mt-1 text-xl font-semibold">{equipment.name}</h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            {equipmentTypeLabels[equipment.type]}
-          </p>
-        </div>
-        <dl className="grid gap-4 p-5 md:grid-cols-2">
-          <MasterMetric
-            label="Jenis"
-            value={equipmentTypeLabels[equipment.type]}
-          />
-          <MasterMetric
-            label="Kondisi"
-            value={equipmentConditionLabels[equipment.condition]}
-          />
-          <MasterMetric label="Jumlah" value={formatQuantity(equipment.quantity)} />
-          <MasterMetric label="Merek" value={equipment.brand ?? "-"} />
-          <MasterMetric label="Nomor Seri" value={equipment.serialNumber ?? "-"} />
-          <MasterMetric
-            label="Tanggal Kalibrasi"
-            value={formatDateDisplay(equipment.calibrationDate)}
-          />
-          <MasterMetric
-            label="Harga Pembelian"
-            value={formatCurrency(equipment.purchasePrice)}
-          />
-          <MasterMetric
-            label="Tanggal Pembelian"
-            value={formatDateDisplay(equipment.purchasedAt)}
-          />
-          <MasterMetric
-            label="Masa Penyusutan"
-            value={formatDepreciationMonths(equipment.depreciationMonths)}
-          />
-          <div className="md:col-span-2">
-            <MasterMetric label="Catatan" value={equipment.notes ?? "-"} />
-          </div>
-        </dl>
-        <div className="border-border flex justify-end border-t p-5">
-          <button
-            className={cn(buttonVariants({ variant: "outline" }))}
-            popoverTarget={`detail-equipment-${equipment.id}`}
-            popoverTargetAction="hide"
-            type="button"
-          >
-            Tutup
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function EquipmentEditModal({ equipment }: { equipment: EquipmentFormData }) {
-  return (
-    <div
-      className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit max-h-[90vh] w-[min(92vw,42rem)] overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
-      id={`edit-equipment-${equipment.id}`}
-      popover="auto"
-    >
-      <div className="w-full">
-        <div className="border-border border-b p-5">
-          <p className="text-muted-foreground text-sm">Form Master Data</p>
-          <h2 className="mt-1 text-xl font-semibold">Edit Alat</h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Perbarui data alat yang tersimpan di database.
-          </p>
-        </div>
-
-        <EquipmentForm
-          action={updateEquipment}
-          equipment={equipment}
-          submitLabel="Simpan Perubahan"
+    <>
+      <dl className="grid gap-4 p-5 md:grid-cols-2">
+        <MasterMetric
+          label="Jenis"
+          value={equipmentTypeLabels[equipment.type]}
         />
+        <MasterMetric
+          label="Kondisi"
+          value={equipmentConditionLabels[equipment.condition]}
+        />
+        <MasterMetric label="Jumlah" value={formatQuantity(equipment.quantity)} />
+        <MasterMetric label="Merek" value={equipment.brand ?? "-"} />
+        <MasterMetric label="Nomor Seri" value={equipment.serialNumber ?? "-"} />
+        <MasterMetric
+          label="Tanggal Kalibrasi"
+          value={formatDateDisplay(equipment.calibrationDate)}
+        />
+        <MasterMetric
+          label="Harga Pembelian"
+          value={formatCurrency(equipment.purchasePrice)}
+        />
+        <MasterMetric
+          label="Tanggal Pembelian"
+          value={formatDateDisplay(equipment.purchasedAt)}
+        />
+        <MasterMetric
+          label="Masa Penyusutan"
+          value={formatDepreciationMonths(equipment.depreciationMonths)}
+        />
+        <div className="md:col-span-2">
+          <MasterMetric label="Catatan" value={equipment.notes ?? "-"} />
+        </div>
+      </dl>
+      <div className="border-border flex justify-end border-t p-5">
+        <DialogClose render={<Button type="button" variant="outline" />}>
+          Tutup
+        </DialogClose>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -616,6 +657,38 @@ function getActionErrorMessage(error: unknown) {
   }
 
   return "Terjadi kesalahan saat memproses data alat."
+}
+
+async function readEquipmentFilters(
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+) {
+  const params = await searchParams
+
+  return {
+    condition: readEnumSearchParam(params.condition, EquipmentCondition),
+    query: readSearchParam(params.query),
+    type: readEnumSearchParam(params.type, EquipmentType),
+  }
+}
+
+function readSearchParam(value: string | string[] | undefined) {
+  const normalized = Array.isArray(value) ? value[0] : value
+  const trimmed = normalized?.trim() ?? ""
+
+  return trimmed
+}
+
+function readEnumSearchParam<TValue extends string>(
+  value: string | string[] | undefined,
+  enumObject: Record<string, TValue>
+): TValue | undefined {
+  const normalized = readSearchParam(value)
+
+  if (!normalized) {
+    return undefined
+  }
+
+  return normalized in enumObject ? (normalized as TValue) : undefined
 }
 
 function readRequiredInt(formData: FormData, key: string) {

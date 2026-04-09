@@ -1,6 +1,8 @@
+import Form from "next/form"
+import Link from "next/link"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { Eye, Pencil, Plus, Waves } from "lucide-react"
+import { Plus, Search, Waves } from "lucide-react"
 
 import { auth } from "@/auth"
 import { PondShape, PondStatus, PondType } from "@/app/generated/prisma/enums"
@@ -11,10 +13,19 @@ import {
 } from "@/app/lib/action-state"
 import { prisma } from "@/app/lib/prisma"
 import { ActionForm } from "@/components/action-form"
-import { DeleteConfirmButton } from "@/components/delete-confirm-button"
+import { CrudRowActions } from "@/components/crud-row-actions"
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { PondShapeDimensionFields } from "@/components/pond-shape-dimension-fields"
-import { buttonVariants } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const pondTypeLabels: Record<PondType, string> = {
@@ -35,8 +46,36 @@ const pondStatusLabels: Record<PondStatus, string> = {
   MAINTENANCE: "Perawatan",
 }
 
-export default async function KolamPage() {
+export default async function KolamPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const filters = await readPondFilters(searchParams)
   const ponds = await prisma.pond.findMany({
+    where: {
+      ...(filters.query
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: filters.query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                code: {
+                  contains: filters.query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          }
+        : {}),
+      ...(filters.type ? { type: filters.type } : {}),
+      ...(filters.shape ? { shape: filters.shape } : {}),
+      ...(filters.status ? { status: filters.status } : {}),
+    },
     orderBy: [{ createdAt: "desc" }, { name: "asc" }],
   })
 
@@ -60,14 +99,32 @@ export default async function KolamPage() {
           </p>
         </div>
 
-        <button
-          className={cn(buttonVariants({ size: "lg" }), "gap-2")}
-          popoverTarget="create-pond-modal"
-          type="button"
-        >
-          <Plus className="size-4" />
-          Tambah Kolam
-        </button>
+        <Dialog>
+          <DialogTrigger
+            render={<Button className="gap-2" size="lg" type="button" />}
+          >
+            <Plus className="size-4" />
+            Tambah Kolam
+          </DialogTrigger>
+          <DialogContent
+            className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto p-0 sm:max-w-3xl"
+            showCloseButton={false}
+          >
+            <DialogHeader className="border-border border-b p-5">
+              <p className="text-muted-foreground text-sm">Form Master Data</p>
+              <DialogTitle>Tambah Kolam</DialogTitle>
+              <DialogDescription>
+                Data kolam akan tersimpan ke database.
+              </DialogDescription>
+            </DialogHeader>
+
+            <PondForm
+              action={createPond}
+              closeTargetId="create-pond-dialog-close"
+              submitLabel="Simpan Kolam"
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <section className="grid gap-4 md:grid-cols-4">
@@ -80,6 +137,71 @@ export default async function KolamPage() {
         />
       </section>
 
+      <section className="border-border bg-card rounded-lg border p-4 shadow-sm">
+        <Form
+          action=""
+          className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,0.8fr))_auto_auto]"
+          replace
+          scroll={false}
+        >
+          <div className="relative">
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <input
+              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border pr-3 pl-9 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+              defaultValue={filters.query}
+              name="query"
+              placeholder="Cari nama atau kode kolam"
+            />
+          </div>
+          <select
+            className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+            defaultValue={filters.type}
+            name="type"
+          >
+            <option value="">Semua jenis</option>
+            {Object.entries(pondTypeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+            defaultValue={filters.shape}
+            name="shape"
+          >
+            <option value="">Semua bentuk</option>
+            {Object.entries(pondShapeLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+            defaultValue={filters.status}
+            name="status"
+          >
+            <option value="">Semua status</option>
+            {Object.entries(pondStatusLabels).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <Button className="gap-2" type="submit">
+            <Search className="size-4" />
+            Filter
+          </Button>
+          <Link
+            className={cn(buttonVariants({ variant: "outline" }), "justify-center")}
+            href="/kolam"
+          >
+            Reset
+          </Link>
+        </Form>
+      </section>
+
       <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
         <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -89,7 +211,7 @@ export default async function KolamPage() {
             </p>
           </div>
           <span className="text-muted-foreground text-sm">
-            {ponds.length} kolam
+            {ponds.length} kolam ditemukan
           </span>
         </div>
 
@@ -125,33 +247,25 @@ export default async function KolamPage() {
                   />
                 </dl>
 
-                <div className="flex flex-wrap items-start gap-2 lg:justify-end">
-                  <button
-                    className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
-                    popoverTarget={`detail-pond-${pond.id}`}
-                    type="button"
-                  >
-                    <Eye className="size-4" />
-                    Detail
-                  </button>
-                  <button
-                    className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
-                    popoverTarget={`edit-pond-${pond.id}`}
-                    type="button"
-                  >
-                    <Pencil className="size-4" />
-                    Edit
-                  </button>
-                  <DeleteConfirmButton
-                    action={deletePond}
-                    description="Data kolam yang dihapus tidak bisa dikembalikan untuk"
-                    id={pond.id}
-                    itemName={pond.name}
-                  />
-                </div>
-
-                <PondDetailModal pond={pond} />
-                <PondEditModal pond={pond} />
+                <CrudRowActions
+                  deleteAction={deletePond}
+                  deleteDescription="Data kolam yang dihapus tidak bisa dikembalikan untuk"
+                  detailContent={<PondDetailContent pond={pond} />}
+                  detailDescription={pond.code}
+                  detailTitle={pond.name}
+                  editContent={
+                    <PondForm
+                      action={updatePond}
+                      closeTargetId={`edit-pond-dialog-close-${pond.id}`}
+                      pond={pond}
+                      submitLabel="Simpan Perubahan"
+                    />
+                  }
+                  editDescription="Perbarui data kolam yang tersimpan di database."
+                  editTitle="Edit Kolam"
+                  itemId={pond.id}
+                  itemName={pond.name}
+                />
               </article>
             ))}
           </div>
@@ -168,23 +282,6 @@ export default async function KolamPage() {
         )}
       </section>
 
-      <div
-        className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit max-h-[90vh] w-[min(92vw,42rem)] overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
-        id="create-pond-modal"
-        popover="auto"
-      >
-        <div className="w-full">
-          <div className="border-border border-b p-5">
-            <p className="text-muted-foreground text-sm">Form Master Data</p>
-            <h2 className="mt-1 text-xl font-semibold">Tambah Kolam</h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Data kolam akan tersimpan ke database.
-            </p>
-          </div>
-
-          <PondForm action={createPond} submitLabel="Simpan Kolam" />
-        </div>
-      </div>
     </div>
   )
 }
@@ -330,6 +427,7 @@ async function createUniquePondCode(name: string) {
 
 function PondForm({
   action,
+  closeTargetId,
   pond,
   submitLabel,
 }: {
@@ -337,6 +435,7 @@ function PondForm({
     previousState: ActionState,
     formData: FormData
   ) => Promise<ActionState>
+  closeTargetId: string
   pond?: PondFormData
   submitLabel: string
 }) {
@@ -344,7 +443,7 @@ function PondForm({
     <ActionForm
       action={action}
       className="space-y-5 p-5"
-      closePopoverId={pond ? `edit-pond-${pond.id}` : "create-pond-modal"}
+      closeTargetId={closeTargetId}
       resetOnSuccess={!pond}
     >
       {pond ? <input name="id" type="hidden" value={pond.id} /> : null}
@@ -411,14 +510,17 @@ function PondForm({
       </div>
 
       <div className="border-border flex justify-end gap-2 border-t pt-4">
-        <button
-          className={cn(buttonVariants({ variant: "outline" }))}
-          popoverTarget={pond ? `edit-pond-${pond.id}` : "create-pond-modal"}
-          popoverTargetAction="hide"
-          type="button"
+        <DialogClose
+          id={closeTargetId}
+          render={
+            <button
+              className={cn(buttonVariants({ variant: "outline" }))}
+              type="button"
+            />
+          }
         >
           Batal
-        </button>
+        </DialogClose>
         <FormSubmitButton pendingLabel="Menyimpan..." type="submit">
           {submitLabel}
         </FormSubmitButton>
@@ -427,76 +529,38 @@ function PondForm({
   )
 }
 
-function PondDetailModal({ pond }: { pond: PondFormData }) {
+function PondDetailContent({ pond }: { pond: PondFormData }) {
   return (
-    <div
-      className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit w-[min(92vw,42rem)] rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
-      id={`detail-pond-${pond.id}`}
-      popover="auto"
-    >
-      <div className="w-full">
-        <div className="border-border border-b p-5">
-          <p className="text-muted-foreground text-sm">Detail Kolam</p>
-          <h2 className="mt-1 text-xl font-semibold">{pond.name}</h2>
-          <p className="text-muted-foreground mt-1 text-sm">{pond.code}</p>
+    <>
+      <dl className="grid gap-4 p-5 md:grid-cols-2">
+        <MasterMetric label="Kode" value={pond.code} />
+        <MasterMetric label="Jenis" value={pondTypeLabels[pond.type]} />
+        <MasterMetric label="Bentuk" value={pondShapeLabels[pond.shape]} />
+        <MasterMetric label="Status" value={pondStatusLabels[pond.status]} />
+        <MasterMetric label="Dimensi" value={formatPondSize(pond)} />
+        <MasterMetric label="Kapasitas" value={formatCapacity(pond.capacity)} />
+        <MasterMetric
+          label="Harga Pembelian"
+          value={formatCurrency(pond.purchasePrice)}
+        />
+        <MasterMetric
+          label="Tanggal Pasang"
+          value={formatDateDisplay(pond.installedAt)}
+        />
+        <MasterMetric
+          label="Masa Penyusutan"
+          value={formatDepreciationMonths(pond.depreciationMonths)}
+        />
+        <div className="md:col-span-2">
+          <MasterMetric label="Catatan" value={pond.notes ?? "-"} />
         </div>
-        <dl className="grid gap-4 p-5 md:grid-cols-2">
-          <MasterMetric label="Kode" value={pond.code} />
-          <MasterMetric label="Jenis" value={pondTypeLabels[pond.type]} />
-          <MasterMetric label="Bentuk" value={pondShapeLabels[pond.shape]} />
-          <MasterMetric label="Status" value={pondStatusLabels[pond.status]} />
-          <MasterMetric label="Dimensi" value={formatPondSize(pond)} />
-          <MasterMetric label="Kapasitas" value={formatCapacity(pond.capacity)} />
-          <MasterMetric
-            label="Harga Pembelian"
-            value={formatCurrency(pond.purchasePrice)}
-          />
-          <MasterMetric
-            label="Tanggal Pasang"
-            value={formatDateDisplay(pond.installedAt)}
-          />
-          <MasterMetric
-            label="Masa Penyusutan"
-            value={formatDepreciationMonths(pond.depreciationMonths)}
-          />
-          <div className="md:col-span-2">
-            <MasterMetric label="Catatan" value={pond.notes ?? "-"} />
-          </div>
-        </dl>
-        <div className="border-border flex justify-end border-t p-5">
-          <button
-            className={cn(buttonVariants({ variant: "outline" }))}
-            popoverTarget={`detail-pond-${pond.id}`}
-            popoverTargetAction="hide"
-            type="button"
-          >
-            Tutup
-          </button>
-        </div>
+      </dl>
+      <div className="border-border flex justify-end border-t p-5">
+        <DialogClose render={<Button type="button" variant="outline" />}>
+          Tutup
+        </DialogClose>
       </div>
-    </div>
-  )
-}
-
-function PondEditModal({ pond }: { pond: PondFormData }) {
-  return (
-    <div
-      className="backdrop:bg-foreground/30 open:flex fixed inset-0 m-auto hidden h-fit max-h-[90vh] w-[min(92vw,42rem)] overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground shadow-lg"
-      id={`edit-pond-${pond.id}`}
-      popover="auto"
-    >
-      <div className="w-full">
-        <div className="border-border border-b p-5">
-          <p className="text-muted-foreground text-sm">Form Master Data</p>
-          <h2 className="mt-1 text-xl font-semibold">Edit Kolam</h2>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Perbarui data kolam yang tersimpan di database.
-          </p>
-        </div>
-
-        <PondForm action={updatePond} pond={pond} submitLabel="Simpan Perubahan" />
-      </div>
-    </div>
+    </>
   )
 }
 
@@ -612,6 +676,39 @@ function getActionErrorMessage(error: unknown) {
   }
 
   return "Terjadi kesalahan saat memproses data kolam."
+}
+
+async function readPondFilters(
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+) {
+  const params = await searchParams
+
+  return {
+    query: readSearchParam(params.query),
+    shape: readEnumSearchParam(params.shape, PondShape),
+    status: readEnumSearchParam(params.status, PondStatus),
+    type: readEnumSearchParam(params.type, PondType),
+  }
+}
+
+function readSearchParam(value: string | string[] | undefined) {
+  const normalized = Array.isArray(value) ? value[0] : value
+  const trimmed = normalized?.trim() ?? ""
+
+  return trimmed
+}
+
+function readEnumSearchParam<TValue extends string>(
+  value: string | string[] | undefined,
+  enumObject: Record<string, TValue>
+): TValue | undefined {
+  const normalized = readSearchParam(value)
+
+  if (!normalized) {
+    return undefined
+  }
+
+  return normalized in enumObject ? (normalized as TValue) : undefined
 }
 
 function readOptionalFloat(formData: FormData, key: string) {
