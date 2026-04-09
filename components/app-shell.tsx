@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import type { AppRole } from "@/app/lib/authz"
 import { AppSidebar } from "@/components/app-sidebar"
 import { TopBar } from "@/components/top-bar"
 import { cn } from "@/lib/utils"
@@ -11,7 +12,7 @@ type AppShellProps = {
   user: {
     name?: string | null
     email?: string | null
-    role?: string | null
+    role?: AppRole | null
   }
 }
 
@@ -25,6 +26,7 @@ export function AppShell({ children, user }: AppShellProps) {
         collapsed={isSidebarCollapsed}
         isMobileOpen={isMobileSidebarOpen}
         onNavigate={() => setIsMobileSidebarOpen(false)}
+        role={user.role ?? "WORKER"}
       />
 
       {isMobileSidebarOpen ? (

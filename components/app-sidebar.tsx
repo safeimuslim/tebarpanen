@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import type { AppRole } from "@/app/lib/authz"
 import {
   Fish,
   Home,
@@ -46,13 +47,21 @@ export function AppSidebar({
   collapsed,
   isMobileOpen,
   onNavigate,
+  role,
 }: {
   collapsed: boolean
   isMobileOpen: boolean
   onNavigate: () => void
+  role: AppRole
 }) {
   const pathname = usePathname()
   const isCompact = collapsed && !isMobileOpen
+  const visibleMenuGroups =
+    role === "WORKER"
+      ? menuGroups.filter(
+          (group) => group.title !== "Master Data" && group.title !== "Pengaturan"
+        )
+      : menuGroups
 
   return (
     <aside
@@ -87,7 +96,7 @@ export function AppSidebar({
         </div>
 
         <nav className="flex flex-1 flex-col gap-5 overflow-y-auto p-3">
-          {menuGroups.map((group, index) => (
+          {visibleMenuGroups.map((group, index) => (
             <div key={group.title ?? index} className="space-y-1">
               {group.title && !isCompact ? (
                 <p className="text-muted-foreground px-3 text-xs font-medium uppercase tracking-wide">
