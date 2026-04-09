@@ -23,24 +23,29 @@ const menuGroups = [
     ],
   },
   {
+    title: "Budidaya",
     items: [{ title: "Siklus Budidaya", href: "/siklus-budidaya", icon: Fish }],
   },
   {
     title: "Pengaturan",
     items: [
       { title: "User", href: "/pengaturan/user", icon: Users },
-      { title: "Role & Akses", href: "/pengaturan/role-akses", icon: ShieldCheck },
+      {
+        title: "Role & Akses",
+        href: "/pengaturan/role-akses",
+        icon: ShieldCheck,
+      },
     ],
   },
-]
+];
 
 export function AppSidebar() {
   return (
     <aside className="border-border bg-[#ffffff] text-sidebar-foreground fixed bottom-0 left-0 top-20 z-40 flex w-72 -translate-x-full flex-col border-r transition-transform peer-checked:translate-x-0 md:translate-x-0">
-      <div className="border-border border-b px-5 py-4">
+      {/* <div className="border-border border-b px-5 py-4">
         <p className="text-lg font-semibold">Tebar Panen</p>
         <p className="text-muted-foreground mt-1 text-sm">Operasional budidaya</p>
-      </div>
+      </div> */}
 
       <nav className="flex flex-1 flex-col gap-5 overflow-y-auto p-3">
         {menuGroups.map((group, index) => (
