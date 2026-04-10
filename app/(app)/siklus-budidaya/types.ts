@@ -1,4 +1,10 @@
-import type { CultureCycle, Farm, FeedLog, Pond } from "@/app/generated/prisma/client"
+import type {
+  CultureCycle,
+  Farm,
+  FeedLog,
+  MortalityLog,
+  Pond,
+} from "@/app/generated/prisma/client"
 import type { CycleStatus } from "@/app/generated/prisma/enums"
 import type { ActionState } from "@/app/lib/action-state"
 
@@ -27,7 +33,7 @@ export type CycleDetailData = CultureCycle & {
     isActive: boolean
     pond: Pond
   }>
-  mortalityLogs: Array<{ deadCount: number }>
+  mortalityLogs: MortalityLog[]
   feedLogs: FeedLog[]
 }
 

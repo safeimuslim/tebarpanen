@@ -17,14 +17,19 @@ import {
   getEstimatedAlive,
   getSurvivalRate,
 } from "../utils"
+import { CycleDetailTabs } from "./components/cycle-detail-tabs"
 import { FeedLogSection } from "./components/feed-log-section"
+import { MortalityLogSection } from "./components/mortality-log-section"
 
 export default async function SiklusBudidayaDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const { id } = await params
+  const query = await searchParams
   const user = await requireSessionUser()
   const cycle = await getCycleById(id)
 
@@ -39,6 +44,7 @@ export default async function SiklusBudidayaDetailPage({
     priceTotal: decimalToNumber(feedLog.priceTotal),
   }))
   const estimatedAlive = getEstimatedAlive(cycle.seedCount, deadCount)
+  const activeTab = readDetailTab(query.tab)
   const summary = [
     { label: "Estimasi Ikan Hidup", value: `${formatNumber(estimatedAlive)} ekor` },
     { label: "Jumlah Kolam", value: `${formatNumber(cycle.ponds.length)} kolam` },
@@ -150,60 +156,99 @@ export default async function SiklusBudidayaDetailPage({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
-        <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <CalendarDays className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Ringkasan Operasional</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Ringkasan data yang sudah tercatat pada siklus ini.
-              </p>
-            </div>
-          </div>
-
-          <dl className="mt-5 grid gap-4 text-sm md:grid-cols-2">
-            <DetailMetric label="Total Pakan" value={`${formatNumber(feedUsed)} kg`} />
-            <DetailMetric label="Mortalitas" value={`${formatNumber(deadCount)} ekor`} />
-            <DetailMetric label="Jumlah Catatan Pakan" value={formatNumber(cycle.feedLogs.length)} />
-            <DetailMetric
-              label="Jumlah Catatan Mortalitas"
-              value={formatNumber(cycle.mortalityLogs.length)}
-            />
-          </dl>
+      <section className="border-border bg-card rounded-lg border shadow-sm">
+        <div className="border-border border-b p-3 sm:p-4">
+          <CycleDetailTabs
+            activeTab={activeTab}
+            counts={{
+              feedLogs: cycle.feedLogs.length,
+              mortalityLogs: cycle.mortalityLogs.length,
+            }}
+            cycleId={cycle.id}
+          />
         </div>
 
-        <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <FileText className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Status Pengembangan</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                CRUD siklus dan modul pakan sudah aktif. Modul operasional lain akan
-                dikerjakan pada tahap berikutnya.
-              </p>
-            </div>
-          </div>
+        <div className="p-4 sm:p-5">
+          {activeTab === "ringkasan" ? (
+            <section className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(20rem,0.8fr)]">
+              <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
+                    <CalendarDays className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold">Ringkasan Operasional</h2>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      Snapshot cepat dari data operasional yang sudah tercatat pada siklus ini.
+                    </p>
+                  </div>
+                </div>
 
-          <p className="text-muted-foreground mt-5 text-sm">
-            Saat ini input pakan sudah terhubung ke database. Modul mortalitas,
-            sampling, kualitas air, pengobatan, biaya, dan panen belum diintegrasikan
-            pada halaman ini.
-          </p>
+                <dl className="mt-5 grid gap-4 text-sm md:grid-cols-2">
+                  <DetailMetric label="Total Pakan" value={`${formatNumber(feedUsed)} kg`} />
+                  <DetailMetric label="Mortalitas" value={`${formatNumber(deadCount)} ekor`} />
+                  <DetailMetric label="Jumlah Catatan Pakan" value={formatNumber(cycle.feedLogs.length)} />
+                  <DetailMetric
+                    label="Jumlah Catatan Mortalitas"
+                    value={formatNumber(cycle.mortalityLogs.length)}
+                  />
+                </dl>
+              </div>
+
+              <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
+                    <FileText className="size-5" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold">Status Pengembangan</h2>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                      CRUD siklus, pakan, dan mortalitas sudah aktif. Modul operasional
+                      lain akan dikerjakan pada tahap berikutnya.
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-muted-foreground mt-5 text-sm">
+                  Saat ini input pakan dan mortalitas sudah terhubung ke database.
+                  Modul sampling, kualitas air, pengobatan, biaya, dan panen belum
+                  diintegrasikan pada halaman ini.
+                </p>
+              </div>
+            </section>
+          ) : null}
+
+          {activeTab === "pakan" ? (
+            <FeedLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              feedLogs={serializedFeedLogs}
+            />
+          ) : null}
+
+          {activeTab === "mortalitas" ? (
+            <MortalityLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              mortalityLogs={cycle.mortalityLogs}
+            />
+          ) : null}
         </div>
       </section>
-
-      <FeedLogSection
-        canManage={Boolean(user.id)}
-        cycleId={cycle.id}
-        feedLogs={serializedFeedLogs}
-      />
     </div>
   )
+}
+
+function readDetailTab(
+  value: string | string[] | undefined
+): "ringkasan" | "pakan" | "mortalitas" {
+  const tab = Array.isArray(value) ? value[0] : value
+
+  if (tab === "pakan" || tab === "mortalitas") {
+    return tab
+  }
+
+  return "ringkasan"
 }
 
 function SummaryCard({ label, value }: { label: string; value: string }) {

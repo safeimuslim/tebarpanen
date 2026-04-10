@@ -139,9 +139,10 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
         ],
       },
       mortalityLogs: {
-        select: {
-          deadCount: true,
-        },
+        orderBy: [
+          { logDate: "desc" },
+          { createdAt: "desc" },
+        ],
       },
     },
   })
