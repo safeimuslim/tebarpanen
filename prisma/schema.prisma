@@ -99,6 +99,7 @@ model CultureCycle {
   ponds             CyclePond[]
   feedLogs          FeedLog[]
   mortalityLogs     MortalityLog[]
+  samplingLogs      SamplingLog[]
 }
 
 model CyclePond {
@@ -136,6 +137,19 @@ model MortalityLog {
   notes          String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+}
+
+model SamplingLog {
+  id              String       @id @default(cuid())
+  cultureCycleId  String
+  cultureCycle    CultureCycle @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  logDate         DateTime
+  sampleCount     Int
+  averageWeightG  Float?
+  averageLengthCm Float?
+  notes           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }
 
 enum PondType {

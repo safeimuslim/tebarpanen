@@ -237,6 +237,117 @@ export async function deleteMortalityLog(
   }
 }
 
+export async function createSamplingLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    await prisma.samplingLog.create({
+      data: {
+        cultureCycleId: cycle.id,
+        logDate: readRequiredDate(formData, "logDate", "Tanggal sampling"),
+        sampleCount: readRequiredInt(formData, "sampleCount", "Jumlah sampel"),
+        averageWeightG: readRequiredFloat(formData, "averageWeightG", "Berat rata-rata"),
+        averageLengthCm: readRequiredFloat(formData, "averageLengthCm", "Panjang rata-rata"),
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data sampling berhasil ditambahkan.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function updateSamplingLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const samplingLogId = readRequiredText(formData, "id", "ID sampling")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const samplingLog = await prisma.samplingLog.findFirst({
+      where: {
+        id: samplingLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!samplingLog) {
+      return actionError("Data sampling tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.samplingLog.update({
+      where: {
+        id: samplingLog.id,
+      },
+      data: {
+        logDate: readRequiredDate(formData, "logDate", "Tanggal sampling"),
+        sampleCount: readRequiredInt(formData, "sampleCount", "Jumlah sampel"),
+        averageWeightG: readRequiredFloat(formData, "averageWeightG", "Berat rata-rata"),
+        averageLengthCm: readRequiredFloat(formData, "averageLengthCm", "Panjang rata-rata"),
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data sampling berhasil diperbarui.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function deleteSamplingLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const samplingLogId = readRequiredText(formData, "id", "ID sampling")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const samplingLog = await prisma.samplingLog.findFirst({
+      where: {
+        id: samplingLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!samplingLog) {
+      return actionError("Data sampling tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.samplingLog.delete({
+      where: {
+        id: samplingLog.id,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data sampling berhasil dihapus.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
 async function requireAccessibleCycle(
   cycleId: string,
   user: Awaited<ReturnType<typeof requireSessionUser>>

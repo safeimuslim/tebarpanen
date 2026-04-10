@@ -144,6 +144,12 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
           { createdAt: "desc" },
         ],
       },
+      samplingLogs: {
+        orderBy: [
+          { logDate: "desc" },
+          { createdAt: "desc" },
+        ],
+      },
     },
   })
 }

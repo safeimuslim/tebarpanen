@@ -4,6 +4,7 @@ import type {
   FeedLog,
   MortalityLog,
   Pond,
+  SamplingLog,
 } from "@/app/generated/prisma/client"
 import type { CycleStatus } from "@/app/generated/prisma/enums"
 import type { ActionState } from "@/app/lib/action-state"
@@ -35,6 +36,7 @@ export type CycleDetailData = CultureCycle & {
   }>
   mortalityLogs: MortalityLog[]
   feedLogs: FeedLog[]
+  samplingLogs: SamplingLog[]
 }
 
 export type CyclePageData = {

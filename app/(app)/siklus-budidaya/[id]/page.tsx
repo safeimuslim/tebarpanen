@@ -20,6 +20,7 @@ import {
 import { CycleDetailTabs } from "./components/cycle-detail-tabs"
 import { FeedLogSection } from "./components/feed-log-section"
 import { MortalityLogSection } from "./components/mortality-log-section"
+import { SamplingLogSection } from "./components/sampling-log-section"
 
 export default async function SiklusBudidayaDetailPage({
   params,
@@ -43,6 +44,7 @@ export default async function SiklusBudidayaDetailPage({
     ...feedLog,
     priceTotal: decimalToNumber(feedLog.priceTotal),
   }))
+  const latestSampling = cycle.samplingLogs[0]
   const estimatedAlive = getEstimatedAlive(cycle.seedCount, deadCount)
   const activeTab = readDetailTab(query.tab)
   const summary = [
@@ -163,6 +165,7 @@ export default async function SiklusBudidayaDetailPage({
             counts={{
               feedLogs: cycle.feedLogs.length,
               mortalityLogs: cycle.mortalityLogs.length,
+              samplingLogs: cycle.samplingLogs.length,
             }}
             cycleId={cycle.id}
           />
@@ -192,6 +195,18 @@ export default async function SiklusBudidayaDetailPage({
                     label="Jumlah Catatan Mortalitas"
                     value={formatNumber(cycle.mortalityLogs.length)}
                   />
+                  <DetailMetric
+                    label="Sampling Terakhir"
+                    value={
+                      latestSampling?.averageWeightG != null
+                        ? `${formatNumber(latestSampling.averageWeightG)} g`
+                        : "-"
+                    }
+                  />
+                  <DetailMetric
+                    label="Jumlah Catatan Sampling"
+                    value={formatNumber(cycle.samplingLogs.length)}
+                  />
                 </dl>
               </div>
 
@@ -203,16 +218,16 @@ export default async function SiklusBudidayaDetailPage({
                   <div>
                     <h2 className="font-semibold">Status Pengembangan</h2>
                     <p className="text-muted-foreground mt-1 text-sm">
-                      CRUD siklus, pakan, dan mortalitas sudah aktif. Modul operasional
-                      lain akan dikerjakan pada tahap berikutnya.
+                      CRUD siklus, pakan, mortalitas, dan sampling sudah aktif.
+                      Modul operasional lain akan dikerjakan pada tahap berikutnya.
                     </p>
                   </div>
                 </div>
 
                 <p className="text-muted-foreground mt-5 text-sm">
-                  Saat ini input pakan dan mortalitas sudah terhubung ke database.
-                  Modul sampling, kualitas air, pengobatan, biaya, dan panen belum
-                  diintegrasikan pada halaman ini.
+                  Saat ini input pakan, mortalitas, dan sampling sudah terhubung
+                  ke database. Modul kualitas air, pengobatan, biaya, dan panen
+                  belum diintegrasikan pada halaman ini.
                 </p>
               </div>
             </section>
@@ -233,6 +248,14 @@ export default async function SiklusBudidayaDetailPage({
               mortalityLogs={cycle.mortalityLogs}
             />
           ) : null}
+
+          {activeTab === "sampling" ? (
+            <SamplingLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              samplingLogs={cycle.samplingLogs}
+            />
+          ) : null}
         </div>
       </section>
     </div>
@@ -241,10 +264,10 @@ export default async function SiklusBudidayaDetailPage({
 
 function readDetailTab(
   value: string | string[] | undefined
-): "ringkasan" | "pakan" | "mortalitas" {
+): "ringkasan" | "pakan" | "mortalitas" | "sampling" {
   const tab = Array.isArray(value) ? value[0] : value
 
-  if (tab === "pakan" || tab === "mortalitas") {
+  if (tab === "pakan" || tab === "mortalitas" || tab === "sampling") {
     return tab
   }
 

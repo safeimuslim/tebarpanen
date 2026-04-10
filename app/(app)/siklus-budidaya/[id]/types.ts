@@ -1,4 +1,4 @@
-import type { FeedLog, MortalityLog } from "@/app/generated/prisma/client"
+import type { FeedLog, MortalityLog, SamplingLog } from "@/app/generated/prisma/client"
 import type { ActionState } from "@/app/lib/action-state"
 
 export type FeedLogItem = Omit<FeedLog, "priceTotal"> & {
@@ -13,6 +13,13 @@ export type FeedLogAction = (
 export type MortalityLogItem = MortalityLog
 
 export type MortalityLogAction = (
+  previousState: ActionState,
+  formData: FormData
+) => Promise<ActionState>
+
+export type SamplingLogItem = SamplingLog
+
+export type SamplingLogAction = (
   previousState: ActionState,
   formData: FormData
 ) => Promise<ActionState>
