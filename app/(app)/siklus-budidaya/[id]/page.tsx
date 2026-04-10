@@ -2,11 +2,13 @@ import Link from "next/link"
 import { ArrowLeft, CalendarDays, FileText, Waves } from "lucide-react"
 import { notFound } from "next/navigation"
 
+import { requireSessionUser } from "@/app/lib/authz"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 import { getCycleById } from "../queries"
 import {
+  decimalToNumber,
   formatCurrency,
   formatDate,
   formatNumber,
@@ -15,6 +17,7 @@ import {
   getEstimatedAlive,
   getSurvivalRate,
 } from "../utils"
+import { FeedLogSection } from "./components/feed-log-section"
 
 export default async function SiklusBudidayaDetailPage({
   params,
@@ -22,6 +25,7 @@ export default async function SiklusBudidayaDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const user = await requireSessionUser()
   const cycle = await getCycleById(id)
 
   if (!cycle) {
@@ -30,6 +34,10 @@ export default async function SiklusBudidayaDetailPage({
 
   const deadCount = cycle.mortalityLogs.reduce((sum, log) => sum + log.deadCount, 0)
   const feedUsed = cycle.feedLogs.reduce((sum, log) => sum + log.quantityKg, 0)
+  const serializedFeedLogs = cycle.feedLogs.map((feedLog) => ({
+    ...feedLog,
+    priceTotal: decimalToNumber(feedLog.priceTotal),
+  }))
   const estimatedAlive = getEstimatedAlive(cycle.seedCount, deadCount)
   const summary = [
     { label: "Estimasi Ikan Hidup", value: `${formatNumber(estimatedAlive)} ekor` },
@@ -175,19 +183,25 @@ export default async function SiklusBudidayaDetailPage({
             <div>
               <h2 className="font-semibold">Status Pengembangan</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                CRUD siklus sudah aktif. Form operasional siklus akan dikerjakan
-                pada tahap berikutnya.
+                CRUD siklus dan modul pakan sudah aktif. Modul operasional lain akan
+                dikerjakan pada tahap berikutnya.
               </p>
             </div>
           </div>
 
           <p className="text-muted-foreground mt-5 text-sm">
-            Data operasional yang sudah ada akan tetap terbaca pada ringkasan ini,
-            tetapi input form pakan, mortalitas, sampling, kualitas air, dan modul
-            lain belum diintegrasikan pada halaman ini.
+            Saat ini input pakan sudah terhubung ke database. Modul mortalitas,
+            sampling, kualitas air, pengobatan, biaya, dan panen belum diintegrasikan
+            pada halaman ini.
           </p>
         </div>
       </section>
+
+      <FeedLogSection
+        canManage={Boolean(user.id)}
+        cycleId={cycle.id}
+        feedLogs={serializedFeedLogs}
+      />
     </div>
   )
 }

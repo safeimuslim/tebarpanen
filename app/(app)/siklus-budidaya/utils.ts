@@ -116,6 +116,17 @@ export function readRequiredInt(formData: FormData, key: string, label: string) 
   return value
 }
 
+export function readRequiredFloat(formData: FormData, key: string, label: string) {
+  const rawValue = readRequiredText(formData, key, label)
+  const value = Number.parseFloat(rawValue)
+
+  if (!Number.isFinite(value)) {
+    throw new Error(`${label} harus berupa angka.`)
+  }
+
+  return value
+}
+
 export function readRequiredIdList(formData: FormData, key: string, label: string) {
   const values = formData
     .getAll(key)

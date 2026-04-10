@@ -133,9 +133,10 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
         },
       },
       feedLogs: {
-        select: {
-          quantityKg: true,
-        },
+        orderBy: [
+          { logDate: "desc" },
+          { createdAt: "desc" },
+        ],
       },
       mortalityLogs: {
         select: {

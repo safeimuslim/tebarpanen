@@ -37,6 +37,7 @@ type CrudRowActionsProps = {
     formData: FormData
   ) => Promise<ActionState>
   deleteDescription: string
+  deleteHiddenFields?: Array<{ name: string; value: string }>
   detailContent: React.ReactNode
   detailDescription?: string
   detailTitle: string
@@ -50,6 +51,7 @@ type CrudRowActionsProps = {
 export function CrudRowActions({
   deleteAction,
   deleteDescription,
+  deleteHiddenFields,
   detailContent,
   detailDescription,
   detailTitle,
@@ -169,6 +171,9 @@ export function CrudRowActions({
             <AlertDialogCancel ref={closeDeleteRef}>Batal</AlertDialogCancel>
             <form action={deleteFormAction}>
               <input name="id" type="hidden" value={itemId} />
+              {deleteHiddenFields?.map((field) => (
+                <input key={field.name} name={field.name} type="hidden" value={field.value} />
+              ))}
               <FormSubmitButton
                 className="gap-2"
                 pendingLabel="Menghapus..."
