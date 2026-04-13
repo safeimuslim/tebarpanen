@@ -20,6 +20,7 @@ import {
 import { CycleDetailTabs } from "./components/cycle-detail-tabs"
 import { ExpenseLogSection } from "./components/expense-log-section"
 import { FeedLogSection } from "./components/feed-log-section"
+import { HarvestLogSection } from "./components/harvest-log-section"
 import { MortalityLogSection } from "./components/mortality-log-section"
 import { SamplingLogSection } from "./components/sampling-log-section"
 import { TreatmentLogSection } from "./components/treatment-log-section"
@@ -51,11 +52,24 @@ export default async function SiklusBudidayaDetailPage({
     ...feedLog,
     priceTotal: decimalToNumber(feedLog.priceTotal),
   }))
+  const serializedHarvestLogs = cycle.harvestLogs.map((harvestLog) => ({
+    ...harvestLog,
+    pricePerKg: decimalToNumber(harvestLog.pricePerKg) ?? 0,
+  }))
   const totalExpense = serializedExpenseLogs.reduce(
     (sum, expenseLog) => sum + expenseLog.amount,
     0
   )
+  const totalHarvestWeight = serializedHarvestLogs.reduce(
+    (sum, harvestLog) => sum + harvestLog.totalWeightKg,
+    0
+  )
+  const totalHarvestRevenue = serializedHarvestLogs.reduce(
+    (sum, harvestLog) => sum + harvestLog.totalWeightKg * harvestLog.pricePerKg,
+    0
+  )
   const latestExpense = serializedExpenseLogs[0]
+  const latestHarvest = serializedHarvestLogs[0]
   const latestSampling = cycle.samplingLogs[0]
   const latestTreatment = cycle.treatmentLogs[0]
   const latestWaterQuality = cycle.waterQualityLogs[0]
@@ -179,6 +193,7 @@ export default async function SiklusBudidayaDetailPage({
             counts={{
               expenseLogs: cycle.expenseLogs.length,
               feedLogs: cycle.feedLogs.length,
+              harvestLogs: cycle.harvestLogs.length,
               mortalityLogs: cycle.mortalityLogs.length,
               samplingLogs: cycle.samplingLogs.length,
               treatmentLogs: cycle.treatmentLogs.length,
@@ -207,11 +222,16 @@ export default async function SiklusBudidayaDetailPage({
                 <dl className="mt-5 grid gap-4 text-sm md:grid-cols-2">
                   <DetailMetric label="Total Pakan" value={`${formatNumber(feedUsed)} kg`} />
                   <DetailMetric label="Biaya Manual" value={formatCurrency(totalExpense)} />
+                  <DetailMetric label="Total Panen" value={`${formatNumber(totalHarvestWeight)} kg`} />
                   <DetailMetric label="Mortalitas" value={`${formatNumber(deadCount)} ekor`} />
                   <DetailMetric label="Jumlah Catatan Pakan" value={formatNumber(cycle.feedLogs.length)} />
                   <DetailMetric
                     label="Jumlah Catatan Biaya"
                     value={formatNumber(cycle.expenseLogs.length)}
+                  />
+                  <DetailMetric
+                    label="Jumlah Catatan Panen"
+                    value={formatNumber(cycle.harvestLogs.length)}
                   />
                   <DetailMetric
                     label="Jumlah Catatan Mortalitas"
@@ -238,6 +258,10 @@ export default async function SiklusBudidayaDetailPage({
                     value={latestExpense ? formatDate(latestExpense.logDate) : "-"}
                   />
                   <DetailMetric
+                    label="Panen Terakhir"
+                    value={latestHarvest ? formatDate(latestHarvest.logDate) : "-"}
+                  />
+                  <DetailMetric
                     label="Jumlah Catatan Pengobatan"
                     value={formatNumber(cycle.treatmentLogs.length)}
                   />
@@ -248,6 +272,10 @@ export default async function SiklusBudidayaDetailPage({
                   <DetailMetric
                     label="Jumlah Catatan Kualitas Air"
                     value={formatNumber(cycle.waterQualityLogs.length)}
+                  />
+                  <DetailMetric
+                    label="Nilai Panen"
+                    value={formatCurrency(totalHarvestRevenue)}
                   />
                 </dl>
               </div>
@@ -261,17 +289,17 @@ export default async function SiklusBudidayaDetailPage({
                     <h2 className="font-semibold">Status Pengembangan</h2>
                     <p className="text-muted-foreground mt-1 text-sm">
                       CRUD siklus, pakan, mortalitas, sampling, pengobatan, kualitas air,
-                      dan biaya manual sudah aktif. Modul panen akan dikerjakan pada tahap
-                      berikutnya.
+                      biaya manual, dan panen sudah aktif.
                     </p>
                   </div>
                 </div>
 
                 <p className="text-muted-foreground mt-5 text-sm">
                   Saat ini input pakan, mortalitas, sampling, pengobatan, kualitas air,
-                  dan biaya manual sudah terhubung ke database. Nominal dari modul biaya
-                  belum digabung otomatis dengan harga bibit, pakan, atau pengobatan
-                  dari modul lain agar tidak terjadi hitung ganda.
+                  biaya manual, dan panen sudah terhubung ke database. Nominal dari modul
+                  biaya belum digabung otomatis dengan harga bibit, pakan, atau pengobatan
+                  dari modul lain agar tidak terjadi hitung ganda, dan panen belum
+                  mengubah status siklus secara otomatis.
                 </p>
               </div>
             </section>
@@ -282,6 +310,14 @@ export default async function SiklusBudidayaDetailPage({
               canManage={Boolean(user.id)}
               cycleId={cycle.id}
               expenseLogs={serializedExpenseLogs}
+            />
+          ) : null}
+
+          {activeTab === "panen" ? (
+            <HarvestLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              harvestLogs={serializedHarvestLogs}
             />
           ) : null}
 
@@ -335,6 +371,7 @@ function readDetailTab(
 ):
   | "ringkasan"
   | "biaya"
+  | "panen"
   | "pakan"
   | "mortalitas"
   | "sampling"
@@ -344,6 +381,7 @@ function readDetailTab(
 
   if (
     tab === "biaya" ||
+    tab === "panen" ||
     tab === "pakan" ||
     tab === "mortalitas" ||
     tab === "sampling" ||

@@ -351,6 +351,119 @@ export async function deleteExpenseLog(
   }
 }
 
+export async function createHarvestLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    await prisma.harvestLog.create({
+      data: {
+        cultureCycleId: cycle.id,
+        logDate: readRequiredDate(formData, "logDate", "Tanggal panen"),
+        totalWeightKg: readRequiredFloat(formData, "totalWeightKg", "Total berat panen"),
+        harvestedCount: readRequiredInt(formData, "harvestedCount", "Jumlah ikan terpanen"),
+        pricePerKg: readRequiredDecimal(formData, "pricePerKg", "Harga jual per kg"),
+        buyer: readText(formData, "buyer") || null,
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data panen berhasil ditambahkan.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function updateHarvestLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const harvestLogId = readRequiredText(formData, "id", "ID panen")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const harvestLog = await prisma.harvestLog.findFirst({
+      where: {
+        id: harvestLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!harvestLog) {
+      return actionError("Data panen tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.harvestLog.update({
+      where: {
+        id: harvestLog.id,
+      },
+      data: {
+        logDate: readRequiredDate(formData, "logDate", "Tanggal panen"),
+        totalWeightKg: readRequiredFloat(formData, "totalWeightKg", "Total berat panen"),
+        harvestedCount: readRequiredInt(formData, "harvestedCount", "Jumlah ikan terpanen"),
+        pricePerKg: readRequiredDecimal(formData, "pricePerKg", "Harga jual per kg"),
+        buyer: readText(formData, "buyer") || null,
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data panen berhasil diperbarui.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function deleteHarvestLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const harvestLogId = readRequiredText(formData, "id", "ID panen")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const harvestLog = await prisma.harvestLog.findFirst({
+      where: {
+        id: harvestLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!harvestLog) {
+      return actionError("Data panen tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.harvestLog.delete({
+      where: {
+        id: harvestLog.id,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data panen berhasil dihapus.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
 export async function createSamplingLog(
   _previousState: ActionState,
   formData: FormData
