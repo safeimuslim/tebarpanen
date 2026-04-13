@@ -1,14 +1,19 @@
 import Link from "next/link"
 import {
-  ArrowLeft,
-  ArrowRight,
   CalendarRange,
   ChartColumn,
-  Landmark,
+  Info,
   Wallet,
 } from "lucide-react"
 
-import { buttonVariants, Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { cn } from "@/lib/utils"
 
 import { FinanceReportActions } from "./components/finance-report-actions"
@@ -22,7 +27,12 @@ export default async function KeuanganPage({
 }) {
   const data = await getFinancePageData(searchParams)
 
-  const summaryCards = [
+  const summaryCards: Array<{
+    helper: string
+    label: string
+    value: string
+    valueClassName?: string
+  }> = [
     {
       helper: "Total pemasukan panen farm pada periode terpilih",
       label: "Pendapatan Periode",
@@ -75,35 +85,70 @@ export default async function KeuanganPage({
     },
   ]
 
+  const periodStats = [
+    {
+      label: "Rentang Bulan",
+      value: data.periodLabel,
+    },
+    {
+      label: "Farm",
+      value: data.farmLabel,
+    },
+    {
+      label: "Total Bulan",
+      value: `${formatNumber(data.monthCount)} bulan`,
+    },
+    {
+      label: "Siklus Berjalan",
+      value: `${formatNumber(data.activeCyclesCount)} siklus`,
+    },
+    {
+      label: "Panen Tercatat",
+      value: `${formatNumber(data.harvestCount)} transaksi`,
+    },
+    {
+      label: "Aset Disusutkan",
+      value: `${formatNumber(data.totalDepreciatedAssetCount)} aset`,
+    },
+  ]
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-        <div>
-          <p className="text-muted-foreground text-sm">Keuangan</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Ringkasan keuangan farm
-          </h1>
-          <p className="text-muted-foreground mt-2 max-w-3xl text-sm">
-            Pendapatan, biaya langsung, penyusutan, dan laporan laba rugi ditinjau
-            berdasarkan rentang bulan yang dipilih.
-          </p>
-        </div>
-      </div>
-
       <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <h2 className="font-semibold">Filter Periode</h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Pilih bulan awal dan bulan akhir untuk menyusun laporan keuangan farm.
+            <p className="text-muted-foreground text-sm">Keuangan</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+              Ringkasan keuangan farm
+            </h1>
+            <p className="text-muted-foreground mt-2 max-w-3xl text-sm">
+              Halaman ini diringkas untuk membantu membaca hasil usaha lebih cepat:
+              lihat hasil, baca tren, lalu buka detail biaya jika diperlukan.
             </p>
           </div>
 
-          <form className="flex flex-col gap-3 sm:flex-row sm:items-end" method="get">
-            <MonthField defaultValue={data.startMonthParam} label="Bulan Awal" name="start" />
-            <MonthField defaultValue={data.endMonthParam} label="Bulan Akhir" name="end" />
-            <Button type="submit">Terapkan</Button>
-          </form>
+          <div className="flex flex-col gap-3 lg:items-end">
+            <form className="flex flex-col gap-3 sm:flex-row sm:items-end" method="get">
+              <MonthField defaultValue={data.startMonthParam} label="Bulan Awal" name="start" />
+              <MonthField defaultValue={data.endMonthParam} label="Bulan Akhir" name="end" />
+              <Button type="submit">Terapkan</Button>
+            </form>
+
+            <div className="flex flex-wrap gap-2">
+              <Link
+                className={buttonVariants({ size: "sm", variant: "outline" })}
+                href={`?start=${data.previousStartMonthParam}&end=${data.previousEndMonthParam}`}
+              >
+                Periode Sebelumnya
+              </Link>
+              <Link
+                className={buttonVariants({ size: "sm", variant: "outline" })}
+                href={`?start=${data.nextStartMonthParam}&end=${data.nextEndMonthParam}`}
+              >
+                Periode Berikutnya
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -124,57 +169,53 @@ export default async function KeuanganPage({
         ))}
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <CalendarRange className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Ringkasan Periode</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Gambaran umum aktivitas farm pada rentang {data.periodLabel.toLowerCase()}.
-              </p>
-            </div>
-          </div>
-
-          <dl className="mt-5 grid gap-3 text-sm md:grid-cols-2">
-            <MetricRow label="Rentang Bulan" value={data.periodLabel} />
-            <MetricRow label="Farm" value={data.farmLabel} />
-            <MetricRow
-              label="Total Bulan"
-              value={`${formatNumber(data.monthCount)} bulan`}
-            />
-            <MetricRow
-              label="Siklus Berjalan"
-              value={`${formatNumber(data.activeCyclesCount)} siklus`}
-            />
-            <MetricRow
-              label="Panen Tercatat"
-              value={`${formatNumber(data.harvestCount)} transaksi`}
-            />
-            <MetricRow
-              label="Aset Disusutkan"
-              value={`${formatNumber(data.totalDepreciatedAssetCount)} aset`}
-            />
-          </dl>
-        </div>
-
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
         <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
               <ChartColumn className="size-5" />
             </div>
             <div>
-              <h2 className="font-semibold">Laba Rugi</h2>
+              <h2 className="font-semibold">Tren Pendapatan, Biaya, dan Laba</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Hasil usaha farm setelah dikurangi biaya langsung dan beban penyusutan.
+                Cukup satu grafik untuk membaca arah usaha farm pada rentang{" "}
+                {data.periodLabel.toLowerCase()}.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <FinanceTrendChart points={data.trendPoints} />
+          </div>
+        </div>
+
+        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
+              <CalendarRange className="size-5" />
+            </div>
+            <div>
+              <h2 className="font-semibold">Laba Rugi Singkat</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Ringkasan hasil usaha dan konteks periode tanpa perlu membuka detail panjang.
               </p>
             </div>
           </div>
 
           <dl className="mt-5 grid gap-3 text-sm">
-            <MetricRow label="Pendapatan" value={formatCurrency(data.revenue)} variant="income" />
+            {periodStats.map((item) => (
+              <MetricRow key={item.label} label={item.label} value={item.value} />
+            ))}
+          </dl>
+
+          <div className="border-border my-5 border-t" />
+
+          <dl className="grid gap-3 text-sm">
+            <MetricRow
+              label="Pendapatan"
+              value={formatCurrency(data.revenue)}
+              variant="income"
+            />
             <MetricRow
               label="Biaya Operasional"
               value={formatCurrency(data.operationalCost)}
@@ -194,39 +235,22 @@ export default async function KeuanganPage({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]">
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
+      <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <ChartColumn className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Tren Pendapatan, Biaya, dan Laba</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Perbandingan nilai per bulan untuk memudahkan membaca arah usaha farm.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5">
-            <FinanceTrendChart points={data.trendPoints} />
-          </div>
-        </div>
-
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <Landmark className="size-5" />
+              <Wallet className="size-5" />
             </div>
             <div>
               <h2 className="font-semibold">Laporan Laba Rugi</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Laporan dapat dicetak langsung atau disimpan sebagai PDF dari dialog cetak.
+                Tabel utama laporan dan aksi cetak disatukan dalam satu bagian agar alurnya
+                lebih ringkas.
               </p>
             </div>
           </div>
 
-          <div className="mt-5">
+          <div className="shrink-0">
             <FinanceReportActions
               farmLabel={data.farmLabel}
               periodLabel={data.periodLabel}
@@ -239,9 +263,11 @@ export default async function KeuanganPage({
               }}
             />
           </div>
+        </div>
 
-          <div className="border-border bg-background mt-5 rounded-md border">
-            <div className="grid grid-cols-[minmax(0,1.2fr)_repeat(4,minmax(0,1fr))] gap-3 border-b px-3 py-2 text-xs font-medium text-muted-foreground">
+        <div className="border-border bg-background mt-5 overflow-x-auto rounded-md border">
+          <div className="min-w-[760px]">
+            <div className="grid grid-cols-[minmax(0,1.2fr)_repeat(4,minmax(8rem,1fr))] gap-3 border-b px-3 py-2 text-xs font-medium text-muted-foreground">
               <span>Periode</span>
               <span className="text-right">Pendapatan</span>
               <span className="text-right">Biaya</span>
@@ -251,14 +277,19 @@ export default async function KeuanganPage({
             <div className="divide-border divide-y">
               {data.reportRows.map((row) => (
                 <div
-                  className="grid grid-cols-[minmax(0,1.2fr)_repeat(4,minmax(0,1fr))] gap-3 px-3 py-2 text-sm"
+                  className="grid grid-cols-[minmax(0,1.2fr)_repeat(4,minmax(8rem,1fr))] gap-3 px-3 py-2 text-sm"
                   key={row.label}
                 >
                   <span>{row.label}</span>
                   <span className="text-right">{formatCurrency(row.revenue)}</span>
                   <span className="text-right">{formatCurrency(row.operationalCost)}</span>
                   <span className="text-right">{formatCurrency(row.depreciation)}</span>
-                  <span className={cn("text-right font-medium", getProfitValueClassName(row.netProfit))}>
+                  <span
+                    className={cn(
+                      "text-right font-medium",
+                      getProfitValueClassName(row.netProfit)
+                    )}
+                  >
                     {formatCurrency(row.netProfit)}
                   </span>
                 </div>
@@ -268,71 +299,88 @@ export default async function KeuanganPage({
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <Wallet className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Rincian Biaya</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Pemisahan biaya langsung dan beban penyusutan untuk memudahkan analisis.
-              </p>
-            </div>
+      <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
+        <div className="flex items-start gap-3">
+          <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
+            <Info className="size-5" />
           </div>
-
-          <div className="mt-5 space-y-3">
-            {expenseBreakdown.map((item) => (
-              <div
-                className="border-border bg-background rounded-md border px-3 py-3"
-                key={item.label}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-medium">{item.label}</p>
-                    <p className="text-muted-foreground mt-1 text-xs leading-5">
-                      {item.note}
-                    </p>
-                  </div>
-                  <p className="text-right font-medium">{item.value}</p>
-                </div>
-              </div>
-            ))}
+          <div>
+            <h2 className="font-semibold">Detail Perhitungan</h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Detail biaya dan cara hitung disimpan di bagian ini agar halaman utama tetap
+              singkat.
+            </p>
           </div>
         </div>
 
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <Landmark className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Dasar Perhitungan</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Asumsi yang dipakai untuk laporan keuangan farm saat ini.
-              </p>
-            </div>
-          </div>
+        <div className="mt-5">
+          <Accordion defaultValue={[]} multiple>
+            <AccordionItem value="rincian-biaya">
+              <AccordionHeader>
+                <AccordionTrigger className="bg-background rounded-md">
+                  <div className="min-w-0">
+                    <p>Rincian Biaya</p>
+                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                      Bibit, pakan, biaya manual, dan penyusutan.
+                    </p>
+                  </div>
+                </AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent className="border-border border-t px-3 py-3">
+                <div className="space-y-3">
+                  {expenseBreakdown.map((item) => (
+                    <div
+                      className="border-border bg-background rounded-md border px-3 py-3"
+                      key={item.label}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="font-medium">{item.label}</p>
+                          <p className="text-muted-foreground mt-1 text-xs leading-5">
+                            {item.note}
+                          </p>
+                        </div>
+                        <p className="text-right font-medium">{item.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          <div className="mt-5 space-y-3">
-            <InfoCard
-              title="Bibit"
-              description="Biaya bibit dihitung dari siklus yang tanggal tebar-nya masuk ke rentang bulan terpilih."
-            />
-            <InfoCard
-              title="Pakan"
-              description="Biaya pakan diambil dari catatan pakan pada rentang bulan terpilih yang memiliki harga."
-            />
-            <InfoCard
-              title="Biaya Manual"
-              description="Biaya manual diambil dari modul biaya pada rentang bulan terpilih."
-            />
-            <InfoCard
-              title="Penyusutan"
-              description="Penyusutan dihitung lurus per bulan dari harga beli dibagi umur penyusutan. Jika tanggal mulai tidak diisi, sistem memakai tanggal data dibuat sebagai fallback."
-            />
-          </div>
+            <AccordionItem className="mt-3" value="dasar-perhitungan">
+              <AccordionHeader>
+                <AccordionTrigger className="bg-background rounded-md">
+                  <div className="min-w-0">
+                    <p>Dasar Perhitungan</p>
+                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                      Penjelasan singkat agar angka mudah dipahami pengguna.
+                    </p>
+                  </div>
+                </AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent className="border-border border-t px-3 py-3">
+                <div className="space-y-3">
+                  <InfoCard
+                    title="Bibit"
+                    description="Biaya bibit dihitung dari siklus yang tanggal tebar-nya masuk ke rentang bulan terpilih."
+                  />
+                  <InfoCard
+                    title="Pakan"
+                    description="Biaya pakan diambil dari catatan pakan pada rentang bulan terpilih yang memiliki harga."
+                  />
+                  <InfoCard
+                    title="Biaya Manual"
+                    description="Biaya manual diambil dari modul biaya pada rentang bulan terpilih."
+                  />
+                  <InfoCard
+                    title="Penyusutan"
+                    description="Penyusutan dihitung lurus per bulan dari harga beli dibagi umur penyusutan. Jika tanggal mulai tidak diisi, sistem memakai tanggal data dibuat sebagai fallback."
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
     </div>
