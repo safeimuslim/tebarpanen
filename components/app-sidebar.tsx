@@ -8,6 +8,7 @@ import {
   Home,
   ShieldCheck,
   Users,
+  Wallet,
   Waves,
   Wrench,
 } from "lucide-react"
@@ -17,7 +18,10 @@ import { cn } from "@/lib/utils"
 
 const menuGroups = [
   {
-    items: [{ title: "Dashboard", href: "/dashboard", icon: Home }],
+    items: [
+      { title: "Dashboard", href: "/dashboard", icon: Home },
+      { title: "Keuangan", href: "/keuangan", icon: Wallet },
+    ],
   },
   {
     title: "Master Data",
