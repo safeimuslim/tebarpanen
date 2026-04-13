@@ -1,11 +1,11 @@
 import Link from "next/link"
+import type { ReactNode } from "react"
 import {
   AlertTriangle,
   Fish,
   FlaskConical,
   Package,
   TrendingDown,
-  Waves,
 } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
@@ -17,48 +17,36 @@ export default async function Dashboard() {
   const data = await getDashboardPageData()
 
   const summaryCards: Array<{
-    helper: string
     label: string
     value: string
     valueClassName?: string
-    valueSubtext?: string
   }> = [
     {
-      helper: "Kolam yang sedang dipakai untuk operasional budidaya",
       label: "Kolam Aktif",
       value: formatNumber(data.activePondsCount),
     },
     {
-      helper: "Siklus yang sedang berjalan dan belum selesai",
       label: "Siklus Aktif",
       value: formatNumber(data.activeCyclesCount),
     },
     {
-      helper: "Estimasi ikan hidup dari seluruh siklus aktif",
       label: "Estimasi Ikan Hidup",
       value: formatNumber(data.totalEstimatedAlive),
     },
     {
-      helper: "Akumulasi pakan yang sudah dicatat hari ini",
-      label: "Pakan Hari Ini",
-      value: `${formatNumber(data.feedTodayKg)} kg`,
-    },
-    {
-      helper: "Jumlah ikan mati yang tercatat hari ini",
-      label: "Mortalitas Hari Ini",
-      value: formatNumber(data.mortalityTodayCount),
-      valueClassName: data.mortalityTodayCount > 0 ? "text-destructive" : undefined,
-    },
-    {
-      helper: "Siklus yang jadwal panennya paling dekat",
       label: "Panen Terdekat",
       value:
         data.nearestHarvestDaysLeft != null
           ? `${formatNumber(data.nearestHarvestDaysLeft)} hari lagi`
           : "-",
-      valueSubtext: data.nearestHarvestLabel !== "-" ? data.nearestHarvestLabel : undefined,
+      valueClassName:
+        data.nearestHarvestDaysLeft != null && data.nearestHarvestDaysLeft <= 7
+          ? "text-primary"
+          : undefined,
     },
   ]
+
+  const visibleCycles = data.activeCycles.slice(0, 4)
 
   return (
     <div className="space-y-6">
@@ -66,24 +54,16 @@ export default async function Dashboard() {
         <div>
           <p className="text-muted-foreground text-sm">Dashboard</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Ringkasan operasional farm
+            Prioritas operasional hari ini
           </h1>
-          <p className="text-muted-foreground mt-2 max-w-3xl text-sm">
-            Gambaran cepat kondisi {data.farmLabel.toLowerCase()} hari ini untuk membantu
-            menentukan prioritas kerja.
-          </p>
-        </div>
-
-        <div className="border-border bg-card rounded-lg border px-4 py-3 shadow-sm">
-          <p className="text-muted-foreground text-xs">Periode</p>
-          <p className="mt-1 text-sm font-medium">Hari ini</p>
-          <p className="text-muted-foreground mt-1 text-xs">
-            {formatNumber(data.activeCyclesCount)} siklus aktif • {formatNumber(data.activePondsCount)} kolam aktif
+          <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
+            Ringkasan singkat kondisi {data.farmLabel.toLowerCase()} untuk membantu
+            menentukan tindakan yang perlu dikerjakan lebih dulu.
           </p>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
           <div
             className="border-border bg-card rounded-lg border p-4 shadow-sm"
@@ -93,26 +73,20 @@ export default async function Dashboard() {
             <p className={cn("mt-2 text-2xl font-semibold", card.valueClassName)}>
               {card.value}
             </p>
-            {card.valueSubtext ? (
-              <p className="text-muted-foreground mt-1 text-xs">{card.valueSubtext}</p>
-            ) : null}
-            <p className="text-muted-foreground mt-2 text-xs leading-5">
-              {card.helper}
-            </p>
           </div>
         ))}
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(19rem,0.9fr)]">
         <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
               <AlertTriangle className="size-5" />
             </div>
             <div>
-              <h2 className="font-semibold">Perlu Diperhatikan Hari Ini</h2>
+              <h2 className="font-semibold">Perlu Dikerjakan Hari Ini</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Daftar hal yang perlu segera ditindaklanjuti oleh tim operasional.
+                Fokus pada catatan yang paling berpengaruh ke operasional harian.
               </p>
             </div>
           </div>
@@ -149,12 +123,10 @@ export default async function Dashboard() {
                 )
               })
             ) : (
-              <div className="border-border bg-background rounded-md border px-4 py-8 text-center">
-                <p className="font-medium">Tidak ada catatan yang perlu ditindaklanjuti</p>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  Input operasional hari ini sudah cukup lengkap pada seluruh siklus aktif.
-                </p>
-              </div>
+              <EmptyState
+                description="Input operasional hari ini sudah cukup lengkap pada seluruh siklus aktif."
+                title="Tidak ada catatan yang perlu ditindaklanjuti"
+              />
             )}
           </div>
         </div>
@@ -162,99 +134,166 @@ export default async function Dashboard() {
         <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <Waves className="size-5" />
+              <Fish className="size-5" />
             </div>
             <div>
-              <h2 className="font-semibold">Siklus Aktif</h2>
+              <h2 className="font-semibold">Panen Terdekat</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Snapshot singkat dari siklus yang sedang berjalan dan perlu dipantau.
+                Siklus yang jadwal panennya paling dekat dari hari ini.
               </p>
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3">
-            {data.activeCycles.length ? (
-              data.activeCycles.map((cycle) => (
-                <article
-                  className="border-border bg-background rounded-md border p-4"
-                  key={cycle.id}
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="min-w-0">
-                      <h3 className="font-semibold">{cycle.name}</h3>
-                      <p className="text-muted-foreground mt-1 text-sm">{cycle.pondsLabel}</p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <StatusPill label={`Umur ${formatNumber(cycle.ageDays)} hari`} />
-                        <StatusPill
-                          label={
-                            cycle.targetHarvestDate
-                              ? `Panen ${formatDate(cycle.targetHarvestDate)}`
-                              : "Target panen belum diatur"
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <Link
-                      className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
-                      href={cycle.href}
-                    >
-                      Detail
-                    </Link>
-                  </div>
-
-                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-                    <MetricItem
-                      label="Estimasi Ikan Hidup"
-                      value={`${formatNumber(cycle.aliveEstimate)} ekor`}
-                    />
-                    <MetricItem
-                      label="Pakan Hari Ini"
-                      value={`${formatNumber(cycle.feedTodayKg)} kg`}
-                    />
-                  </dl>
-                </article>
-              ))
-            ) : (
-              <div className="border-border bg-background rounded-md border px-4 py-8 text-center">
-                <p className="font-medium">Belum ada siklus aktif</p>
+          <div className="mt-5">
+            {data.nearestHarvest ? (
+              <div className="border-border bg-background rounded-md border p-4">
+                <p className="font-semibold">{data.nearestHarvest.cycleName}</p>
                 <p className="text-muted-foreground mt-1 text-sm">
-                  Tambahkan siklus budidaya baru untuk mulai mencatat operasional.
+                  {data.nearestHarvest.pondsLabel}
                 </p>
+
+                <dl className="mt-4 space-y-3 text-sm">
+                  <MetricRow
+                    label="Target Panen"
+                    value={formatDate(data.nearestHarvest.targetHarvestDate)}
+                  />
+                  <MetricRow
+                    label="Sisa Waktu"
+                    value={`${formatNumber(data.nearestHarvest.daysLeft)} hari`}
+                    valueClassName={
+                      data.nearestHarvest.daysLeft <= 7 ? "text-primary" : undefined
+                    }
+                  />
+                </dl>
+
                 <div className="mt-4">
-                  <Link className={buttonVariants({ variant: "outline" })} href="/siklus-budidaya">
-                    Buka Siklus Budidaya
+                  <Link
+                    className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
+                    href={data.nearestHarvest.href}
+                  >
+                    Lihat Detail Siklus
                   </Link>
                 </div>
               </div>
+            ) : (
+              <EmptyState
+                description="Atur target panen pada siklus aktif agar jadwal panen bisa dipantau dari dashboard."
+                title="Belum ada target panen"
+              />
             )}
           </div>
+        </div>
+      </section>
+
+      <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Siklus Aktif</h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Daftar singkat siklus yang sedang berjalan dan perlu dipantau.
+            </p>
+          </div>
+
+          {data.activeCycles.length ? (
+            <Link
+              className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
+              href="/siklus-budidaya"
+            >
+              Lihat Semua Siklus
+            </Link>
+          ) : null}
+        </div>
+
+        <div className="mt-5 grid gap-3">
+          {visibleCycles.length ? (
+            visibleCycles.map((cycle) => (
+              <article
+                className="border-border bg-background rounded-md border p-4"
+                key={cycle.id}
+              >
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold">{cycle.name}</h3>
+                    <p className="text-muted-foreground mt-1 text-sm">{cycle.pondsLabel}</p>
+                  </div>
+
+                  <Link
+                    className={cn(buttonVariants({ size: "sm", variant: "outline" }), "gap-2")}
+                    href={cycle.href}
+                  >
+                    Detail
+                  </Link>
+                </div>
+
+                <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <MetricRow
+                    label="Umur"
+                    value={`${formatNumber(cycle.ageDays)} hari`}
+                  />
+                  <MetricRow
+                    label="Estimasi Hidup"
+                    value={`${formatNumber(cycle.aliveEstimate)} ekor`}
+                  />
+                  <MetricRow
+                    label="Target Panen"
+                    value={
+                      cycle.targetHarvestDate
+                        ? formatDate(cycle.targetHarvestDate)
+                        : "Belum diatur"
+                    }
+                  />
+                </dl>
+              </article>
+            ))
+          ) : (
+            <EmptyState
+              action={
+                <Link className={buttonVariants({ variant: "outline" })} href="/siklus-budidaya">
+                  Buka Siklus Budidaya
+                </Link>
+              }
+              description="Tambahkan siklus budidaya baru untuk mulai mencatat operasional."
+              title="Belum ada siklus aktif"
+            />
+          )}
         </div>
       </section>
     </div>
   )
 }
 
-function MetricItem({
-  label,
-  value,
+function EmptyState({
+  action,
+  description,
+  title,
 }: {
-  label: string
-  value: string
+  action?: ReactNode
+  description: string
+  title: string
 }) {
   return (
-    <div className="border-border rounded-md border px-3 py-2.5">
-      <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd className="mt-1 font-medium">{value}</dd>
+    <div className="border-border bg-background rounded-md border px-4 py-8 text-center">
+      <p className="font-medium">{title}</p>
+      <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+      {action ? <div className="mt-4">{action}</div> : null}
     </div>
   )
 }
 
-function StatusPill({ label }: { label: string }) {
+function MetricRow({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string
+  value: string
+  valueClassName?: string
+}) {
   return (
-    <span className="border-border bg-card inline-flex rounded-full border px-2 py-1 text-xs font-medium">
-      {label}
-    </span>
+    <div className="border-border rounded-md border px-3 py-2.5">
+      <dt className="text-muted-foreground text-xs">{label}</dt>
+      <dd className={cn("mt-1 font-medium", valueClassName)}>{value}</dd>
+    </div>
   )
 }
 

@@ -23,6 +23,14 @@ type DashboardCycle = {
   targetHarvestDate: Date | null
 }
 
+type DashboardNearestHarvest = {
+  cycleName: string
+  daysLeft: number
+  href: string
+  pondsLabel: string
+  targetHarvestDate: Date
+} | null
+
 export type DashboardPageData = {
   activeCycles: DashboardCycle[]
   activeCyclesCount: number
@@ -31,6 +39,7 @@ export type DashboardPageData = {
   farmLabel: string
   feedTodayKg: number
   mortalityTodayCount: number
+  nearestHarvest: DashboardNearestHarvest
   nearestHarvestDaysLeft: number | null
   nearestHarvestLabel: string
   totalEstimatedAlive: number
@@ -144,6 +153,16 @@ export async function getDashboardPageData(): Promise<DashboardPageData> {
   const nearestHarvestDaysLeft = nearestHarvestCycle?.targetHarvestDate
     ? getDateDiffInDays(todayRange.now, nearestHarvestCycle.targetHarvestDate)
     : null
+  const nearestHarvest =
+    nearestHarvestCycle?.targetHarvestDate && nearestHarvestDaysLeft != null
+      ? {
+          cycleName: nearestHarvestCycle.name,
+          daysLeft: nearestHarvestDaysLeft,
+          href: nearestHarvestCycle.href,
+          pondsLabel: nearestHarvestCycle.pondsLabel,
+          targetHarvestDate: nearestHarvestCycle.targetHarvestDate,
+        }
+      : null
 
   return {
     activeCycles: serializedCycles.map((cycle) => ({
@@ -162,6 +181,7 @@ export async function getDashboardPageData(): Promise<DashboardPageData> {
     farmLabel: user.farmName ?? (user.farmId ? "Farm aktif" : "Semua farm"),
     feedTodayKg,
     mortalityTodayCount,
+    nearestHarvest,
     nearestHarvestDaysLeft,
     nearestHarvestLabel: nearestHarvestCycle?.targetHarvestDate
       ? formatDate(nearestHarvestCycle.targetHarvestDate)
