@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
+import { ExpenseCategory } from "@/app/generated/prisma/enums"
 import { type Prisma } from "@/app/generated/prisma/client"
 import { actionError, actionSuccess, type ActionState } from "@/app/lib/action-state"
 import { getFarmScopeWhere, requireSessionUser } from "@/app/lib/authz"
@@ -11,6 +12,7 @@ import {
   getActionErrorMessage,
   readOptionalDecimal,
   readOptionalFloat,
+  readRequiredDecimal,
   readRequiredDate,
   readRequiredFloat,
   readRequiredInt,
@@ -233,6 +235,117 @@ export async function deleteMortalityLog(
 
     revalidatePath(`/siklus-budidaya/${cycle.id}`)
     return actionSuccess("Data mortalitas berhasil dihapus.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function createExpenseLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    await prisma.expenseLog.create({
+      data: {
+        cultureCycleId: cycle.id,
+        logDate: readRequiredDate(formData, "logDate", "Tanggal"),
+        category: readExpenseCategory(formData),
+        title: readRequiredText(formData, "title", "Nama biaya"),
+        amount: readRequiredDecimal(formData, "amount", "Nominal"),
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data biaya berhasil ditambahkan.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function updateExpenseLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const expenseLogId = readRequiredText(formData, "id", "ID biaya")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const expenseLog = await prisma.expenseLog.findFirst({
+      where: {
+        id: expenseLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!expenseLog) {
+      return actionError("Data biaya tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.expenseLog.update({
+      where: {
+        id: expenseLog.id,
+      },
+      data: {
+        logDate: readRequiredDate(formData, "logDate", "Tanggal"),
+        category: readExpenseCategory(formData),
+        title: readRequiredText(formData, "title", "Nama biaya"),
+        amount: readRequiredDecimal(formData, "amount", "Nominal"),
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data biaya berhasil diperbarui.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function deleteExpenseLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const expenseLogId = readRequiredText(formData, "id", "ID biaya")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const expenseLog = await prisma.expenseLog.findFirst({
+      where: {
+        id: expenseLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!expenseLog) {
+      return actionError("Data biaya tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.expenseLog.delete({
+      where: {
+        id: expenseLog.id,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data biaya berhasil dihapus.")
   } catch (error) {
     return actionError(getActionErrorMessage(error))
   }
@@ -464,6 +577,117 @@ export async function deleteWaterQualityLog(
   }
 }
 
+export async function createTreatmentLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    await prisma.treatmentLog.create({
+      data: {
+        cultureCycleId: cycle.id,
+        logDate: readRequiredDate(formData, "logDate", "Tanggal"),
+        productName: readRequiredText(formData, "productName", "Nama obat / vitamin"),
+        dosage: readText(formData, "dosage") || null,
+        purpose: readText(formData, "purpose") || null,
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data pengobatan berhasil ditambahkan.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function updateTreatmentLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const treatmentLogId = readRequiredText(formData, "id", "ID pengobatan")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const treatmentLog = await prisma.treatmentLog.findFirst({
+      where: {
+        id: treatmentLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!treatmentLog) {
+      return actionError("Data pengobatan tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.treatmentLog.update({
+      where: {
+        id: treatmentLog.id,
+      },
+      data: {
+        logDate: readRequiredDate(formData, "logDate", "Tanggal"),
+        productName: readRequiredText(formData, "productName", "Nama obat / vitamin"),
+        dosage: readText(formData, "dosage") || null,
+        purpose: readText(formData, "purpose") || null,
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data pengobatan berhasil diperbarui.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function deleteTreatmentLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const treatmentLogId = readRequiredText(formData, "id", "ID pengobatan")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const treatmentLog = await prisma.treatmentLog.findFirst({
+      where: {
+        id: treatmentLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!treatmentLog) {
+      return actionError("Data pengobatan tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.treatmentLog.delete({
+      where: {
+        id: treatmentLog.id,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data pengobatan berhasil dihapus.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
 async function requireAccessibleCycle(
   cycleId: string,
   user: Awaited<ReturnType<typeof requireSessionUser>>
@@ -483,4 +707,21 @@ async function requireAccessibleCycle(
   }
 
   return cycle
+}
+
+function readExpenseCategory(formData: FormData): ExpenseCategory {
+  const value = readRequiredText(formData, "category", "Kategori biaya")
+
+  if (
+    value === ExpenseCategory.SEED ||
+    value === ExpenseCategory.FEED ||
+    value === ExpenseCategory.MEDICINE_VITAMIN ||
+    value === ExpenseCategory.LABOR ||
+    value === ExpenseCategory.ELECTRICITY ||
+    value === ExpenseCategory.OTHER
+  ) {
+    return value
+  }
+
+  throw new Error("Kategori biaya tidak valid.")
 }

@@ -138,6 +138,12 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
           { createdAt: "desc" },
         ],
       },
+      expenseLogs: {
+        orderBy: [
+          { logDate: "desc" },
+          { createdAt: "desc" },
+        ],
+      },
       mortalityLogs: {
         orderBy: [
           { logDate: "desc" },
@@ -145,6 +151,12 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
         ],
       },
       samplingLogs: {
+        orderBy: [
+          { logDate: "desc" },
+          { createdAt: "desc" },
+        ],
+      },
+      treatmentLogs: {
         orderBy: [
           { logDate: "desc" },
           { createdAt: "desc" },

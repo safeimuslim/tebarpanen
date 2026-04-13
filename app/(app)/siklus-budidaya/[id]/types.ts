@@ -1,7 +1,9 @@
 import type {
+  ExpenseLog,
   FeedLog,
   MortalityLog,
   SamplingLog,
+  TreatmentLog,
   WaterQualityLog,
 } from "@/app/generated/prisma/client"
 import type { ActionState } from "@/app/lib/action-state"
@@ -11,6 +13,15 @@ export type FeedLogItem = Omit<FeedLog, "priceTotal"> & {
 }
 
 export type FeedLogAction = (
+  previousState: ActionState,
+  formData: FormData
+) => Promise<ActionState>
+
+export type ExpenseLogItem = Omit<ExpenseLog, "amount"> & {
+  amount: number
+}
+
+export type ExpenseLogAction = (
   previousState: ActionState,
   formData: FormData
 ) => Promise<ActionState>
@@ -32,6 +43,13 @@ export type SamplingLogAction = (
 export type WaterQualityLogItem = WaterQualityLog
 
 export type WaterQualityLogAction = (
+  previousState: ActionState,
+  formData: FormData
+) => Promise<ActionState>
+
+export type TreatmentLogItem = TreatmentLog
+
+export type TreatmentLogAction = (
   previousState: ActionState,
   formData: FormData
 ) => Promise<ActionState>

@@ -1,2 +1,2 @@
 -- DropIndex
-DROP INDEX "SamplingLog_cultureCycleId_idx";
+DROP INDEX IF EXISTS "SamplingLog_cultureCycleId_idx";

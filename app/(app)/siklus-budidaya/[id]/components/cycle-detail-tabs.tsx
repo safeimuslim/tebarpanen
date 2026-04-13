@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils"
 
 type CycleDetailTab =
   | "ringkasan"
+  | "biaya"
   | "pakan"
   | "mortalitas"
   | "sampling"
+  | "pengobatan"
   | "kualitas-air"
 
 export function CycleDetailTabs({
@@ -17,9 +19,11 @@ export function CycleDetailTabs({
 }: {
   activeTab: CycleDetailTab
   counts: {
+    expenseLogs: number
     feedLogs: number
     mortalityLogs: number
     samplingLogs: number
+    treatmentLogs: number
     waterQualityLogs: number
   }
   cycleId: string
@@ -30,9 +34,11 @@ export function CycleDetailTabs({
     count?: number
   }> = [
     { label: "Ringkasan", value: "ringkasan" },
+    { label: "Biaya", value: "biaya", count: counts.expenseLogs },
     { label: "Pakan", value: "pakan", count: counts.feedLogs },
     { label: "Mortalitas", value: "mortalitas", count: counts.mortalityLogs },
     { label: "Sampling", value: "sampling", count: counts.samplingLogs },
+    { label: "Pengobatan", value: "pengobatan", count: counts.treatmentLogs },
     { label: "Kualitas Air", value: "kualitas-air", count: counts.waterQualityLogs },
   ]
 

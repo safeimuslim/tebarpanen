@@ -199,6 +199,17 @@ export function readOptionalDecimal(formData: FormData, key: string) {
   return value
 }
 
+export function readRequiredDecimal(formData: FormData, key: string, label: string) {
+  const rawValue = readRequiredText(formData, key, label)
+  const value = Number.parseFloat(rawValue)
+
+  if (!Number.isFinite(value)) {
+    throw new Error(`${label} tidak valid.`)
+  }
+
+  return value
+}
+
 export function getActionErrorMessage(error: unknown) {
   if (
     typeof error === "object" &&

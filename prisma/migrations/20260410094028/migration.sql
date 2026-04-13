@@ -1,2 +1,2 @@
 -- DropIndex
-DROP INDEX "WaterQualityLog_cultureCycleId_idx";
+DROP INDEX IF EXISTS "WaterQualityLog_cultureCycleId_idx";

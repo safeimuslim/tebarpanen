@@ -98,8 +98,10 @@ model CultureCycle {
   updatedAt         DateTime          @updatedAt
   ponds             CyclePond[]
   feedLogs          FeedLog[]
+  expenseLogs       ExpenseLog[]
   mortalityLogs     MortalityLog[]
   samplingLogs      SamplingLog[]
+  treatmentLogs     TreatmentLog[]
   waterQualityLogs  WaterQualityLog[]
 }
 
@@ -168,6 +170,32 @@ model WaterQualityLog {
   updatedAt      DateTime     @updatedAt
 }
 
+model TreatmentLog {
+  id             String       @id @default(cuid())
+  cultureCycleId String
+  cultureCycle   CultureCycle @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  logDate        DateTime
+  productName    String
+  dosage         String?
+  purpose        String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model ExpenseLog {
+  id             String          @id @default(cuid())
+  cultureCycleId String
+  cultureCycle   CultureCycle    @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  logDate        DateTime
+  category       ExpenseCategory
+  title          String
+  amount         Decimal         @db.Decimal(12, 2)
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
 enum PondType {
   TERPAL
   BETON
@@ -209,6 +237,15 @@ enum CycleStatus {
   HARVESTED
   FAILED
   CLOSED
+}
+
+enum ExpenseCategory {
+  SEED
+  FEED
+  MEDICINE_VITAMIN
+  LABOR
+  ELECTRICITY
+  OTHER
 }
 
 enum UserRole {

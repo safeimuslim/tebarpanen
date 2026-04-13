@@ -18,9 +18,11 @@ import {
   getSurvivalRate,
 } from "../utils"
 import { CycleDetailTabs } from "./components/cycle-detail-tabs"
+import { ExpenseLogSection } from "./components/expense-log-section"
 import { FeedLogSection } from "./components/feed-log-section"
 import { MortalityLogSection } from "./components/mortality-log-section"
 import { SamplingLogSection } from "./components/sampling-log-section"
+import { TreatmentLogSection } from "./components/treatment-log-section"
 import { WaterQualityLogSection } from "./components/water-quality-log-section"
 
 export default async function SiklusBudidayaDetailPage({
@@ -41,11 +43,21 @@ export default async function SiklusBudidayaDetailPage({
 
   const deadCount = cycle.mortalityLogs.reduce((sum, log) => sum + log.deadCount, 0)
   const feedUsed = cycle.feedLogs.reduce((sum, log) => sum + log.quantityKg, 0)
+  const serializedExpenseLogs = cycle.expenseLogs.map((expenseLog) => ({
+    ...expenseLog,
+    amount: decimalToNumber(expenseLog.amount) ?? 0,
+  }))
   const serializedFeedLogs = cycle.feedLogs.map((feedLog) => ({
     ...feedLog,
     priceTotal: decimalToNumber(feedLog.priceTotal),
   }))
+  const totalExpense = serializedExpenseLogs.reduce(
+    (sum, expenseLog) => sum + expenseLog.amount,
+    0
+  )
+  const latestExpense = serializedExpenseLogs[0]
   const latestSampling = cycle.samplingLogs[0]
+  const latestTreatment = cycle.treatmentLogs[0]
   const latestWaterQuality = cycle.waterQualityLogs[0]
   const estimatedAlive = getEstimatedAlive(cycle.seedCount, deadCount)
   const activeTab = readDetailTab(query.tab)
@@ -165,9 +177,11 @@ export default async function SiklusBudidayaDetailPage({
           <CycleDetailTabs
             activeTab={activeTab}
             counts={{
+              expenseLogs: cycle.expenseLogs.length,
               feedLogs: cycle.feedLogs.length,
               mortalityLogs: cycle.mortalityLogs.length,
               samplingLogs: cycle.samplingLogs.length,
+              treatmentLogs: cycle.treatmentLogs.length,
               waterQualityLogs: cycle.waterQualityLogs.length,
             }}
             cycleId={cycle.id}
@@ -192,8 +206,13 @@ export default async function SiklusBudidayaDetailPage({
 
                 <dl className="mt-5 grid gap-4 text-sm md:grid-cols-2">
                   <DetailMetric label="Total Pakan" value={`${formatNumber(feedUsed)} kg`} />
+                  <DetailMetric label="Biaya Manual" value={formatCurrency(totalExpense)} />
                   <DetailMetric label="Mortalitas" value={`${formatNumber(deadCount)} ekor`} />
                   <DetailMetric label="Jumlah Catatan Pakan" value={formatNumber(cycle.feedLogs.length)} />
+                  <DetailMetric
+                    label="Jumlah Catatan Biaya"
+                    value={formatNumber(cycle.expenseLogs.length)}
+                  />
                   <DetailMetric
                     label="Jumlah Catatan Mortalitas"
                     value={formatNumber(cycle.mortalityLogs.length)}
@@ -209,6 +228,18 @@ export default async function SiklusBudidayaDetailPage({
                   <DetailMetric
                     label="Jumlah Catatan Sampling"
                     value={formatNumber(cycle.samplingLogs.length)}
+                  />
+                  <DetailMetric
+                    label="Pengobatan Terakhir"
+                    value={latestTreatment ? formatDate(latestTreatment.logDate) : "-"}
+                  />
+                  <DetailMetric
+                    label="Biaya Terakhir"
+                    value={latestExpense ? formatDate(latestExpense.logDate) : "-"}
+                  />
+                  <DetailMetric
+                    label="Jumlah Catatan Pengobatan"
+                    value={formatNumber(cycle.treatmentLogs.length)}
                   />
                   <DetailMetric
                     label="pH Terakhir"
@@ -229,19 +260,29 @@ export default async function SiklusBudidayaDetailPage({
                   <div>
                     <h2 className="font-semibold">Status Pengembangan</h2>
                     <p className="text-muted-foreground mt-1 text-sm">
-                      CRUD siklus, pakan, mortalitas, sampling, dan kualitas air
-                      sudah aktif. Modul operasional lain akan dikerjakan pada tahap berikutnya.
+                      CRUD siklus, pakan, mortalitas, sampling, pengobatan, kualitas air,
+                      dan biaya manual sudah aktif. Modul panen akan dikerjakan pada tahap
+                      berikutnya.
                     </p>
                   </div>
                 </div>
 
                 <p className="text-muted-foreground mt-5 text-sm">
-                  Saat ini input pakan, mortalitas, sampling, dan kualitas air
-                  sudah terhubung ke database. Modul pengobatan, biaya, dan panen
-                  belum diintegrasikan pada halaman ini.
+                  Saat ini input pakan, mortalitas, sampling, pengobatan, kualitas air,
+                  dan biaya manual sudah terhubung ke database. Nominal dari modul biaya
+                  belum digabung otomatis dengan harga bibit, pakan, atau pengobatan
+                  dari modul lain agar tidak terjadi hitung ganda.
                 </p>
               </div>
             </section>
+          ) : null}
+
+          {activeTab === "biaya" ? (
+            <ExpenseLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              expenseLogs={serializedExpenseLogs}
+            />
           ) : null}
 
           {activeTab === "pakan" ? (
@@ -268,6 +309,14 @@ export default async function SiklusBudidayaDetailPage({
             />
           ) : null}
 
+          {activeTab === "pengobatan" ? (
+            <TreatmentLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              treatmentLogs={cycle.treatmentLogs}
+            />
+          ) : null}
+
           {activeTab === "kualitas-air" ? (
             <WaterQualityLogSection
               canManage={Boolean(user.id)}
@@ -283,13 +332,22 @@ export default async function SiklusBudidayaDetailPage({
 
 function readDetailTab(
   value: string | string[] | undefined
-): "ringkasan" | "pakan" | "mortalitas" | "sampling" | "kualitas-air" {
+):
+  | "ringkasan"
+  | "biaya"
+  | "pakan"
+  | "mortalitas"
+  | "sampling"
+  | "pengobatan"
+  | "kualitas-air" {
   const tab = Array.isArray(value) ? value[0] : value
 
   if (
+    tab === "biaya" ||
     tab === "pakan" ||
     tab === "mortalitas" ||
     tab === "sampling" ||
+    tab === "pengobatan" ||
     tab === "kualitas-air"
   ) {
     return tab
