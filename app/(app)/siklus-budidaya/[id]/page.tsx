@@ -21,6 +21,7 @@ import { CycleDetailTabs } from "./components/cycle-detail-tabs"
 import { FeedLogSection } from "./components/feed-log-section"
 import { MortalityLogSection } from "./components/mortality-log-section"
 import { SamplingLogSection } from "./components/sampling-log-section"
+import { WaterQualityLogSection } from "./components/water-quality-log-section"
 
 export default async function SiklusBudidayaDetailPage({
   params,
@@ -45,6 +46,7 @@ export default async function SiklusBudidayaDetailPage({
     priceTotal: decimalToNumber(feedLog.priceTotal),
   }))
   const latestSampling = cycle.samplingLogs[0]
+  const latestWaterQuality = cycle.waterQualityLogs[0]
   const estimatedAlive = getEstimatedAlive(cycle.seedCount, deadCount)
   const activeTab = readDetailTab(query.tab)
   const summary = [
@@ -166,6 +168,7 @@ export default async function SiklusBudidayaDetailPage({
               feedLogs: cycle.feedLogs.length,
               mortalityLogs: cycle.mortalityLogs.length,
               samplingLogs: cycle.samplingLogs.length,
+              waterQualityLogs: cycle.waterQualityLogs.length,
             }}
             cycleId={cycle.id}
           />
@@ -207,6 +210,14 @@ export default async function SiklusBudidayaDetailPage({
                     label="Jumlah Catatan Sampling"
                     value={formatNumber(cycle.samplingLogs.length)}
                   />
+                  <DetailMetric
+                    label="pH Terakhir"
+                    value={latestWaterQuality?.ph != null ? formatNumber(latestWaterQuality.ph) : "-"}
+                  />
+                  <DetailMetric
+                    label="Jumlah Catatan Kualitas Air"
+                    value={formatNumber(cycle.waterQualityLogs.length)}
+                  />
                 </dl>
               </div>
 
@@ -218,15 +229,15 @@ export default async function SiklusBudidayaDetailPage({
                   <div>
                     <h2 className="font-semibold">Status Pengembangan</h2>
                     <p className="text-muted-foreground mt-1 text-sm">
-                      CRUD siklus, pakan, mortalitas, dan sampling sudah aktif.
-                      Modul operasional lain akan dikerjakan pada tahap berikutnya.
+                      CRUD siklus, pakan, mortalitas, sampling, dan kualitas air
+                      sudah aktif. Modul operasional lain akan dikerjakan pada tahap berikutnya.
                     </p>
                   </div>
                 </div>
 
                 <p className="text-muted-foreground mt-5 text-sm">
-                  Saat ini input pakan, mortalitas, dan sampling sudah terhubung
-                  ke database. Modul kualitas air, pengobatan, biaya, dan panen
+                  Saat ini input pakan, mortalitas, sampling, dan kualitas air
+                  sudah terhubung ke database. Modul pengobatan, biaya, dan panen
                   belum diintegrasikan pada halaman ini.
                 </p>
               </div>
@@ -256,6 +267,14 @@ export default async function SiklusBudidayaDetailPage({
               samplingLogs={cycle.samplingLogs}
             />
           ) : null}
+
+          {activeTab === "kualitas-air" ? (
+            <WaterQualityLogSection
+              canManage={Boolean(user.id)}
+              cycleId={cycle.id}
+              waterQualityLogs={cycle.waterQualityLogs}
+            />
+          ) : null}
         </div>
       </section>
     </div>
@@ -264,10 +283,15 @@ export default async function SiklusBudidayaDetailPage({
 
 function readDetailTab(
   value: string | string[] | undefined
-): "ringkasan" | "pakan" | "mortalitas" | "sampling" {
+): "ringkasan" | "pakan" | "mortalitas" | "sampling" | "kualitas-air" {
   const tab = Array.isArray(value) ? value[0] : value
 
-  if (tab === "pakan" || tab === "mortalitas" || tab === "sampling") {
+  if (
+    tab === "pakan" ||
+    tab === "mortalitas" ||
+    tab === "sampling" ||
+    tab === "kualitas-air"
+  ) {
     return tab
   }
 

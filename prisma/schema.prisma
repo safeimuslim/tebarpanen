@@ -82,24 +82,25 @@ model Equipment {
 }
 
 model CultureCycle {
-  id                String         @id @default(cuid())
+  id                String            @id @default(cuid())
   farmId            String?
-  farm              Farm?          @relation(fields: [farmId], references: [id], onDelete: SetNull)
+  farm              Farm?             @relation(fields: [farmId], references: [id], onDelete: SetNull)
   cycleName         String
   startDate         DateTime
   endDate           DateTime?
   seedCount         Int
   initialAvgWeightG Float?
-  seedPriceTotal    Decimal?       @db.Decimal(14, 2)
+  seedPriceTotal    Decimal?          @db.Decimal(14, 2)
   targetHarvestDate DateTime?
-  status            CycleStatus    @default(ACTIVE)
+  status            CycleStatus       @default(ACTIVE)
   notes             String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
   ponds             CyclePond[]
   feedLogs          FeedLog[]
   mortalityLogs     MortalityLog[]
   samplingLogs      SamplingLog[]
+  waterQualityLogs  WaterQualityLog[]
 }
 
 model CyclePond {
@@ -150,6 +151,21 @@ model SamplingLog {
   notes           String?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+}
+
+model WaterQualityLog {
+  id             String       @id @default(cuid())
+  cultureCycleId String
+  cultureCycle   CultureCycle @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  logDate        DateTime
+  ph             Float?
+  temperatureC   Float?
+  doMgL          Float?
+  ammoniaMgL     Float?
+  waterColor     String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
 
 enum PondType {

@@ -10,6 +10,7 @@ import { prisma } from "@/app/lib/prisma"
 import {
   getActionErrorMessage,
   readOptionalDecimal,
+  readOptionalFloat,
   readRequiredDate,
   readRequiredFloat,
   readRequiredInt,
@@ -343,6 +344,121 @@ export async function deleteSamplingLog(
 
     revalidatePath(`/siklus-budidaya/${cycle.id}`)
     return actionSuccess("Data sampling berhasil dihapus.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function createWaterQualityLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    await prisma.waterQualityLog.create({
+      data: {
+        cultureCycleId: cycle.id,
+        logDate: readRequiredDate(formData, "logDate", "Tanggal"),
+        ph: readOptionalFloat(formData, "ph"),
+        temperatureC: readOptionalFloat(formData, "temperatureC"),
+        doMgL: readOptionalFloat(formData, "doMgL"),
+        ammoniaMgL: readOptionalFloat(formData, "ammoniaMgL"),
+        waterColor: readText(formData, "waterColor") || null,
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data kualitas air berhasil ditambahkan.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function updateWaterQualityLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const waterQualityLogId = readRequiredText(formData, "id", "ID kualitas air")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const waterQualityLog = await prisma.waterQualityLog.findFirst({
+      where: {
+        id: waterQualityLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!waterQualityLog) {
+      return actionError("Data kualitas air tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.waterQualityLog.update({
+      where: {
+        id: waterQualityLog.id,
+      },
+      data: {
+        logDate: readRequiredDate(formData, "logDate", "Tanggal"),
+        ph: readOptionalFloat(formData, "ph"),
+        temperatureC: readOptionalFloat(formData, "temperatureC"),
+        doMgL: readOptionalFloat(formData, "doMgL"),
+        ammoniaMgL: readOptionalFloat(formData, "ammoniaMgL"),
+        waterColor: readText(formData, "waterColor") || null,
+        notes: readText(formData, "notes") || null,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data kualitas air berhasil diperbarui.")
+  } catch (error) {
+    return actionError(getActionErrorMessage(error))
+  }
+}
+
+export async function deleteWaterQualityLog(
+  _previousState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const user = await requireSessionUser()
+
+  try {
+    const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
+    const waterQualityLogId = readRequiredText(formData, "id", "ID kualitas air")
+    const cycle = await requireAccessibleCycle(cycleId, user)
+
+    const waterQualityLog = await prisma.waterQualityLog.findFirst({
+      where: {
+        id: waterQualityLogId,
+        cultureCycleId: cycle.id,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!waterQualityLog) {
+      return actionError("Data kualitas air tidak ditemukan atau tidak dapat diakses.")
+    }
+
+    await prisma.waterQualityLog.delete({
+      where: {
+        id: waterQualityLog.id,
+      },
+    })
+
+    revalidatePath(`/siklus-budidaya/${cycle.id}`)
+    return actionSuccess("Data kualitas air berhasil dihapus.")
   } catch (error) {
     return actionError(getActionErrorMessage(error))
   }

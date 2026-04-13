@@ -3,7 +3,12 @@ import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-type CycleDetailTab = "ringkasan" | "pakan" | "mortalitas" | "sampling"
+type CycleDetailTab =
+  | "ringkasan"
+  | "pakan"
+  | "mortalitas"
+  | "sampling"
+  | "kualitas-air"
 
 export function CycleDetailTabs({
   activeTab,
@@ -15,6 +20,7 @@ export function CycleDetailTabs({
     feedLogs: number
     mortalityLogs: number
     samplingLogs: number
+    waterQualityLogs: number
   }
   cycleId: string
 }) {
@@ -27,6 +33,7 @@ export function CycleDetailTabs({
     { label: "Pakan", value: "pakan", count: counts.feedLogs },
     { label: "Mortalitas", value: "mortalitas", count: counts.mortalityLogs },
     { label: "Sampling", value: "sampling", count: counts.samplingLogs },
+    { label: "Kualitas Air", value: "kualitas-air", count: counts.waterQualityLogs },
   ]
 
   return (
