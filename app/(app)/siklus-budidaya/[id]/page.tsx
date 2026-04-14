@@ -244,7 +244,6 @@ export default async function SiklusBudidayaDetailPage({
         <div className="p-4 sm:p-5">
           {activeTab === "ringkasan" ? (
             <section>
-              <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
                     <CalendarDays className="size-5" />
@@ -282,7 +281,6 @@ export default async function SiklusBudidayaDetailPage({
                     value={latestWaterQuality?.ph != null ? formatNumber(latestWaterQuality.ph) : "-"}
                   />
                 </dl>
-              </div>
             </section>
           ) : null}
 
