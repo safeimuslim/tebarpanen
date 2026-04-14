@@ -1,15 +1,8 @@
 import Link from "next/link"
-import { ArrowLeft, CalendarDays, FileText, Info, Waves } from "lucide-react"
+import { ArrowLeft, CalendarDays, Info } from "lucide-react"
 import { notFound } from "next/navigation"
 
 import { requireSessionUser } from "@/app/lib/authz"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionHeader,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { buttonVariants } from "@/components/ui/button"
 import {
   Popover,
@@ -111,14 +104,19 @@ export default async function SiklusBudidayaDetailPage({
   const estimatedAlive = getEstimatedAlive(cycle.seedCount, deadCount)
   const activeTab = readDetailTab(query.tab)
   const summary: SummaryItem[] = [
-    { label: "Estimasi Ikan Hidup", value: `${formatNumber(estimatedAlive)} ekor` },
     {
-      label: "Pendapatan Panen",
-      value: formatCurrency(totalHarvestRevenue),
+      label: "Estimasi Ikan Hidup",
+      valueClassName: "text-primary",
+      value: `${formatNumber(estimatedAlive)} ekor`,
     },
     {
-      label: "Biaya Operasional",
-      value: formatCurrency(totalOperationalCost),
+      label: "Mortalitas",
+      valueClassName: "text-destructive",
+      value: `${formatNumber(deadCount)} ekor`,
+    },
+    {
+      label: "Survival Rate",
+      value: getSurvivalRate(cycle.seedCount, deadCount),
     },
     {
       label: "Untung / Rugi",
@@ -152,11 +150,7 @@ export default async function SiklusBudidayaDetailPage({
         },
       ],
     },
-    { label: "Jumlah Kolam", value: `${formatNumber(cycle.ponds.length)} kolam` },
-    { label: "Total Pakan", value: `${formatNumber(feedUsed)} kg` },
-    { label: "Mortalitas", value: `${formatNumber(deadCount)} ekor` },
-    { label: "Survival Rate", value: getSurvivalRate(cycle.seedCount, deadCount) },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -182,17 +176,6 @@ export default async function SiklusBudidayaDetailPage({
                 {getCycleStatusLabel(cycle.status)}
               </span>
             </div>
-            <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-              Detail dasar siklus budidaya dari database. Form operasional siklus
-              akan dikerjakan berikutnya.
-            </p>
-          </div>
-
-          <div className="border-border bg-card rounded-lg border px-4 py-3 shadow-sm">
-            <p className="text-muted-foreground text-xs">Farm</p>
-            <p className="mt-1 text-sm font-medium">
-              {cycle.farm?.name ?? "Tanpa farm"}
-            </p>
           </div>
         </div>
       </div>
@@ -209,7 +192,7 @@ export default async function SiklusBudidayaDetailPage({
         ))}
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(20rem,0.6fr)]">
+      <section>
         <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
@@ -230,40 +213,14 @@ export default async function SiklusBudidayaDetailPage({
             <DetailMetric label="Berat Awal" value={formatWeight(cycle.initialAvgWeightG)} />
             <DetailMetric label="Harga Bibit" value={formatCurrency(cycle.seedPriceTotal)} />
             <DetailMetric
-              label="Survival Rate"
-              value={getSurvivalRate(cycle.seedCount, deadCount)}
+              label="Kolam"
+              value={
+                cycle.ponds.length
+                  ? cycle.ponds.map((item) => item.pond.name).join(", ")
+                  : "-"
+              }
             />
           </dl>
-        </div>
-
-        <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <Waves className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Kolam Dalam Siklus</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Selama siklus aktif, kolam-kolam ini tidak bisa dipakai untuk siklus aktif lain.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 space-y-3">
-            {cycle.ponds.map((item) => (
-              <div className="border-border bg-background rounded-lg border p-3" key={item.pond.id}>
-                <div className="flex items-center justify-between gap-3">
-                  <p className="font-medium">{item.pond.name}</p>
-                  <span className="text-muted-foreground text-xs">
-                    {item.pond.status}
-                  </span>
-                </div>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  {item.pond.type} / {item.pond.shape}
-                </p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -286,7 +243,7 @@ export default async function SiklusBudidayaDetailPage({
 
         <div className="p-4 sm:p-5">
           {activeTab === "ringkasan" ? (
-            <section className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.85fr)]">
+            <section>
               <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
@@ -323,79 +280,6 @@ export default async function SiklusBudidayaDetailPage({
                   <SummaryMetricRow
                     label="pH Terakhir"
                     value={latestWaterQuality?.ph != null ? formatNumber(latestWaterQuality.ph) : "-"}
-                  />
-                </dl>
-              </div>
-
-              <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
-                <div className="flex items-start gap-3">
-                  <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-                    <FileText className="size-5" />
-                  </div>
-                  <div>
-                    <h2 className="font-semibold">Ringkasan Biaya</h2>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                      Snapshot cepat dari pemasukan panen dan pengeluaran utama pada siklus ini.
-                    </p>
-                  </div>
-                </div>
-
-                <dl className="mt-5 grid gap-3 text-sm">
-                  <SummaryMetricRow
-                    badgeLabel="Pemasukan"
-                    badgeVariant="income"
-                    label="Pendapatan Panen"
-                    value={formatCurrency(totalHarvestRevenue)}
-                  />
-                  <div>
-                    <Accordion defaultValue={["total-biaya"]}>
-                      <AccordionItem value="total-biaya">
-                        <AccordionHeader>
-                          <AccordionTrigger className="bg-background rounded-md">
-                            <div className="flex min-w-0 flex-1 items-start justify-between gap-4">
-                              <div className="min-w-0 space-y-1">
-                                <p className="text-muted-foreground text-xs">
-                                  Total Biaya Operasional
-                                </p>
-                                <span className="inline-flex rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive">
-                                  Pengeluaran
-                                </span>
-                              </div>
-                              <span className="text-right font-medium">
-                                {formatCurrency(totalOperationalCost)}
-                              </span>
-                            </div>
-                          </AccordionTrigger>
-                        </AccordionHeader>
-                        <AccordionContent className="border-border border-t">
-                          <div className="space-y-2 p-3">
-                            <NestedMetricRow
-                              badgeLabel="Pengeluaran"
-                              badgeVariant="expense"
-                              label="Biaya Bibit"
-                              value={formatCurrency(totalSeedCost)}
-                            />
-                            <NestedMetricRow
-                              badgeLabel="Pengeluaran"
-                              badgeVariant="expense"
-                              label="Biaya Pakan"
-                              value={formatCurrency(totalFeedCost)}
-                            />
-                            <NestedMetricRow
-                              badgeLabel="Pengeluaran"
-                              badgeVariant="expense"
-                              label="Biaya Manual"
-                              value={formatCurrency(totalExpense)}
-                            />
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </div>
-                  <SummaryMetricRow
-                    label="Untung / Rugi Operasional"
-                    value={formatCurrency(operationalProfit)}
-                    valueClassName={getProfitValueClassName(operationalProfit)}
                   />
                 </dl>
               </div>
@@ -633,39 +517,6 @@ function SummaryMetricRow({
         ) : null}
       </div>
       <dd className={cn("text-right font-medium", valueClassName)}>{value}</dd>
-    </div>
-  )
-}
-
-function NestedMetricRow({
-  badgeLabel,
-  badgeVariant,
-  label,
-  value,
-}: {
-  badgeLabel?: string
-  badgeVariant?: "income" | "expense"
-  label: string
-  value: string
-}) {
-  return (
-    <div className="border-border bg-card/50 flex items-start justify-between gap-4 rounded-md border px-3 py-2">
-      <div className="min-w-0 space-y-1">
-        <p className="text-muted-foreground text-xs">{label}</p>
-        {badgeLabel ? (
-          <span
-            className={cn(
-              "inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium",
-              badgeVariant === "income"
-                ? "bg-primary/10 text-primary"
-                : "bg-destructive/10 text-destructive"
-            )}
-          >
-            {badgeLabel}
-          </span>
-        ) : null}
-      </div>
-      <span className="text-right font-medium">{value}</span>
     </div>
   )
 }

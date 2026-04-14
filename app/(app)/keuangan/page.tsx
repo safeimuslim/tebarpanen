@@ -1,6 +1,5 @@
 import Link from "next/link"
 import {
-  CalendarRange,
   ChartColumn,
   Info,
   Wallet,
@@ -356,38 +355,6 @@ function MonthField({
         name={name}
         type="month"
       />
-    </div>
-  )
-}
-
-function MetricRow({
-  label,
-  value,
-  valueClassName,
-  variant,
-}: {
-  label: string
-  value: string
-  valueClassName?: string
-  variant?: "income" | "expense"
-}) {
-  return (
-    <div className="border-border bg-background flex items-start justify-between gap-4 rounded-md border px-3 py-2.5">
-      <div className="min-w-0 space-y-1">
-        <dt className="text-muted-foreground text-xs">{label}</dt>
-        {variant ? (
-          <span
-            className={
-              variant === "income"
-                ? "bg-primary/10 text-primary inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium"
-                : "bg-destructive/10 text-destructive inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium"
-            }
-          >
-            {variant === "income" ? "Pemasukan" : "Pengeluaran"}
-          </span>
-        ) : null}
-      </div>
-      <dd className={cn("text-right font-medium", valueClassName)}>{value}</dd>
     </div>
   )
 }
