@@ -85,33 +85,6 @@ export default async function KeuanganPage({
     },
   ]
 
-  const periodStats = [
-    {
-      label: "Rentang Bulan",
-      value: data.periodLabel,
-    },
-    {
-      label: "Farm",
-      value: data.farmLabel,
-    },
-    {
-      label: "Total Bulan",
-      value: `${formatNumber(data.monthCount)} bulan`,
-    },
-    {
-      label: "Siklus Berjalan",
-      value: `${formatNumber(data.activeCyclesCount)} siklus`,
-    },
-    {
-      label: "Panen Tercatat",
-      value: `${formatNumber(data.harvestCount)} transaksi`,
-    },
-    {
-      label: "Aset Disusutkan",
-      value: `${formatNumber(data.totalDepreciatedAssetCount)} aset`,
-    },
-  ]
-
   return (
     <div className="space-y-6">
       <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
@@ -122,15 +95,27 @@ export default async function KeuanganPage({
               Ringkasan keuangan farm
             </h1>
             <p className="text-muted-foreground mt-2 max-w-3xl text-sm">
-              Halaman ini diringkas untuk membantu membaca hasil usaha lebih cepat:
-              lihat hasil, baca tren, lalu buka detail biaya jika diperlukan.
+              Halaman ini diringkas untuk membantu membaca hasil usaha lebih
+              cepat: lihat hasil, baca tren, lalu buka detail biaya jika
+              diperlukan.
             </p>
           </div>
 
           <div className="flex flex-col gap-3 lg:items-end">
-            <form className="flex flex-col gap-3 sm:flex-row sm:items-end" method="get">
-              <MonthField defaultValue={data.startMonthParam} label="Bulan Awal" name="start" />
-              <MonthField defaultValue={data.endMonthParam} label="Bulan Akhir" name="end" />
+            <form
+              className="flex flex-col gap-3 sm:flex-row sm:items-end"
+              method="get"
+            >
+              <MonthField
+                defaultValue={data.startMonthParam}
+                label="Bulan Awal"
+                name="start"
+              />
+              <MonthField
+                defaultValue={data.endMonthParam}
+                label="Bulan Akhir"
+                name="end"
+              />
               <Button type="submit">Terapkan</Button>
             </form>
 
@@ -159,7 +144,9 @@ export default async function KeuanganPage({
             key={card.label}
           >
             <p className="text-muted-foreground text-sm">{card.label}</p>
-            <p className={cn("mt-2 text-2xl font-semibold", card.valueClassName)}>
+            <p
+              className={cn("mt-2 text-2xl font-semibold", card.valueClassName)}
+            >
               {card.value}
             </p>
             <p className="text-muted-foreground mt-2 text-xs leading-5">
@@ -169,14 +156,15 @@ export default async function KeuanganPage({
         ))}
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
+      <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
               <ChartColumn className="size-5" />
             </div>
             <div>
-              <h2 className="font-semibold">Tren Pendapatan, Biaya, dan Laba</h2>
+              <h2 className="font-semibold">
+                Tren Pendapatan, Biaya, dan Laba
+              </h2>
               <p className="text-muted-foreground mt-1 text-sm">
                 Cukup satu grafik untuk membaca arah usaha farm pada rentang{" "}
                 {data.periodLabel.toLowerCase()}.
@@ -187,52 +175,6 @@ export default async function KeuanganPage({
           <div className="mt-5">
             <FinanceTrendChart points={data.trendPoints} />
           </div>
-        </div>
-
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
-              <CalendarRange className="size-5" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Laba Rugi Singkat</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Ringkasan hasil usaha dan konteks periode tanpa perlu membuka detail panjang.
-              </p>
-            </div>
-          </div>
-
-          <dl className="mt-5 grid gap-3 text-sm">
-            {periodStats.map((item) => (
-              <MetricRow key={item.label} label={item.label} value={item.value} />
-            ))}
-          </dl>
-
-          <div className="border-border my-5 border-t" />
-
-          <dl className="grid gap-3 text-sm">
-            <MetricRow
-              label="Pendapatan"
-              value={formatCurrency(data.revenue)}
-              variant="income"
-            />
-            <MetricRow
-              label="Biaya Operasional"
-              value={formatCurrency(data.operationalCost)}
-              variant="expense"
-            />
-            <MetricRow
-              label="Penyusutan"
-              value={formatCurrency(data.totalDepreciation)}
-              variant="expense"
-            />
-            <MetricRow
-              label="Laba / Rugi Bersih"
-              value={formatCurrency(data.netProfit)}
-              valueClassName={getProfitValueClassName(data.netProfit)}
-            />
-          </dl>
-        </div>
       </section>
 
       <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
@@ -244,8 +186,8 @@ export default async function KeuanganPage({
             <div>
               <h2 className="font-semibold">Laporan Laba Rugi</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                Tabel utama laporan dan aksi cetak disatukan dalam satu bagian agar alurnya
-                lebih ringkas.
+                Tabel utama laporan dan aksi cetak disatukan dalam satu bagian
+                agar alurnya lebih ringkas.
               </p>
             </div>
           </div>
@@ -281,13 +223,19 @@ export default async function KeuanganPage({
                   key={row.label}
                 >
                   <span>{row.label}</span>
-                  <span className="text-right">{formatCurrency(row.revenue)}</span>
-                  <span className="text-right">{formatCurrency(row.operationalCost)}</span>
-                  <span className="text-right">{formatCurrency(row.depreciation)}</span>
+                  <span className="text-right">
+                    {formatCurrency(row.revenue)}
+                  </span>
+                  <span className="text-right">
+                    {formatCurrency(row.operationalCost)}
+                  </span>
+                  <span className="text-right">
+                    {formatCurrency(row.depreciation)}
+                  </span>
                   <span
                     className={cn(
                       "text-right font-medium",
-                      getProfitValueClassName(row.netProfit)
+                      getProfitValueClassName(row.netProfit),
                     )}
                   >
                     {formatCurrency(row.netProfit)}
@@ -307,8 +255,8 @@ export default async function KeuanganPage({
           <div>
             <h2 className="font-semibold">Detail Perhitungan</h2>
             <p className="text-muted-foreground mt-1 text-sm">
-              Detail biaya dan cara hitung disimpan di bagian ini agar halaman utama tetap
-              singkat.
+              Detail biaya dan cara hitung disimpan di bagian ini agar halaman
+              utama tetap singkat.
             </p>
           </div>
         </div>
@@ -384,7 +332,7 @@ export default async function KeuanganPage({
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 function MonthField({
