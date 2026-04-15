@@ -34,7 +34,7 @@ function getMessage(status?: string, error?: string) {
   }
 
   const messages: Record<string, string> = {
-    required: "Nama farm, nama admin, email, HP, dan password wajib diisi.",
+    required: "Nama farm, email, HP, dan password wajib diisi.",
     password_length: "Password minimal 6 karakter.",
     password_mismatch: "Konfirmasi password tidak sesuai.",
     duplicate: "Email atau nomor HP sudah digunakan.",
@@ -74,13 +74,12 @@ export default async function RegisterPage({
 
     const farmName = readText(formData, "farmName")
     const farmDescription = readText(formData, "farmDescription")
-    const name = readText(formData, "name")
     const email = readText(formData, "email").toLowerCase()
     const phone = readText(formData, "phone")
     const password = readText(formData, "password")
     const confirmPassword = readText(formData, "confirmPassword")
 
-    if (!farmName || !name || !email || !phone || !password) {
+    if (!farmName || !email || !phone || !password) {
       return registerRedirect({ error: "required" })
     }
 
@@ -96,7 +95,7 @@ export default async function RegisterPage({
       await prisma.$transaction(async (tx) => {
         const user = await tx.user.create({
           data: {
-            name,
+            name: farmName,
             email,
             phone,
             passwordHash: hashPassword(password),
@@ -178,29 +177,17 @@ export default async function RegisterPage({
 
             <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium" htmlFor="farmDescription">
-                Deskripsi Farm
+                Alamat Farm
               </label>
               <textarea
                 className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="farmDescription"
                 name="farmDescription"
-                placeholder="Opsional"
+                placeholder="Alamat farm"
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="name">
-                Nama Admin Farm
-              </label>
-              <input
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
-                id="name"
-                name="name"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
+            <div className="space-y-2 md:col-span-2">
               <label className="text-sm font-medium" htmlFor="phone">
                 HP
               </label>
@@ -268,7 +255,7 @@ export default async function RegisterPage({
         </p>
       </section>
     </main>
-  )
+  );
 }
 
 function isPrismaUniqueError(error: unknown) {
