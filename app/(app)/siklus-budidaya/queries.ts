@@ -144,9 +144,9 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
           { createdAt: "desc" },
         ],
       },
-      harvestLogs: {
+      harvestTransactions: {
         orderBy: [
-          { logDate: "desc" },
+          { harvestDate: "desc" },
           { createdAt: "desc" },
         ],
       },

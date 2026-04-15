@@ -85,7 +85,7 @@ export async function getFinancePageData(
 
   const [
     activeCyclesCount,
-    harvestLogs,
+    harvestTransactions,
     feedLogs,
     expenseLogs,
     seededCycles,
@@ -108,18 +108,17 @@ export async function getFinancePageData(
         ],
       },
     }),
-    prisma.harvestLog.findMany({
+    prisma.harvestTransaction.findMany({
       where: {
         ...farmRelationWhere,
-        logDate: {
+        harvestDate: {
           gte: range.startRange,
           lt: range.endRange,
         },
       },
       select: {
-        logDate: true,
-        pricePerKg: true,
-        totalWeightKg: true,
+        grossAmount: true,
+        harvestDate: true,
       },
     }),
     prisma.feedLog.findMany({
@@ -198,15 +197,15 @@ export async function getFinancePageData(
     ])
   )
 
-  harvestLogs.forEach((log) => {
-    const monthKey = toMonthParam(log.logDate)
+  harvestTransactions.forEach((transaction) => {
+    const monthKey = toMonthParam(transaction.harvestDate)
     const month = monthlyMap.get(monthKey)
 
     if (!month) {
       return
     }
 
-    month.revenue += log.totalWeightKg * decimalToNumber(log.pricePerKg)
+    month.revenue += decimalToNumber(transaction.grossAmount)
   })
 
   feedLogs.forEach((log) => {
@@ -313,7 +312,7 @@ export async function getFinancePageData(
     expenseCost,
     farmLabel: user.farmName ?? (user.farmId ? "Farm aktif" : "Semua farm"),
     feedCost,
-    harvestCount: harvestLogs.length,
+    harvestCount: harvestTransactions.length,
     monthCount: range.monthCount,
     netProfit,
     nextEndMonthParam: range.nextEndMonthParam,

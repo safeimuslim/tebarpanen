@@ -29,7 +29,7 @@ import {
 import { CycleDetailTabs } from "./components/cycle-detail-tabs"
 import { ExpenseLogSection } from "./components/expense-log-section"
 import { FeedLogSection } from "./components/feed-log-section"
-import { HarvestLogSection } from "./components/harvest-log-section"
+import { HarvestTransactionSection } from "./components/harvest-log-section"
 import { MortalityLogSection } from "./components/mortality-log-section"
 import { SamplingLogSection } from "./components/sampling-log-section"
 import { TreatmentLogSection } from "./components/treatment-log-section"
@@ -75,9 +75,10 @@ export default async function SiklusBudidayaDetailPage({
     ...feedLog,
     priceTotal: decimalToNumber(feedLog.priceTotal),
   }))
-  const serializedHarvestLogs = cycle.harvestLogs.map((harvestLog) => ({
-    ...harvestLog,
-    pricePerKg: decimalToNumber(harvestLog.pricePerKg) ?? 0,
+  const serializedHarvestTransactions = cycle.harvestTransactions.map((transaction) => ({
+    ...transaction,
+    grossAmount: decimalToNumber(transaction.grossAmount) ?? 0,
+    pricePerKg: decimalToNumber(transaction.pricePerKg) ?? 0,
   }))
   const totalExpense = serializedExpenseLogs.reduce(
     (sum, expenseLog) => sum + expenseLog.amount,
@@ -88,17 +89,17 @@ export default async function SiklusBudidayaDetailPage({
     0
   )
   const totalSeedCost = decimalToNumber(cycle.seedPriceTotal) ?? 0
-  const totalHarvestWeight = serializedHarvestLogs.reduce(
-    (sum, harvestLog) => sum + harvestLog.totalWeightKg,
+  const totalHarvestWeight = serializedHarvestTransactions.reduce(
+    (sum, transaction) => sum + transaction.totalWeightKg,
     0
   )
-  const totalHarvestRevenue = serializedHarvestLogs.reduce(
-    (sum, harvestLog) => sum + harvestLog.totalWeightKg * harvestLog.pricePerKg,
+  const totalHarvestRevenue = serializedHarvestTransactions.reduce(
+    (sum, transaction) => sum + transaction.grossAmount,
     0
   )
   const totalOperationalCost = totalSeedCost + totalFeedCost + totalExpense
   const operationalProfit = totalHarvestRevenue - totalOperationalCost
-  const latestHarvest = serializedHarvestLogs[0]
+  const latestHarvest = serializedHarvestTransactions[0]
   const latestSampling = cycle.samplingLogs[0]
   const latestTreatment = cycle.treatmentLogs[0]
   const latestWaterQuality = cycle.waterQualityLogs[0]
@@ -289,7 +290,7 @@ export default async function SiklusBudidayaDetailPage({
             counts={{
               expenseLogs: cycle.expenseLogs.length,
               feedLogs: cycle.feedLogs.length,
-              harvestLogs: cycle.harvestLogs.length,
+              harvestTransactions: cycle.harvestTransactions.length,
               mortalityLogs: cycle.mortalityLogs.length,
               samplingLogs: cycle.samplingLogs.length,
               treatmentLogs: cycle.treatmentLogs.length,
@@ -332,7 +333,7 @@ export default async function SiklusBudidayaDetailPage({
                   />
                   <SummaryMetricRow
                     label="Panen Terakhir"
-                    value={latestHarvest ? formatDate(latestHarvest.logDate) : "-"}
+                    value={latestHarvest ? formatDate(latestHarvest.harvestDate) : "-"}
                   />
                   <SummaryMetricRow
                     label="pH Terakhir"
@@ -351,10 +352,10 @@ export default async function SiklusBudidayaDetailPage({
           ) : null}
 
           {activeTab === "panen" ? (
-            <HarvestLogSection
+            <HarvestTransactionSection
               canManage={Boolean(user.id)}
               cycleId={cycle.id}
-              harvestLogs={serializedHarvestLogs}
+              harvestTransactions={serializedHarvestTransactions}
             />
           ) : null}
 

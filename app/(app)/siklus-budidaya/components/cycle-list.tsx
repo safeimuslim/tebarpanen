@@ -42,7 +42,6 @@ import {
   formatDate,
   formatNumber,
   getCycleStatusLabel,
-  getSurvivalRate,
 } from "../utils"
 import { CycleForm } from "./cycle-form"
 
@@ -293,7 +292,6 @@ function CycleRow({
     }
   }, [deleteState])
 
-  const deadCount = cycle.mortalityLogs.reduce((sum, log) => sum + log.deadCount, 0)
   const pondSummary = getPondSummary(cycle.ponds.map((pond) => pond.name))
   const targetHarvestText = cycle.targetHarvestDate
     ? `Target ${formatDate(cycle.targetHarvestDate)}`
@@ -329,18 +327,6 @@ function CycleRow({
               {formatNumber(cycle.ponds.length)} kolam terhubung
             </p>
           </div>
-
-          <dl className="grid grid-cols-2 gap-3 pt-1 sm:grid-cols-3 lg:max-w-xl">
-            <Metric label="Bibit" value={`${formatNumber(cycle.seedCount)} ekor`} />
-            <Metric
-              label="Survival"
-              value={getSurvivalRate(cycle.seedCount, deadCount)}
-            />
-            <Metric
-              label="Kolam"
-              value={`${formatNumber(cycle.ponds.length)} kolam`}
-            />
-          </dl>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
@@ -435,15 +421,6 @@ function CycleRow({
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border bg-white rounded-lg border px-3 py-2.5">
-      <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd className="mt-1 text-sm font-semibold">{value}</dd>
-    </div>
   )
 }
 

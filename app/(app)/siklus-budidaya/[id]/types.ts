@@ -1,7 +1,7 @@
 import type {
   ExpenseLog,
   FeedLog,
-  HarvestLog,
+  HarvestTransaction,
   MortalityLog,
   SamplingLog,
   TreatmentLog,
@@ -27,11 +27,15 @@ export type ExpenseLogAction = (
   formData: FormData
 ) => Promise<ActionState>
 
-export type HarvestLogItem = Omit<HarvestLog, "pricePerKg"> & {
+export type HarvestTransactionItem = Omit<
+  HarvestTransaction,
+  "grossAmount" | "pricePerKg"
+> & {
+  grossAmount: number
   pricePerKg: number
 }
 
-export type HarvestLogAction = (
+export type HarvestTransactionAction = (
   previousState: ActionState,
   formData: FormData
 ) => Promise<ActionState>

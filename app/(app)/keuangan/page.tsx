@@ -128,10 +128,10 @@ export default async function KeuanganPage({
       <section>
         <p className="text-muted-foreground text-sm">Keuangan</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-          Keuangan farm
+          Laporan Keuangan
         </h1>
         <p className="text-muted-foreground mt-2 max-w-3xl text-sm">
-          Lihat hasil usaha, tren, dan rincian biaya.
+          Pantau kinerja keuangan budidaya berdasarkan periode laporan.
         </p>
       </section>
 

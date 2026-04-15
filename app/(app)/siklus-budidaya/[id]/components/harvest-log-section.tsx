@@ -16,28 +16,25 @@ import { SummaryCard } from "@/components/ui/summary-card"
 
 import { formatCurrency, formatDate, formatNumber } from "../../utils"
 import {
-  createHarvestLog,
-  deleteHarvestLog,
-  updateHarvestLog,
+  createHarvestTransaction,
+  deleteHarvestTransaction,
+  updateHarvestTransaction,
 } from "../actions"
-import type { HarvestLogItem } from "../types"
-import { HarvestLogDetailContent } from "./harvest-log-detail-content"
-import { HarvestLogForm } from "./harvest-log-form"
+import type { HarvestTransactionItem } from "../types"
+import { HarvestTransactionDetailContent } from "./harvest-log-detail-content"
+import { HarvestTransactionForm } from "./harvest-log-form"
 
-export function HarvestLogSection({
+export function HarvestTransactionSection({
   canManage,
   cycleId,
-  harvestLogs,
+  harvestTransactions,
 }: {
   canManage: boolean
   cycleId: string
-  harvestLogs: HarvestLogItem[]
+  harvestTransactions: HarvestTransactionItem[]
 }) {
-  const totalWeight = harvestLogs.reduce((sum, item) => sum + item.totalWeightKg, 0)
-  const totalRevenue = harvestLogs.reduce(
-    (sum, item) => sum + item.totalWeightKg * item.pricePerKg,
-    0
-  )
+  const totalWeight = harvestTransactions.reduce((sum, item) => sum + item.totalWeightKg, 0)
+  const totalRevenue = harvestTransactions.reduce((sum, item) => sum + item.grossAmount, 0)
 
   return (
     <section className="space-y-4">
@@ -45,7 +42,7 @@ export function HarvestLogSection({
         <div>
           <h2 className="text-xl font-semibold">Panen</h2>
           <p className="text-muted-foreground mt-1 text-sm">
-            Pencatatan hasil panen per siklus, termasuk panen parsial bila diperlukan.
+            Catat panen parsial atau final yang langsung menjadi transaksi penjualan.
           </p>
         </div>
 
@@ -63,16 +60,16 @@ export function HarvestLogSection({
             >
               <DialogHeader className="border-border border-b p-5">
                 <p className="text-muted-foreground text-sm">Form Operasional Siklus</p>
-                <DialogTitle>Tambah Data Panen</DialogTitle>
+                <DialogTitle>Tambah Transaksi Panen</DialogTitle>
                 <DialogDescription>
-                  Catatan panen akan tersimpan untuk siklus budidaya ini.
+                  Data panen akan tersimpan sekaligus sebagai transaksi penjualan siklus ini.
                 </DialogDescription>
               </DialogHeader>
-              <HarvestLogForm
-                action={createHarvestLog}
+              <HarvestTransactionForm
+                action={createHarvestTransaction}
                 closeTargetId="create-harvest-log-dialog-close"
                 cycleId={cycleId}
-                submitLabel="Simpan Data Panen"
+                submitLabel="Simpan Transaksi Panen"
               />
             </DialogContent>
           </Dialog>
@@ -80,12 +77,19 @@ export function HarvestLogSection({
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <SummaryCard label="Jumlah Catatan" value={formatNumber(harvestLogs.length)} />
+        <SummaryCard
+          label="Jumlah Transaksi"
+          value={formatNumber(harvestTransactions.length)}
+        />
         <SummaryCard label="Total Berat Panen" value={`${formatNumber(totalWeight)} kg`} />
-        <SummaryCard label="Estimasi Nilai Panen" value={formatCurrency(totalRevenue)} />
+        <SummaryCard label="Total Penjualan" value={formatCurrency(totalRevenue)} />
         <SummaryCard
           label="Panen Terakhir"
-          value={harvestLogs[0] ? formatDate(harvestLogs[0].logDate) : "-"}
+          value={
+            harvestTransactions[0]
+              ? formatDate(harvestTransactions[0].harvestDate)
+              : "-"
+          }
         />
       </div>
 
@@ -94,23 +98,21 @@ export function HarvestLogSection({
           <div>
             <h3 className="font-semibold">List Panen</h3>
             <p className="text-muted-foreground text-sm">
-              Data panen yang sudah tercatat pada siklus ini.
+              Riwayat panen yang langsung tercatat sebagai transaksi penjualan.
             </p>
           </div>
           <span className="text-muted-foreground text-sm">
-            {formatNumber(harvestLogs.length)} catatan
+            {formatNumber(harvestTransactions.length)} transaksi
           </span>
         </div>
 
-        {harvestLogs.length ? (
+        {harvestTransactions.length ? (
           <div className="divide-border divide-y">
-            {harvestLogs.map((harvestLog) => {
-              const revenue = harvestLog.totalWeightKg * harvestLog.pricePerKg
-
+            {harvestTransactions.map((transaction) => {
               return (
                 <article
                   className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]"
-                  key={harvestLog.id}
+                  key={transaction.id}
                 >
                   <div className="min-w-0 space-y-2">
                     <div className="flex items-center gap-2">
@@ -119,52 +121,57 @@ export function HarvestLogSection({
                       </div>
                       <div className="min-w-0">
                         <h4 className="truncate font-semibold">
-                          {harvestLog.buyer || "Panen tanpa pembeli"}
+                          {transaction.buyerName}
                         </h4>
                         <p className="text-muted-foreground text-sm">
-                          {formatDate(harvestLog.logDate)}
+                          {transaction.invoiceNumber}
                         </p>
                       </div>
                     </div>
                     <p className="text-muted-foreground text-sm">
-                      {formatNumber(harvestLog.harvestedCount)} ekor /
+                      {formatNumber(transaction.harvestedCount)} ekor /
                       {" "}
-                      {formatNumber(harvestLog.totalWeightKg)} kg
+                      {formatNumber(transaction.totalWeightKg)} kg
                     </p>
-                    {harvestLog.notes ? (
+                    <p className="text-muted-foreground text-sm">
+                      {formatDate(transaction.harvestDate)}
+                    </p>
+                    {transaction.notes ? (
                       <p className="text-muted-foreground line-clamp-2 text-sm">
-                        {harvestLog.notes}
+                        {transaction.notes}
                       </p>
                     ) : null}
                   </div>
 
                   <dl className="grid grid-cols-2 gap-3 text-sm md:grid-cols-3 lg:grid-cols-1">
-                    <Metric label="Harga / kg" value={formatCurrency(harvestLog.pricePerKg)} />
-                    <Metric label="Nilai Panen" value={formatCurrency(revenue)} />
-                    <Metric label="Dicatat" value={formatDate(harvestLog.createdAt)} />
+                    <Metric label="Harga / kg" value={formatCurrency(transaction.pricePerKg)} />
+                    <Metric label="Nilai Transaksi" value={formatCurrency(transaction.grossAmount)} />
+                    <Metric label="Dicatat" value={formatDate(transaction.createdAt)} />
                   </dl>
 
                   {canManage ? (
                     <CrudRowActions
-                      deleteAction={deleteHarvestLog}
-                      deleteDescription="Data panen yang dihapus tidak bisa dikembalikan untuk"
+                      deleteAction={deleteHarvestTransaction}
+                      deleteDescription="Transaksi panen yang dihapus tidak bisa dikembalikan untuk"
                       deleteHiddenFields={[{ name: "cycleId", value: cycleId }]}
-                      detailContent={<HarvestLogDetailContent harvestLog={harvestLog} />}
-                      detailDescription={formatDate(harvestLog.logDate)}
-                      detailTitle={harvestLog.buyer || "Detail Panen"}
+                      detailContent={
+                        <HarvestTransactionDetailContent transaction={transaction} />
+                      }
+                      detailDescription={formatDate(transaction.harvestDate)}
+                      detailTitle={transaction.buyerName}
                       editContent={
-                        <HarvestLogForm
-                          action={updateHarvestLog}
-                          closeTargetId={`edit-harvest-log-dialog-close-${harvestLog.id}`}
+                        <HarvestTransactionForm
+                          action={updateHarvestTransaction}
+                          closeTargetId={`edit-harvest-log-dialog-close-${transaction.id}`}
                           cycleId={cycleId}
-                          harvestLog={harvestLog}
+                          transaction={transaction}
                           submitLabel="Simpan Perubahan"
                         />
                       }
-                      editDescription="Perbarui data panen untuk siklus budidaya ini."
-                      editTitle="Edit Data Panen"
-                      itemId={harvestLog.id}
-                      itemName={harvestLog.buyer || formatDate(harvestLog.logDate)}
+                      editDescription="Perbarui transaksi panen untuk siklus budidaya ini."
+                      editTitle="Edit Transaksi Panen"
+                      itemId={transaction.id}
+                      itemName={transaction.invoiceNumber}
                     />
                   ) : (
                     <div className="flex items-start justify-end">
@@ -180,10 +187,10 @@ export function HarvestLogSection({
                         >
                           <DialogHeader className="border-border border-b p-5">
                             <p className="text-muted-foreground text-sm">Detail Panen</p>
-                            <DialogTitle>{harvestLog.buyer || "Detail Panen"}</DialogTitle>
-                            <DialogDescription>{formatDate(harvestLog.logDate)}</DialogDescription>
+                            <DialogTitle>{transaction.buyerName}</DialogTitle>
+                            <DialogDescription>{transaction.invoiceNumber}</DialogDescription>
                           </DialogHeader>
-                          <HarvestLogDetailContent harvestLog={harvestLog} />
+                          <HarvestTransactionDetailContent transaction={transaction} />
                         </DialogContent>
                       </Dialog>
                     </div>
@@ -194,9 +201,9 @@ export function HarvestLogSection({
           </div>
         ) : (
           <div className="p-8 text-center">
-            <h3 className="font-semibold">Belum ada catatan panen</h3>
+            <h3 className="font-semibold">Belum ada transaksi panen</h3>
             <p className="text-muted-foreground mt-1 text-sm">
-              Tambahkan pencatatan panen pertama untuk siklus ini.
+              Tambahkan transaksi panen pertama untuk siklus ini.
             </p>
           </div>
         )}

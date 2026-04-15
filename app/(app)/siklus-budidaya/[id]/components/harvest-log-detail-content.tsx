@@ -1,31 +1,36 @@
 import { formatCurrency, formatDate, formatNumber } from "../../utils"
-import type { HarvestLogItem } from "../types"
+import type { HarvestTransactionItem } from "../types"
+import { HarvestPaymentStatus } from "@/app/generated/prisma/enums"
 
-export function HarvestLogDetailContent({
-  harvestLog,
+export function HarvestTransactionDetailContent({
+  transaction,
 }: {
-  harvestLog: HarvestLogItem
+  transaction: HarvestTransactionItem
 }) {
-  const revenue = harvestLog.totalWeightKg * harvestLog.pricePerKg
-
   return (
     <div className="grid gap-4 p-5 text-sm md:grid-cols-2">
-      <DetailItem label="Tanggal Panen" value={formatDate(harvestLog.logDate)} />
+      <DetailItem label="Invoice" value={transaction.invoiceNumber} />
+      <DetailItem label="Tanggal Panen" value={formatDate(transaction.harvestDate)} />
       <DetailItem
         label="Total Berat Panen"
-        value={`${formatNumber(harvestLog.totalWeightKg)} kg`}
+        value={`${formatNumber(transaction.totalWeightKg)} kg`}
       />
       <DetailItem
         label="Jumlah Ikan Terpanen"
-        value={`${formatNumber(harvestLog.harvestedCount)} ekor`}
+        value={`${formatNumber(transaction.harvestedCount)} ekor`}
       />
-      <DetailItem label="Harga Jual per kg" value={formatCurrency(harvestLog.pricePerKg)} />
-      <DetailItem label="Estimasi Nilai Panen" value={formatCurrency(revenue)} />
-      <DetailItem label="Pembeli" value={harvestLog.buyer || "-"} />
+      <DetailItem label="Harga Jual per kg" value={formatCurrency(transaction.pricePerKg)} />
+      <DetailItem label="Nilai Transaksi" value={formatCurrency(transaction.grossAmount)} />
+      <DetailItem label="Pembeli" value={transaction.buyerName} />
+      <DetailItem
+        label="Status Pembayaran"
+        value={getPaymentStatusLabel(transaction.paymentStatus)}
+      />
+      <DetailItem label="Jatuh Tempo" value={formatDate(transaction.dueDate)} />
       <div className="md:col-span-2">
         <p className="text-muted-foreground text-xs">Catatan</p>
         <p className="mt-1 whitespace-pre-wrap font-medium">
-          {harvestLog.notes || "-"}
+          {transaction.notes || "-"}
         </p>
       </div>
     </div>
@@ -39,4 +44,16 @@ function DetailItem({ label, value }: { label: string; value: string }) {
       <p className="mt-1 font-medium">{value}</p>
     </div>
   )
+}
+
+function getPaymentStatusLabel(status: HarvestPaymentStatus) {
+  if (status === HarvestPaymentStatus.PAID) {
+    return "Lunas"
+  }
+
+  if (status === HarvestPaymentStatus.PARTIALLY_PAID) {
+    return "DP / Sebagian"
+  }
+
+  return "Belum Lunas"
 }

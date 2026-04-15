@@ -1,8 +1,12 @@
 "use server"
 
+import { randomUUID } from "node:crypto"
 import { revalidatePath } from "next/cache"
 
-import { ExpenseCategory } from "@/app/generated/prisma/enums"
+import {
+  ExpenseCategory,
+  HarvestPaymentStatus,
+} from "@/app/generated/prisma/enums"
 import { type Prisma } from "@/app/generated/prisma/client"
 import { actionError, actionSuccess, type ActionState } from "@/app/lib/action-state"
 import { getFarmScopeWhere, requireSessionUser } from "@/app/lib/authz"
@@ -12,6 +16,7 @@ import {
   getActionErrorMessage,
   readOptionalDecimal,
   readOptionalFloat,
+  readOptionalDate,
   readRequiredDecimal,
   readRequiredDate,
   readRequiredFloat,
@@ -351,7 +356,7 @@ export async function deleteExpenseLog(
   }
 }
 
-export async function createHarvestLog(
+export async function createHarvestTransaction(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
@@ -360,27 +365,35 @@ export async function createHarvestLog(
   try {
     const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
     const cycle = await requireAccessibleCycle(cycleId, user)
+    const harvestDate = readRequiredDate(formData, "harvestDate", "Tanggal panen")
+    const totalWeightKg = readRequiredFloat(formData, "totalWeightKg", "Total berat panen")
+    const pricePerKg = readRequiredDecimal(formData, "pricePerKg", "Harga jual per kg")
+    const paymentStatus = readHarvestPaymentStatus(formData)
 
-    await prisma.harvestLog.create({
+    await prisma.harvestTransaction.create({
       data: {
         cultureCycleId: cycle.id,
-        logDate: readRequiredDate(formData, "logDate", "Tanggal panen"),
-        totalWeightKg: readRequiredFloat(formData, "totalWeightKg", "Total berat panen"),
+        invoiceNumber: generateHarvestInvoiceNumber(harvestDate),
+        harvestDate,
+        totalWeightKg,
         harvestedCount: readRequiredInt(formData, "harvestedCount", "Jumlah ikan terpanen"),
-        pricePerKg: readRequiredDecimal(formData, "pricePerKg", "Harga jual per kg"),
-        buyer: readText(formData, "buyer") || null,
+        buyerName: readRequiredText(formData, "buyerName", "Pembeli"),
+        pricePerKg,
+        grossAmount: calculateGrossAmount(totalWeightKg, pricePerKg),
+        dueDate: paymentStatus === HarvestPaymentStatus.PAID ? null : readOptionalDate(formData, "dueDate"),
+        paymentStatus,
         notes: readText(formData, "notes") || null,
       },
     })
 
-    revalidatePath(`/siklus-budidaya/${cycle.id}`)
-    return actionSuccess("Data panen berhasil ditambahkan.")
+    revalidateHarvestPaths(cycle.id)
+    return actionSuccess("Transaksi panen berhasil ditambahkan.")
   } catch (error) {
     return actionError(getActionErrorMessage(error))
   }
 }
 
-export async function updateHarvestLog(
+export async function updateHarvestTransaction(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
@@ -388,12 +401,16 @@ export async function updateHarvestLog(
 
   try {
     const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
-    const harvestLogId = readRequiredText(formData, "id", "ID panen")
+    const harvestTransactionId = readRequiredText(formData, "id", "ID transaksi panen")
     const cycle = await requireAccessibleCycle(cycleId, user)
+    const harvestDate = readRequiredDate(formData, "harvestDate", "Tanggal panen")
+    const totalWeightKg = readRequiredFloat(formData, "totalWeightKg", "Total berat panen")
+    const pricePerKg = readRequiredDecimal(formData, "pricePerKg", "Harga jual per kg")
+    const paymentStatus = readHarvestPaymentStatus(formData)
 
-    const harvestLog = await prisma.harvestLog.findFirst({
+    const harvestTransaction = await prisma.harvestTransaction.findFirst({
       where: {
-        id: harvestLogId,
+        id: harvestTransactionId,
         cultureCycleId: cycle.id,
       },
       select: {
@@ -401,32 +418,35 @@ export async function updateHarvestLog(
       },
     })
 
-    if (!harvestLog) {
-      return actionError("Data panen tidak ditemukan atau tidak dapat diakses.")
+    if (!harvestTransaction) {
+      return actionError("Transaksi panen tidak ditemukan atau tidak dapat diakses.")
     }
 
-    await prisma.harvestLog.update({
+    await prisma.harvestTransaction.update({
       where: {
-        id: harvestLog.id,
+        id: harvestTransaction.id,
       },
       data: {
-        logDate: readRequiredDate(formData, "logDate", "Tanggal panen"),
-        totalWeightKg: readRequiredFloat(formData, "totalWeightKg", "Total berat panen"),
+        harvestDate,
+        totalWeightKg,
         harvestedCount: readRequiredInt(formData, "harvestedCount", "Jumlah ikan terpanen"),
-        pricePerKg: readRequiredDecimal(formData, "pricePerKg", "Harga jual per kg"),
-        buyer: readText(formData, "buyer") || null,
+        buyerName: readRequiredText(formData, "buyerName", "Pembeli"),
+        pricePerKg,
+        grossAmount: calculateGrossAmount(totalWeightKg, pricePerKg),
+        dueDate: paymentStatus === HarvestPaymentStatus.PAID ? null : readOptionalDate(formData, "dueDate"),
+        paymentStatus,
         notes: readText(formData, "notes") || null,
       },
     })
 
-    revalidatePath(`/siklus-budidaya/${cycle.id}`)
-    return actionSuccess("Data panen berhasil diperbarui.")
+    revalidateHarvestPaths(cycle.id)
+    return actionSuccess("Transaksi panen berhasil diperbarui.")
   } catch (error) {
     return actionError(getActionErrorMessage(error))
   }
 }
 
-export async function deleteHarvestLog(
+export async function deleteHarvestTransaction(
   _previousState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
@@ -434,12 +454,12 @@ export async function deleteHarvestLog(
 
   try {
     const cycleId = readRequiredText(formData, "cycleId", "ID siklus")
-    const harvestLogId = readRequiredText(formData, "id", "ID panen")
+    const harvestTransactionId = readRequiredText(formData, "id", "ID transaksi panen")
     const cycle = await requireAccessibleCycle(cycleId, user)
 
-    const harvestLog = await prisma.harvestLog.findFirst({
+    const harvestTransaction = await prisma.harvestTransaction.findFirst({
       where: {
-        id: harvestLogId,
+        id: harvestTransactionId,
         cultureCycleId: cycle.id,
       },
       select: {
@@ -447,18 +467,18 @@ export async function deleteHarvestLog(
       },
     })
 
-    if (!harvestLog) {
-      return actionError("Data panen tidak ditemukan atau tidak dapat diakses.")
+    if (!harvestTransaction) {
+      return actionError("Transaksi panen tidak ditemukan atau tidak dapat diakses.")
     }
 
-    await prisma.harvestLog.delete({
+    await prisma.harvestTransaction.delete({
       where: {
-        id: harvestLog.id,
+        id: harvestTransaction.id,
       },
     })
 
-    revalidatePath(`/siklus-budidaya/${cycle.id}`)
-    return actionSuccess("Data panen berhasil dihapus.")
+    revalidateHarvestPaths(cycle.id)
+    return actionSuccess("Transaksi panen berhasil dihapus.")
   } catch (error) {
     return actionError(getActionErrorMessage(error))
   }
@@ -805,6 +825,10 @@ async function requireAccessibleCycle(
   cycleId: string,
   user: Awaited<ReturnType<typeof requireSessionUser>>
 ) {
+  if (!cycleId.trim()) {
+    throw new Error("Siklus budidaya wajib dipilih.")
+  }
+
   const cycle = await prisma.cultureCycle.findFirst({
     where: {
       id: cycleId,
@@ -814,12 +838,62 @@ async function requireAccessibleCycle(
       id: true,
     },
   })
+  
 
   if (!cycle) {
-    throw new Error("Siklus budidaya tidak ditemukan atau tidak dapat diakses.")
+    const existingCycle = await prisma.cultureCycle.findUnique({
+      where: {
+        id: cycleId,
+      },
+      select: {
+        farmId: true,
+        id: true,
+      },
+    })
+
+    if (!existingCycle) {
+      throw new Error("Siklus budidaya tidak ditemukan.")
+    }
+
+    if (user.role !== "SUPER_ADMIN" && user.farmId && existingCycle.farmId !== user.farmId) {
+      throw new Error("Siklus budidaya berada di farm lain dan tidak dapat diakses.")
+    }
+
+    throw new Error("Siklus budidaya tidak dapat diakses.")
   }
 
   return cycle
+}
+
+function generateHarvestInvoiceNumber(harvestDate: Date) {
+  const datePart = harvestDate.toISOString().slice(2, 10).replaceAll("-", "")
+  const suffix = randomUUID().slice(0, 4).toUpperCase()
+
+  return `TRX-PN-${datePart}-${suffix}`
+}
+
+function calculateGrossAmount(totalWeightKg: number, pricePerKg: number) {
+  return Number((totalWeightKg * pricePerKg).toFixed(2))
+}
+
+function readHarvestPaymentStatus(formData: FormData) {
+  const value = readRequiredText(formData, "paymentStatus", "Status pembayaran")
+
+  if (
+    value === HarvestPaymentStatus.PAID ||
+    value === HarvestPaymentStatus.PARTIALLY_PAID ||
+    value === HarvestPaymentStatus.UNPAID
+  ) {
+    return value
+  }
+
+  throw new Error("Status pembayaran tidak valid.")
+}
+
+function revalidateHarvestPaths(cycleId: string) {
+  revalidatePath(`/siklus-budidaya/${cycleId}`)
+  revalidatePath("/transaksi-panen")
+  revalidatePath("/keuangan")
 }
 
 function readExpenseCategory(formData: FormData): ExpenseCategory {

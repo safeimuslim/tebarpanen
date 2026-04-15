@@ -3,7 +3,7 @@ import type {
   ExpenseLog,
   Farm,
   FeedLog,
-  HarvestLog,
+  HarvestTransaction,
   MortalityLog,
   Pond,
   SamplingLog,
@@ -41,7 +41,7 @@ export type CycleDetailData = CultureCycle & {
   expenseLogs: ExpenseLog[]
   mortalityLogs: MortalityLog[]
   feedLogs: FeedLog[]
-  harvestLogs: HarvestLog[]
+  harvestTransactions: HarvestTransaction[]
   samplingLogs: SamplingLog[]
   treatmentLogs: TreatmentLog[]
   waterQualityLogs: WaterQualityLog[]

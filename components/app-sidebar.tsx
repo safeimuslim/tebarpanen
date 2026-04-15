@@ -6,6 +6,7 @@ import type { AppRole } from "@/app/lib/authz"
 import {
   Fish,
   Home,
+  ReceiptText,
   ShieldCheck,
   Users,
   Wallet,
@@ -32,19 +33,21 @@ const menuGroups = [
   {
     items: [
       { title: "Dashboard", href: "/dashboard", icon: Home },
+      { title: "Siklus Budidaya", href: "/siklus-budidaya", icon: Fish },
+      {
+        title: "Penjualan",
+        href: "/transaksi-panen",
+        icon: ReceiptText,
+      },
       { title: "Keuangan", href: "/keuangan", icon: Wallet },
     ],
   },
   {
-    title: "Master Data",
+    title: "Aset",
     items: [
       { title: "Kolam", href: "/kolam", icon: Waves },
       { title: "Alat", href: "/alat", icon: Wrench },
     ],
-  },
-  {
-    title: "Budidaya",
-    items: [{ title: "Siklus Budidaya", href: "/siklus-budidaya", icon: Fish }],
   },
   {
     title: "Pengaturan",
@@ -70,7 +73,7 @@ export function AppSidebar({
   const visibleMenuGroups =
     role === "WORKER"
       ? menuGroups.filter(
-          (group) => group.title !== "Master Data" && group.title !== "Pengaturan"
+          (group) => group.title !== "Aset" && group.title !== "Pengaturan"
         )
       : menuGroups
 

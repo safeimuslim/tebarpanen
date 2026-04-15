@@ -82,28 +82,28 @@ model Equipment {
 }
 
 model CultureCycle {
-  id                String            @id @default(cuid())
-  farmId            String?
-  farm              Farm?             @relation(fields: [farmId], references: [id], onDelete: SetNull)
-  cycleName         String
-  startDate         DateTime
-  endDate           DateTime?
-  seedCount         Int
-  initialAvgWeightG Float?
-  seedPriceTotal    Decimal?          @db.Decimal(14, 2)
-  targetHarvestDate DateTime?
-  status            CycleStatus       @default(ACTIVE)
-  notes             String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  ponds             CyclePond[]
-  feedLogs          FeedLog[]
-  expenseLogs       ExpenseLog[]
-  harvestLogs       HarvestLog[]
-  mortalityLogs     MortalityLog[]
-  samplingLogs      SamplingLog[]
-  treatmentLogs     TreatmentLog[]
-  waterQualityLogs  WaterQualityLog[]
+  id                  String               @id @default(cuid())
+  farmId              String?
+  farm                Farm?                @relation(fields: [farmId], references: [id], onDelete: SetNull)
+  cycleName           String
+  startDate           DateTime
+  endDate             DateTime?
+  seedCount           Int
+  initialAvgWeightG   Float?
+  seedPriceTotal      Decimal?             @db.Decimal(14, 2)
+  targetHarvestDate   DateTime?
+  status              CycleStatus          @default(ACTIVE)
+  notes               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  ponds               CyclePond[]
+  feedLogs            FeedLog[]
+  expenseLogs         ExpenseLog[]
+  harvestTransactions HarvestTransaction[]
+  mortalityLogs       MortalityLog[]
+  samplingLogs        SamplingLog[]
+  treatmentLogs       TreatmentLog[]
+  waterQualityLogs    WaterQualityLog[]
 }
 
 model CyclePond {
@@ -197,18 +197,43 @@ model ExpenseLog {
   updatedAt      DateTime        @updatedAt
 }
 
-model HarvestLog {
-  id             String       @id @default(cuid())
+model HarvestTransaction {
+  id             String               @id @default(cuid())
   cultureCycleId String
-  cultureCycle   CultureCycle @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
-  logDate        DateTime
+  cultureCycle   CultureCycle         @relation(fields: [cultureCycleId], references: [id], onDelete: Cascade)
+  invoiceNumber  String               @unique
+  harvestDate    DateTime
   totalWeightKg  Float
   harvestedCount Int
-  pricePerKg     Decimal      @db.Decimal(12, 2)
-  buyer          String?
+  buyerName      String
+  pricePerKg     Decimal              @db.Decimal(12, 2)
+  grossAmount    Decimal              @db.Decimal(14, 2)
+  dueDate        DateTime?
+  paymentStatus  HarvestPaymentStatus @default(PAID)
   notes          String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  payments       HarvestPayment[]
+
+  @@index([cultureCycleId])
+  @@index([harvestDate])
+  @@index([paymentStatus])
+}
+
+model HarvestPayment {
+  id                   String             @id @default(cuid())
+  harvestTransactionId String
+  harvestTransaction   HarvestTransaction @relation(fields: [harvestTransactionId], references: [id], onDelete: Cascade)
+  paymentDate          DateTime
+  amount               Decimal            @db.Decimal(14, 2)
+  method               HarvestPaymentMethod?
+  referenceNumber      String?
+  notes                String?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  @@index([harvestTransactionId])
+  @@index([paymentDate])
 }
 
 enum PondType {
@@ -260,6 +285,19 @@ enum ExpenseCategory {
   MEDICINE_VITAMIN
   LABOR
   ELECTRICITY
+  OTHER
+}
+
+enum HarvestPaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+enum HarvestPaymentMethod {
+  CASH
+  BANK_TRANSFER
+  E_WALLET
   OTHER
 }
 

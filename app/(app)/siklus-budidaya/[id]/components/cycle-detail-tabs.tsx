@@ -22,7 +22,7 @@ export function CycleDetailTabs({
   counts: {
     expenseLogs: number
     feedLogs: number
-    harvestLogs: number
+    harvestTransactions: number
     mortalityLogs: number
     samplingLogs: number
     treatmentLogs: number
@@ -37,7 +37,7 @@ export function CycleDetailTabs({
   }> = [
     { label: "Ringkasan", value: "ringkasan" },
     { label: "Biaya", value: "biaya", count: counts.expenseLogs },
-    { label: "Panen", value: "panen", count: counts.harvestLogs },
+    { label: "Panen", value: "panen", count: counts.harvestTransactions },
     { label: "Pakan", value: "pakan", count: counts.feedLogs },
     { label: "Mortalitas", value: "mortalitas", count: counts.mortalityLogs },
     { label: "Sampling", value: "sampling", count: counts.samplingLogs },
