@@ -329,6 +329,18 @@ function CycleRow({
               {formatNumber(cycle.ponds.length)} kolam terhubung
             </p>
           </div>
+
+          <dl className="grid grid-cols-2 gap-3 pt-1 sm:grid-cols-3 lg:max-w-xl">
+            <Metric label="Bibit" value={`${formatNumber(cycle.seedCount)} ekor`} />
+            <Metric
+              label="Survival"
+              value={getSurvivalRate(cycle.seedCount, deadCount)}
+            />
+            <Metric
+              label="Kolam"
+              value={`${formatNumber(cycle.ponds.length)} kolam`}
+            />
+          </dl>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
