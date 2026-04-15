@@ -66,7 +66,7 @@ export default async function Dashboard() {
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
           <div
-            className="border-border bg-card rounded-lg border p-4 shadow-sm"
+            className="border-border bg-card rounded-lg border p-4"
             key={card.label}
           >
             <p className="text-muted-foreground text-sm">{card.label}</p>
@@ -78,7 +78,7 @@ export default async function Dashboard() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(19rem,0.9fr)]">
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
+        <div className="border-border bg-card rounded-lg border p-5">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
               <AlertTriangle className="size-5" />
@@ -131,7 +131,7 @@ export default async function Dashboard() {
           </div>
         </div>
 
-        <div className="border-border bg-card rounded-lg border p-5 shadow-sm">
+        <div className="border-border bg-card rounded-lg border p-5">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
               <Fish className="size-5" />
@@ -185,7 +185,7 @@ export default async function Dashboard() {
         </div>
       </section>
 
-      <section className="border-border bg-card rounded-lg border p-5 shadow-sm">
+      <section className="border-border bg-card rounded-lg border p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="font-semibold">Siklus Aktif</h2>

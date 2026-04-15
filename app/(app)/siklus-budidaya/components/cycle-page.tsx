@@ -14,15 +14,11 @@ import { createCycle } from "../actions"
 import type { CyclePageData } from "../types"
 import { CycleForm } from "./cycle-form"
 import { CycleList } from "./cycle-list"
-import { CycleSummaryCards } from "./cycle-summary-cards"
 
 export function CyclePage({
-  activeCount,
   availablePonds,
   canManageCycles,
   cycles,
-  totalEstimatedAlive,
-  totalPondsUsed,
 }: CyclePageData) {
   return (
     <div className="space-y-6">
@@ -68,12 +64,6 @@ export function CyclePage({
           </Dialog>
         ) : null}
       </div>
-
-      <CycleSummaryCards
-        activeCount={activeCount}
-        totalEstimatedAlive={totalEstimatedAlive}
-        totalPondsUsed={totalPondsUsed}
-      />
 
       <CycleList
         availablePonds={availablePonds}

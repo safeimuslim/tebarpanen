@@ -8,6 +8,7 @@ import { ActionForm } from "@/components/action-form"
 import { CrudRowActions } from "@/components/crud-row-actions"
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { SummaryCard } from "@/components/ui/summary-card"
 import {
   Dialog,
   DialogContent,
@@ -122,7 +123,7 @@ export default async function UserPage() {
         <SummaryCard label="Farm" value={farm?.name ?? "-"} />
       </section>
 
-      <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
+      <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border">
         <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-semibold">List User Pekerja</h2>
@@ -239,7 +240,7 @@ function SuperAdminUserPage({
         <SummaryCard label="Registrasi" value="Mandiri" />
       </section>
 
-      <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
+      <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border">
         <div className="border-border border-b p-4">
           <h2 className="font-semibold">List Admin Farm</h2>
           <p className="text-muted-foreground text-sm">
@@ -349,7 +350,7 @@ function UserForm({
             {user ? "Password Baru" : "Password"}
           </label>
           <input
-            className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+            className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
             id={user ? `password-${user.id}` : "password"}
             name="password"
             placeholder={user ? "Kosongkan jika tidak diubah" : "Minimal 6 karakter"}
@@ -410,15 +411,6 @@ function UserDetailContent({
   )
 }
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <article className="border-border bg-card rounded-lg border p-5 shadow-sm">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-    </article>
-  )
-}
-
 function UserMetric({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -445,7 +437,7 @@ function FormField({
         {label}
       </label>
       <input
-        className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+        className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
         defaultValue={defaultValue}
         id={name}
         name={name}
@@ -473,7 +465,7 @@ function SelectField({
         {label}
       </label>
       <select
-        className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+        className="border-input bg-white text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
         defaultValue={defaultValue}
         id={name}
         name={name}

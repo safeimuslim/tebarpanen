@@ -1,3 +1,5 @@
+import { SummaryCard } from "@/components/ui/summary-card"
+
 import { formatCurrency } from "../utils"
 
 export function EquipmentSummaryCards({
@@ -21,14 +23,5 @@ export function EquipmentSummaryCards({
         value={formatCurrency(totalPurchasePrice)}
       />
     </section>
-  )
-}
-
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border bg-card rounded-lg border p-4 shadow-sm">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-    </div>
   )
 }

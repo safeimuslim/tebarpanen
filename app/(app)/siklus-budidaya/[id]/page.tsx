@@ -12,6 +12,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { SummaryCard } from "@/components/ui/summary-card"
 import { cn } from "@/lib/utils"
 
 import { getCycleById } from "../queries"
@@ -185,7 +186,64 @@ export default async function SiklusBudidayaDetailPage({
           <SummaryCard
             key={item.label}
             label={item.label}
-            tooltipLines={item.tooltipLines}
+            labelAccessory={
+              item.tooltipLines?.length ? (
+                <Popover>
+                  <PopoverTrigger
+                    render={
+                      <button
+                        aria-label={`Info perhitungan ${item.label}`}
+                        className="text-muted-foreground hover:text-foreground inline-flex size-4 items-center justify-center rounded-sm transition-colors"
+                        type="button"
+                      />
+                    }
+                  >
+                    <Info className="size-3.5" />
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="space-y-3">
+                    <PopoverHeader>
+                      <PopoverTitle>Detail Perhitungan</PopoverTitle>
+                      <PopoverDescription>
+                        Perhitungan operasional pada card {item.label.toLowerCase()}.
+                      </PopoverDescription>
+                    </PopoverHeader>
+                    <div className="space-y-2">
+                      {item.tooltipLines.map((line) => (
+                        <div
+                          className="border-border bg-background flex items-start justify-between gap-4 rounded-md border px-3 py-2 text-sm"
+                          key={line.label}
+                        >
+                          <div className="min-w-0 space-y-1">
+                            <span className="text-muted-foreground block">
+                              {line.label}
+                            </span>
+                            {line.entryType ? (
+                              <span
+                                className={cn(
+                                  "inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium",
+                                  line.entryType === "income"
+                                    ? "bg-primary/10 text-primary"
+                                    : "bg-destructive/10 text-destructive"
+                                )}
+                              >
+                                {line.entryType === "income"
+                                  ? "Pemasukan"
+                                  : "Pengeluaran"}
+                              </span>
+                            ) : null}
+                          </div>
+                          <span
+                            className={cn("text-right font-medium", line.valueClassName)}
+                          >
+                            {line.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              ) : null
+            }
             value={item.value}
             valueClassName={item.valueClassName}
           />
@@ -193,7 +251,7 @@ export default async function SiklusBudidayaDetailPage({
       </section>
 
       <section>
-        <div className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
+        <div className="border-border bg-card text-card-foreground rounded-lg border p-5">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
               <CalendarDays className="size-5" />
@@ -224,7 +282,7 @@ export default async function SiklusBudidayaDetailPage({
         </div>
       </section>
 
-      <section className="border-border bg-card rounded-lg border shadow-sm">
+      <section className="border-border bg-card rounded-lg border">
         <div className="border-border border-b p-3 sm:p-4">
           <CycleDetailTabs
             activeTab={activeTab}
@@ -371,82 +429,6 @@ function readDetailTab(
   }
 
   return "ringkasan"
-}
-
-function SummaryCard({
-  label,
-  tooltipLines,
-  value,
-  valueClassName,
-}: {
-  label: string
-  tooltipLines?: Array<{
-    entryType?: "income" | "expense"
-    label: string
-    value: string
-    valueClassName?: string
-  }>
-  value: string
-  valueClassName?: string
-}) {
-  return (
-    <div className="border-border bg-card rounded-lg border p-4 shadow-sm">
-      <div className="flex items-center gap-1.5">
-        <p className="text-muted-foreground text-sm">{label}</p>
-        {tooltipLines?.length ? (
-          <Popover>
-            <PopoverTrigger
-              render={
-                <button
-                  aria-label={`Info perhitungan ${label}`}
-                  className="text-muted-foreground hover:text-foreground inline-flex size-4 items-center justify-center rounded-sm transition-colors"
-                  type="button"
-                />
-              }
-            >
-              <Info className="size-3.5" />
-            </PopoverTrigger>
-            <PopoverContent align="start" className="space-y-3">
-              <PopoverHeader>
-                <PopoverTitle>Detail Perhitungan</PopoverTitle>
-                <PopoverDescription>
-                  Perhitungan operasional pada card {label.toLowerCase()}.
-                </PopoverDescription>
-              </PopoverHeader>
-              <div className="space-y-2">
-                {tooltipLines.map((line) => (
-                  <div
-                    className="border-border bg-background flex items-start justify-between gap-4 rounded-md border px-3 py-2 text-sm"
-                    key={line.label}
-                  >
-                    <div className="min-w-0 space-y-1">
-                      <span className="text-muted-foreground block">{line.label}</span>
-                      {line.entryType ? (
-                        <span
-                          className={cn(
-                            "inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium",
-                            line.entryType === "income"
-                              ? "bg-primary/10 text-primary"
-                              : "bg-destructive/10 text-destructive"
-                          )}
-                        >
-                          {line.entryType === "income" ? "Pemasukan" : "Pengeluaran"}
-                        </span>
-                      ) : null}
-                    </div>
-                    <span className={cn("text-right font-medium", line.valueClassName)}>
-                      {line.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-        ) : null}
-      </div>
-      <p className={cn("mt-2 text-2xl font-semibold", valueClassName)}>{value}</p>
-    </div>
-  )
 }
 
 function DetailMetric({

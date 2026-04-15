@@ -119,7 +119,7 @@ export function AppSidebar({
                       href={item.href}
                       className={cn(
                         buttonVariants({ variant: "ghost" }),
-                        "h-11 w-full gap-3 px-3 hover:bg-primary/15 hover:text-primary",
+                        "h-10 w-full gap-3 px-3 hover:bg-primary/15 hover:text-primary",
                         isCompact ? "justify-center px-0" : "justify-start",
                         isActive &&
                           "bg-primary/15 text-primary hover:bg-primary/20 hover:text-primary",

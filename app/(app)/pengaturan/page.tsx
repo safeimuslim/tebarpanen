@@ -8,6 +8,7 @@ import {
   Users,
 } from "lucide-react"
 
+import { SummaryCard } from "@/components/ui/summary-card"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -64,7 +65,7 @@ export default function PengaturanPage() {
 
           return (
             <Link
-              className="border-border bg-card text-card-foreground hover:bg-muted/50 rounded-lg border p-5 shadow-sm transition-colors"
+              className="border-border bg-card text-card-foreground hover:bg-muted/50 rounded-lg border p-5 transition-colors"
               href={item.href}
               key={item.title}
             >
@@ -83,7 +84,7 @@ export default function PengaturanPage() {
         })}
       </section>
 
-      <section className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
+      <section className="border-border bg-card text-card-foreground rounded-lg border p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-start gap-3">
             <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
@@ -105,15 +106,6 @@ export default function PengaturanPage() {
           </Link>
         </div>
       </section>
-    </div>
-  )
-}
-
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border bg-card rounded-lg border p-4 shadow-sm">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
     </div>
   )
 }

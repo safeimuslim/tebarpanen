@@ -60,7 +60,7 @@ export function MortalityLogForm({
           Catatan
         </label>
         <textarea
-          className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+          className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
           defaultValue={mortalityLog?.notes ?? ""}
           id={mortalityLog ? `mortality-notes-${mortalityLog.id}` : "mortality-notes"}
           name="notes"
@@ -100,7 +100,7 @@ function FormField({
         {label}
       </label>
       <input
-        className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+        className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
         defaultValue={defaultValue}
         id={name}
         name={name}

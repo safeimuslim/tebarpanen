@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { SummaryCard } from "@/components/ui/summary-card"
 
 import {
   createWaterQualityLog,
@@ -87,7 +88,7 @@ export function WaterQualityLogSection({
         />
       </div>
 
-      <div className="border-border bg-card overflow-hidden rounded-lg border shadow-sm">
+      <div className="border-border bg-card overflow-hidden rounded-lg border">
         <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-semibold">List Kualitas Air</h3>
@@ -199,15 +200,6 @@ export function WaterQualityLogSection({
         )}
       </div>
     </section>
-  )
-}
-
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="border-border bg-card rounded-lg border p-4 shadow-sm">
-      <p className="text-muted-foreground text-sm">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-    </div>
   )
 }
 

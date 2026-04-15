@@ -48,7 +48,7 @@ export function CycleList({
 }) {
   if (cycles.length === 0) {
     return (
-      <section className="border-border bg-card text-card-foreground rounded-lg border p-6 shadow-sm">
+      <section className="border-border bg-card text-card-foreground rounded-lg border p-6">
         <h2 className="font-semibold">List Siklus Budidaya</h2>
         <p className="text-muted-foreground mt-2 text-sm">
           Belum ada siklus budidaya yang tersimpan.
@@ -58,7 +58,7 @@ export function CycleList({
   }
 
   return (
-    <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
+    <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border">
       <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-semibold">List Siklus Budidaya</h2>

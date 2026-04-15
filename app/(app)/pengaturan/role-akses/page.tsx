@@ -112,7 +112,7 @@ export default async function RoleAksesPage() {
 
           return (
             <article
-              className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm"
+              className="border-border bg-card text-card-foreground rounded-lg border p-5"
               key={role.key}
             >
               <div className="flex items-start justify-between gap-3">
@@ -133,7 +133,7 @@ export default async function RoleAksesPage() {
         })}
       </section>
 
-      <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
+      <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border">
         <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="font-semibold">Matrix Akses</h2>
@@ -176,7 +176,7 @@ export default async function RoleAksesPage() {
         </div>
       </section>
 
-      <section className="border-border bg-card text-card-foreground rounded-lg border p-5 shadow-sm">
+      <section className="border-border bg-card text-card-foreground rounded-lg border p-5">
         <div className="flex items-start gap-3">
           <div className="bg-muted flex size-10 items-center justify-center rounded-lg">
             <LockKeyhole className="size-5" />

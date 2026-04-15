@@ -78,7 +78,7 @@ export function MonthField({
             <div className="flex items-center justify-between gap-2">
               <Button
                 aria-label="Tahun sebelumnya"
-                className="size-8"
+                className="size-10"
                 disabled={displayYear <= MIN_YEAR}
                 onClick={() => setDisplayYear((currentYear) => currentYear - 1)}
                 size="icon"
@@ -95,7 +95,7 @@ export function MonthField({
 
               <Button
                 aria-label="Tahun berikutnya"
-                className="size-8"
+                className="size-10"
                 disabled={displayYear >= maxYear}
                 onClick={() => setDisplayYear((currentYear) => currentYear + 1)}
                 size="icon"
@@ -116,7 +116,7 @@ export function MonthField({
                 return (
                   <Button
                     className={cn(
-                      "h-9 justify-center font-normal",
+                      "h-10 justify-center font-normal",
                       isSelected && "border-primary bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                     )}
                     key={monthLabel}

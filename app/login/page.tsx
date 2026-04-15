@@ -45,7 +45,7 @@ export default async function LoginPage({
 
   return (
     <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-10">
-      <section className="border-border bg-card text-card-foreground w-full max-w-sm rounded-lg border p-6 shadow-sm">
+      <section className="border-border bg-card text-card-foreground w-full max-w-sm rounded-lg border p-6">
         <div className="mb-6 space-y-2">
           <p className="text-muted-foreground text-sm">Tebar Panen</p>
           <h1 className="text-2xl font-semibold tracking-tight">Masuk</h1>
@@ -101,7 +101,7 @@ export default async function LoginPage({
               Email / HP
             </label>
             <input
-              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
               id="identifier"
               name="identifier"
               placeholder="email@domain.com / 08xxxxxxxxxx"
@@ -116,7 +116,7 @@ export default async function LoginPage({
               Password
             </label>
             <input
-              className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
               id="password"
               name="password"
               placeholder="Masukkan password"

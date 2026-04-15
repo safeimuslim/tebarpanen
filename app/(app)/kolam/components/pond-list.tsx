@@ -17,7 +17,7 @@ export function PondList({
   totalCount: number
 }) {
   return (
-    <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border shadow-sm">
+    <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border">
       <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-semibold">List Kolam</h2>

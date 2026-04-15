@@ -138,7 +138,7 @@ export default async function RegisterPage({
 
   return (
     <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-10">
-      <section className="border-border bg-card text-card-foreground w-full max-w-xl rounded-lg border p-6 shadow-sm">
+      <section className="border-border bg-card text-card-foreground w-full max-w-xl rounded-lg border p-6">
         <div className="mb-6 space-y-2">
           <p className="text-muted-foreground text-sm">Tebar Panen</p>
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -168,7 +168,7 @@ export default async function RegisterPage({
                 Nama Farm
               </label>
               <input
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="farmName"
                 name="farmName"
                 placeholder="Farm Lele Sejahtera"
@@ -181,7 +181,7 @@ export default async function RegisterPage({
                 Deskripsi Farm
               </label>
               <textarea
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="farmDescription"
                 name="farmDescription"
                 placeholder="Opsional"
@@ -193,7 +193,7 @@ export default async function RegisterPage({
                 Nama Admin Farm
               </label>
               <input
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="name"
                 name="name"
                 required
@@ -205,7 +205,7 @@ export default async function RegisterPage({
                 HP
               </label>
               <input
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="phone"
                 name="phone"
                 placeholder="08xxxxxxxxxx"
@@ -219,7 +219,7 @@ export default async function RegisterPage({
                 Email
               </label>
               <input
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="email"
                 name="email"
                 placeholder="admin@farm.com"
@@ -233,7 +233,7 @@ export default async function RegisterPage({
                 Password
               </label>
               <input
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="password"
                 name="password"
                 required
@@ -246,7 +246,7 @@ export default async function RegisterPage({
                 Konfirmasi Password
               </label>
               <input
-                className="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="confirmPassword"
                 name="confirmPassword"
                 required
