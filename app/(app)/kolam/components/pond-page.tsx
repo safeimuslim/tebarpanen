@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { PondFiltersSection } from "./pond-filters"
 import { PondForm } from "./pond-form"
 import { PondList } from "./pond-list"
 import { PondSummaryCards } from "./pond-summary-cards"
@@ -73,9 +72,7 @@ export function PondPage({
         totalPurchasePrice={totalPurchasePrice}
       />
 
-      <PondFiltersSection filters={filters} />
-
-      <PondList ponds={ponds} totalCount={totalCount} />
+      <PondList filters={filters} ponds={ponds} totalCount={totalCount} />
 
       <ListPagination
         currentPage={currentPage}

@@ -12,19 +12,33 @@ import {
 import type { EquipmentFilters } from "../types"
 
 export function EquipmentFiltersSection({
+  embedded = false,
   filters,
 }: {
+  embedded?: boolean
   filters: EquipmentFilters
 }) {
-  return (
-    <section className="border-border bg-card rounded-lg border p-4">
-      <Form
-        action=""
-        className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(2,minmax(0,0.8fr))_auto_auto]"
-        replace
-        scroll={false}
-      >
-        <div className="relative">
+  const content = (
+    <Form
+      action=""
+      className="space-y-4 p-4 sm:p-5"
+      replace
+      scroll={false}
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-semibold">Filter Alat</h2>
+          <p className="text-muted-foreground text-sm">
+            Cari alat lebih cepat berdasarkan nama, jenis, dan kondisi.
+          </p>
+        </div>
+        <span className="text-muted-foreground text-sm">
+          Filter aktif sesuai parameter pencarian
+        </span>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_15rem_15rem_auto_auto]">
+        <label className="relative block">
           <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <input
             className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border pr-3 pl-9 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
@@ -32,9 +46,9 @@ export function EquipmentFiltersSection({
             name="query"
             placeholder="Cari nama, merek, atau nomor seri"
           />
-        </div>
+        </label>
         <select
-          className="border-input bg-white text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+          className="border-input bg-white text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
           defaultValue={filters.type}
           name="type"
         >
@@ -46,7 +60,7 @@ export function EquipmentFiltersSection({
           ))}
         </select>
         <select
-          className="border-input bg-white text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+          className="border-input bg-white text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
           defaultValue={filters.condition}
           name="condition"
         >
@@ -67,7 +81,17 @@ export function EquipmentFiltersSection({
         >
           Reset
         </Link>
-      </Form>
+      </div>
+    </Form>
+  )
+
+  if (embedded) {
+    return content
+  }
+
+  return (
+    <section className="border-border bg-card overflow-hidden rounded-lg border">
+      {content}
     </section>
   )
 }

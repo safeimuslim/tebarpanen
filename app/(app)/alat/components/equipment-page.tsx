@@ -13,7 +13,6 @@ import {
 
 import { createEquipment } from "../actions"
 import type { EquipmentPageData } from "../types"
-import { EquipmentFiltersSection } from "./equipment-filters"
 import { EquipmentForm } from "./equipment-form"
 import { EquipmentList } from "./equipment-list"
 import { EquipmentSummaryCards } from "./equipment-summary-cards"
@@ -74,9 +73,11 @@ export function EquipmentPage({
         totalPurchasePrice={totalPurchasePrice}
       />
 
-      <EquipmentFiltersSection filters={filters} />
-
-      <EquipmentList equipment={equipment} totalCount={totalCount} />
+      <EquipmentList
+        equipment={equipment}
+        filters={filters}
+        totalCount={totalCount}
+      />
 
       <ListPagination
         currentPage={currentPage}

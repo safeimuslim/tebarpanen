@@ -55,7 +55,7 @@ export default async function KeuanganPage({
     valueClassName?: string
   }> = [
     {
-      accentClassName: "border-t-primary",
+      accentClassName: "",
       helper: "Total pemasukan panen farm pada periode terpilih",
       icon: Wallet,
       iconClassName: "bg-primary/12 text-primary",
@@ -64,7 +64,7 @@ export default async function KeuanganPage({
       valueClassName: "text-primary",
     },
     {
-      accentClassName: "border-t-[#125E8A]",
+      accentClassName: "",
       helper: "Bibit, pakan, dan biaya manual pada rentang bulan terpilih",
       icon: ReceiptText,
       iconClassName: "bg-[#125E8A]/12 text-[#125E8A]",
@@ -73,7 +73,7 @@ export default async function KeuanganPage({
       valueClassName: "text-[#125E8A]",
     },
     {
-      accentClassName: "border-t-[#E5A93D]",
+      accentClassName: "",
       helper: "Akumulasi penyusutan kolam dan alat pada rentang bulan terpilih",
       icon: Landmark,
       iconClassName: "bg-[#E5A93D]/15 text-[#A87412]",
@@ -82,10 +82,7 @@ export default async function KeuanganPage({
       valueClassName: "text-[#8A6718]",
     },
     {
-      accentClassName:
-        data.netProfit >= 0
-          ? "border-t-primary"
-          : "border-t-destructive",
+      accentClassName: "",
       helper: "Pendapatan dikurangi biaya operasional dan penyusutan.",
       icon: TrendingUp,
       iconClassName:
@@ -196,7 +193,7 @@ export default async function KeuanganPage({
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => (
-          <Card className={cn("border-t-4", card.accentClassName)} key={card.label}>
+          <Card key={card.label}>
             <CardContent className="pt-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">

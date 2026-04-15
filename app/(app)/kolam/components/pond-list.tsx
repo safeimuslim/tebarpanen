@@ -4,20 +4,27 @@ import { CrudRowActions } from "@/components/crud-row-actions"
 
 import { deletePond, updatePond } from "../actions"
 import { pondShapeLabels, pondStatusLabels, pondTypeLabels } from "../constants"
-import type { PondFormData } from "../types"
+import type { PondFilters, PondFormData } from "../types"
 import { formatCapacity, formatCurrency } from "../utils"
 import { PondDetailContent } from "./pond-detail-content"
+import { PondFiltersSection } from "./pond-filters"
 import { PondForm } from "./pond-form"
 
 export function PondList({
+  filters,
   ponds,
   totalCount,
 }: {
+  filters: PondFilters
   ponds: PondFormData[]
   totalCount: number
 }) {
   return (
     <section className="border-border bg-card text-card-foreground overflow-hidden rounded-lg border">
+      <div className="border-border border-b">
+        <PondFiltersSection embedded filters={filters} />
+      </div>
+
       <div className="border-border flex flex-col gap-2 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-semibold">List Kolam</h2>

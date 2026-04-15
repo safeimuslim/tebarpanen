@@ -22,16 +22,18 @@ export function CyclePage({
 }: CyclePageData) {
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-muted-foreground text-sm">Siklus Budidaya</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight">
-            Siklus Budidaya
-          </h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
-            Kelola siklus budidaya dengan satu atau beberapa kolam. Kolam yang sedang
-            dipakai dalam siklus aktif tidak dapat dipilih untuk siklus aktif baru.
-          </p>
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-4">
+          <div>
+            <p className="text-muted-foreground text-sm">Siklus Budidaya</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+              Siklus Budidaya
+            </h1>
+            <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
+              Pantau siklus aktif, cari data lebih cepat, dan kelola kolam tanpa
+              tampilan yang padat.
+            </p>
+          </div>
         </div>
 
         {canManageCycles ? (
@@ -40,7 +42,7 @@ export function CyclePage({
               render={<Button className="gap-2" size="lg" type="button" />}
             >
               <Plus className="size-4" />
-              Create Siklus Budidaya
+              Tambah Siklus
             </DialogTrigger>
             <DialogContent
               className="max-h-[90vh] w-full max-w-[calc(100%-2rem)] overflow-y-auto p-0 sm:max-w-3xl"
@@ -48,7 +50,7 @@ export function CyclePage({
             >
               <DialogHeader className="border-border border-b p-5">
                 <p className="text-muted-foreground text-sm">Form Siklus</p>
-                <DialogTitle>Create Siklus Budidaya</DialogTitle>
+                <DialogTitle>Tambah Siklus Budidaya</DialogTitle>
                 <DialogDescription>
                   Siklus baru akan tersimpan ke database dengan satu atau beberapa kolam.
                 </DialogDescription>

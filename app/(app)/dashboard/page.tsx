@@ -2,10 +2,13 @@ import Link from "next/link"
 import type { ReactNode } from "react"
 import {
   AlertTriangle,
+  CalendarDays,
   Fish,
   FlaskConical,
   Package,
   TrendingDown,
+  Waves,
+  type LucideIcon,
 } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
@@ -17,23 +20,36 @@ export default async function Dashboard() {
   const data = await getDashboardPageData()
 
   const summaryCards: Array<{
+    icon: LucideIcon
+    iconClassName: string
     label: string
     value: string
     valueClassName?: string
   }> = [
     {
+      icon: Waves,
+      iconClassName: "bg-[#125E8A]/12 text-[#125E8A]",
       label: "Kolam Aktif",
       value: formatNumber(data.activePondsCount),
     },
     {
+      icon: Package,
+      iconClassName: "bg-primary/12 text-primary",
       label: "Siklus Aktif",
       value: formatNumber(data.activeCyclesCount),
     },
     {
+      icon: Fish,
+      iconClassName: "bg-[#E5A93D]/15 text-[#A87412]",
       label: "Estimasi Ikan Hidup",
       value: formatNumber(data.totalEstimatedAlive),
     },
     {
+      icon: CalendarDays,
+      iconClassName:
+        data.nearestHarvestDaysLeft != null && data.nearestHarvestDaysLeft <= 7
+          ? "bg-primary/12 text-primary"
+          : "bg-muted text-muted-foreground",
       label: "Panen Terdekat",
       value:
         data.nearestHarvestDaysLeft != null
@@ -69,7 +85,17 @@ export default async function Dashboard() {
             className="border-border bg-card rounded-lg border p-4"
             key={card.label}
           >
-            <p className="text-muted-foreground text-sm">{card.label}</p>
+            <div className="flex items-start gap-3">
+              <div
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-lg",
+                  card.iconClassName
+                )}
+              >
+                <card.icon className="size-5" />
+              </div>
+              <p className="text-muted-foreground pt-1 text-sm">{card.label}</p>
+            </div>
             <p className={cn("mt-2 text-2xl font-semibold", card.valueClassName)}>
               {card.value}
             </p>
