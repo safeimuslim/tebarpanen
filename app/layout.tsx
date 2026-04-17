@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Tebar Panen",
   },
   description:
-    "Sistem operasional budidaya ikan untuk mencatat siklus kolam, penjualan panen, dan laporan keuangan dalam satu tempat.",
+    "Rapikan pencatatan budidaya ikan dari kolam hingga penjualan panen dalam satu aplikasi.",
 }
 
 export default function RootLayout({
