@@ -1,10 +1,12 @@
 import Link from "next/link"
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
+import { Building2, KeyRound, Mail, MapPin, Phone } from "lucide-react"
 
 import { auth } from "@/auth"
 import { hashPassword } from "@/app/lib/password"
 import { prisma } from "@/app/lib/prisma"
+import { AuthShell } from "@/components/auth/auth-shell"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
@@ -136,63 +138,76 @@ export default async function RegisterPage({
   }
 
   return (
-    <main className="bg-background text-foreground flex min-h-screen items-center justify-center px-4 py-10">
-      <section className="border-border bg-card text-card-foreground w-full max-w-xl rounded-lg border p-6">
-        <div className="mb-6 space-y-2">
-          <p className="text-muted-foreground text-sm">Tebar Panen</p>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Registrasi Farm
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Buat akun admin farm untuk mulai mengelola kolam, alat, dan pekerja.
-          </p>
-        </div>
+    <AuthShell
+      badge="Mulai dengan Tebar Panen"
+      description="Buat akun usaha budidaya ikan Anda dan mulai dari kolam yang sedang aktif hari ini."
+      highlights={[
+        "Catat kolam, panen, dan penjualan lebih rapi",
+        "Mulai dari satu kolam dulu, lalu lanjut bertahap",
+        "Laporan usaha lebih mudah dilihat saat dibutuhkan",
+      ]}
+      panelDescription="Buat akun usaha Anda untuk mulai merapikan pencatatan harian tanpa harus langsung mengubah semua proses yang sudah berjalan."
+      panelTitle="Mulai lebih rapi dari sekarang"
+      supportCopy="Tidak perlu menunggu semuanya siap. Anda bisa mulai dari data farm dan kolam yang paling sering dipakai, lalu melengkapinya sambil jalan."
+      supportTitle="Mulai pelan-pelan juga tidak apa-apa"
+      title="Daftarkan usaha budidaya Anda"
+    >
+      {message ? (
+        <p
+          className={
+            message.tone === "success"
+              ? "mb-4 rounded-xl border border-[#d9e9e4] bg-[#f7fbfa] px-4 py-3 text-sm text-[#355565]"
+              : "bg-destructive/10 text-destructive mb-4 rounded-xl px-4 py-3 text-sm"
+          }
+        >
+          {message.text}
+        </p>
+      ) : null}
 
-        {message ? (
-          <p
-            className={
-              message.tone === "success"
-                ? "border-border bg-muted text-foreground mb-4 rounded-md border px-3 py-2 text-sm"
-                : "bg-destructive/10 text-destructive mb-4 rounded-md px-3 py-2 text-sm"
-            }
-          >
-            {message.text}
-          </p>
-        ) : null}
-
-        <form action={registerFarm} className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium" htmlFor="farmName">
-                Nama Farm
-              </label>
+      <form action={registerFarm} className="space-y-4">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium text-[#163042]" htmlFor="farmName">
+              Nama Farm
+            </label>
+            <div className="relative">
+              <Building2 className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#7a909a]" />
               <input
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="farmName"
                 name="farmName"
                 placeholder="Farm Lele Sejahtera"
                 required
               />
             </div>
+          </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium" htmlFor="farmDescription">
-                Alamat Farm
-              </label>
+          <div className="space-y-2 md:col-span-2">
+            <label
+              className="text-sm font-medium text-[#163042]"
+              htmlFor="farmDescription"
+            >
+              Alamat Farm
+            </label>
+            <div className="relative">
+              <MapPin className="pointer-events-none absolute top-3 left-3 size-4 text-[#7a909a]" />
               <textarea
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-md border px-3 py-2 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 min-h-24 w-full rounded-xl border py-2 pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="farmDescription"
                 name="farmDescription"
                 placeholder="Alamat farm"
               />
             </div>
+          </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium" htmlFor="phone">
-                HP
-              </label>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium text-[#163042]" htmlFor="phone">
+              HP
+            </label>
+            <div className="relative">
+              <Phone className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#7a909a]" />
               <input
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="phone"
                 name="phone"
                 placeholder="08xxxxxxxxxx"
@@ -200,13 +215,16 @@ export default async function RegisterPage({
                 type="tel"
               />
             </div>
+          </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium" htmlFor="email">
-                Email
-              </label>
+          <div className="space-y-2 md:col-span-2">
+            <label className="text-sm font-medium text-[#163042]" htmlFor="email">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#7a909a]" />
               <input
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="email"
                 name="email"
                 placeholder="admin@farm.com"
@@ -214,47 +232,62 @@ export default async function RegisterPage({
                 type="email"
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="password">
-                Password
-              </label>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-[#163042]" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
+              <KeyRound className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#7a909a]" />
               <input
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="password"
                 name="password"
                 required
                 type="password"
               />
             </div>
+            <p className="text-xs leading-5 text-[#6f8792]">
+              Minimal 6 karakter agar akun Anda lebih aman.
+            </p>
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="confirmPassword">
-                Konfirmasi Password
-              </label>
+          <div className="space-y-2">
+            <label
+              className="text-sm font-medium text-[#163042]"
+              htmlFor="confirmPassword"
+            >
+              Konfirmasi Password
+            </label>
+            <div className="relative">
+              <KeyRound className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[#7a909a]" />
               <input
-                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
+                className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
                 id="confirmPassword"
                 name="confirmPassword"
                 required
                 type="password"
               />
             </div>
+            <p className="text-xs leading-5 text-[#6f8792]">
+              Ulangi password yang sama agar tidak salah saat masuk nanti.
+            </p>
           </div>
+        </div>
 
-          <Button className="w-full" size="lg" type="submit">
-            Daftarkan Farm
-          </Button>
-        </form>
+        <Button className="h-11 w-full rounded-xl" size="lg" type="submit">
+          Daftarkan Farm
+        </Button>
+      </form>
 
-        <p className="text-muted-foreground mt-4 text-center text-sm">
-          Sudah punya akun?{" "}
-          <Link className="text-primary font-medium" href="/login">
-            Masuk di sini
-          </Link>
-        </p>
-      </section>
-    </main>
+      <p className="mt-5 text-center text-sm text-[#5b7483]">
+        Sudah punya akun?{" "}
+        <Link className="text-primary font-medium" href="/login">
+          Masuk di sini
+        </Link>
+      </p>
+    </AuthShell>
   );
 }
 
