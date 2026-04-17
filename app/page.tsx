@@ -162,17 +162,17 @@ const customerQuotes: SocialProofQuote[] = [
 const faqItems = [
   {
     answer:
-      "Tebar Panen adalah aplikasi budidaya ikan yang membantu Anda mencatat kolam, mortalitas, pakan, panen, penjualan, dan laporan usaha harian dalam satu alur yang lebih rapi. Tujuannya sederhana: supaya operasional harian terasa lebih ringan dan data lebih mudah dibaca saat dibutuhkan.",
+      "Tebar Panen membantu Anda mencatat kolam, mortalitas, pakan, panen, penjualan, dan laporan usaha harian dalam satu alur yang lebih rapi. Tujuannya sederhana: supaya kegiatan harian terasa lebih ringan dan data lebih mudah dilihat saat dibutuhkan.",
     question: "Sebenarnya Tebar Panen ini untuk apa?",
   },
   {
     answer:
-      "Cocok. Banyak usaha budidaya ikan memang mulai dari satu atau beberapa kolam dulu, lalu mulai terasa repot saat catatan manual makin banyak. Tebar Panen bisa dipakai bertahap, jadi Anda tidak perlu menunggu usaha besar dulu untuk mulai rapi.",
+      "Cocok. Banyak usaha budidaya ikan memang mulai dari satu atau beberapa kolam dulu, lalu mulai terasa repot saat catatan manual makin banyak. Tebar Panen bisa dipakai bertahap, jadi Anda tidak perlu menunggu usaha besar dulu untuk mulai lebih rapi.",
     question: "Kalau usaha saya masih kecil, apakah tetap cocok?",
   },
   {
     answer:
-      "Tebar Panen bisa dipakai untuk budidaya lele, nila, patin, gurame, dan ikan air tawar lainnya. Selama alur harian usaha Anda mirip, seperti mencatat kolam, pakan, mortalitas, panen, dan penjualan, aplikasi ini tetap relevan dipakai.",
+      "Tebar Panen bisa dipakai untuk budidaya lele, nila, patin, gurame, dan ikan air tawar lainnya. Selama alur harian usaha Anda mirip, seperti mencatat kolam, pakan, mortalitas, panen, dan penjualan, aplikasi ini tetap nyaman dipakai.",
     question: "Bisa dipakai untuk budidaya ikan apa saja?",
   },
   {
@@ -182,12 +182,12 @@ const faqItems = [
   },
   {
     answer:
-      "Spreadsheet tetap bisa membantu di awal, tetapi biasanya mulai terasa berat saat kolam, panen, dan transaksi makin banyak. Tebar Panen membantu Anda menyusun data harian, penjualan, dan laporan usaha dalam satu alur yang lebih enak dibaca.",
+      "Spreadsheet tetap bisa membantu di awal, tetapi biasanya mulai terasa berat saat kolam, panen, dan transaksi makin banyak. Tebar Panen membantu Anda menyusun data harian, penjualan, dan laporan usaha dalam satu alur yang lebih enak dibaca dan lebih mudah dicek kembali.",
     question: "Apa bedanya dengan spreadsheet biasa?",
   },
   {
     answer:
-      "Cara paling mudah adalah mulai dari kolam yang sedang aktif sekarang. Setelah itu, lanjutkan dengan pencatatan kegiatan harian dan penjualan panen. Anda tidak perlu langsung sempurna, yang penting mulai dulu dari data yang paling sering dipakai.",
+      "Cara paling mudah adalah mulai dari kolam yang sedang aktif sekarang. Setelah itu, lanjutkan dengan pencatatan kegiatan harian dan penjualan panen. Anda tidak perlu langsung sempurna. Yang penting, mulai dulu dari data yang paling sering dipakai.",
     question: "Kalau mau mulai, langkah paling mudahnya bagaimana?",
   },
 ]
@@ -232,7 +232,7 @@ export default function HomePage() {
 
             <div className="space-y-4">
               <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                Aplikasi budidaya ikan untuk mencatat kolam, panen, dan penjualan.
+                Aplikasi budidaya ikan agar catatan kolam tidak tercecer.
               </h1>
               <p className="max-w-2xl text-base leading-7 text-[#4f6775] sm:text-lg">
                 Tebar Panen membantu usaha budidaya ikan mencatat kolam aktif,
@@ -343,7 +343,7 @@ export default function HomePage() {
             <p className="mt-4 text-sm leading-7 text-[#5b7483] sm:text-base">
               Jika Anda masih mencatat di buku, chat, atau spreadsheet
               terpisah, masalahnya biasanya bukan kurang data. Masalahnya,
-              data sering terasa repot saat dibutuhkan cepat.
+              data jadi sulit dicari saat dibutuhkan cepat.
             </p>
           </div>
 
