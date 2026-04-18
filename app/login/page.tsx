@@ -2,7 +2,7 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
-import { KeyRound, Mail, Phone } from "lucide-react"
+import { KeyRound, Mail } from "lucide-react"
 
 import { auth, signIn } from "@/auth"
 import { AuthShell } from "@/components/auth/auth-shell"
@@ -110,11 +110,10 @@ export default async function LoginPage({
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center gap-1 text-[#7a909a]">
               <Mail className="size-4" />
-              <Phone className="size-4" />
             </div>
             <input
               autoComplete="username"
-              className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-12 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-input bg-white text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-xl border pr-3 pl-10 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3 disabled:cursor-not-allowed disabled:opacity-50"
               id="identifier"
               name="identifier"
               placeholder="email@domain.com / 08xxxxxxxxxx"
