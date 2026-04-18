@@ -1,8 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Tebar Panen
+
+Aplikasi operasional budidaya ikan berbasis Next.js untuk mencatat siklus, mortalitas, pakan, panen, penjualan, dan laporan usaha.
+
+## Environment
+
+Salin `.env.example` ke `.env` lalu isi minimal variabel berikut:
+
+```bash
+DATABASE_URL="postgresql://..."
+AUTH_SECRET="secret"
+OPENAI_API_KEY=""
+OPENAI_MODEL="gpt-4o-mini"
+```
+
+`OPENAI_API_KEY` bersifat opsional. Jika diisi, halaman analisis mortalitas akan menampilkan ringkasan AI di atas hasil analisis rule-based.
 
 ## Getting Started
 
-First, run the development server:
+Jalankan development server:
 
 ```bash
 npm run dev

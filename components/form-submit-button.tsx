@@ -6,18 +6,22 @@ import { useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
 
 type FormSubmitButtonProps = React.ComponentProps<typeof Button> & {
+  isPending?: boolean
   pendingLabel?: string
 }
 
 export function FormSubmitButton({
   children,
+  isPending = false,
   pendingLabel,
+  disabled,
   ...props
 }: FormSubmitButtonProps) {
-  const { pending } = useFormStatus()
+  const { pending: formPending } = useFormStatus()
+  const pending = formPending || isPending
 
   return (
-    <Button disabled={pending} {...props}>
+    <Button disabled={pending || disabled} {...props}>
       {pending ? (
         <>
           <Loader2 className="size-4 animate-spin" />

@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { AppRole } from "@/app/lib/authz"
 import {
+  Bot,
   Fish,
   Home,
   ReceiptText,
@@ -34,6 +35,7 @@ const menuGroups = [
     items: [
       { title: "Dashboard", href: "/dashboard", icon: Home },
       { title: "Siklus Budidaya", href: "/siklus-budidaya", icon: Fish },
+      { title: "Analisis AI", href: "/analisis-ai", icon: Bot },
       {
         title: "Penjualan",
         href: "/transaksi-panen",
