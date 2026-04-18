@@ -3,8 +3,10 @@ import {
   Activity,
   ArrowRight,
   CheckCircle2,
+  ClipboardList,
   Droplets,
   Fish,
+  FlaskConical,
   ShieldCheck,
   Sparkles,
   TriangleAlert,
@@ -129,6 +131,13 @@ export default async function AnalisisAiPage({
   const totalFeedCostValue = totalFeedCost ?? 0
   const severityTheme = insight ? getSeverityTheme(insight.severity) : null
   const SeverityIcon = severityTheme?.Icon ?? ShieldCheck
+  const actionSummary =
+    shouldGenerate && selectedCycle && insight
+      ? buildActionSummary({
+          aiNarrative,
+          insight,
+        })
+      : null
   const cycleOptions = cycles.map((cycle) => ({
     id: cycle.id,
     mortalityLabel: `${formatNumber(cycle.mortalityCount)} ekor mati`,
@@ -201,6 +210,17 @@ export default async function AnalisisAiPage({
 
       {shouldGenerate && selectedCycle ? (
         <>
+          <section className="space-y-3">
+            <SectionEyebrow
+              description="Versi singkat ini membantu Anda langsung tahu apa masalah utamanya, apa yang dicek hari ini, dan data apa yang perlu dilengkapi berikutnya."
+              label="Action Summary"
+            />
+            <ActionSummaryCard
+              severity={insight!.severity}
+              summary={actionSummary!}
+            />
+          </section>
+
           <section className="space-y-3">
             <SectionEyebrow
               description="Baca hasil mulai dari ringkasan umum, lalu lanjut ke dugaan penyebab dan tindakan yang disarankan."
@@ -479,6 +499,132 @@ function SummaryStat({
       <p className="mt-1 text-xs leading-5 text-[#5b7483]">{note}</p>
     </div>
   )
+}
+
+function ActionSummaryCard({
+  severity,
+  summary,
+}: {
+  severity: "high" | "low" | "medium"
+  summary: {
+    nextRecord: string
+    todayCheck: string
+    topIssue: string
+  }
+}) {
+  return (
+    <Card
+      className={cn(
+        "border-[#d9e9e4]",
+        severity === "high"
+          ? "bg-[linear-gradient(180deg,#ffffff_0%,#fff7f7_100%)]"
+          : severity === "medium"
+            ? "bg-[linear-gradient(180deg,#ffffff_0%,#fffaf3_100%)]"
+            : "bg-[linear-gradient(180deg,#ffffff_0%,#f6fbf9_100%)]"
+      )}
+    >
+      <CardContent className="grid gap-3 p-4 sm:p-5 lg:grid-cols-3">
+        <ActionSummaryItem
+          description={summary.topIssue}
+          icon={TriangleAlert}
+          title="Apa masalah utamanya"
+          tone={severity}
+        />
+        <ActionSummaryItem
+          description={summary.todayCheck}
+          icon={ClipboardList}
+          title="Apa yang dicek hari ini"
+          tone={severity}
+        />
+        <ActionSummaryItem
+          description={summary.nextRecord}
+          icon={FlaskConical}
+          title="Apa yang perlu dicatat berikutnya"
+          tone={severity}
+        />
+      </CardContent>
+    </Card>
+  )
+}
+
+function ActionSummaryItem({
+  description,
+  icon: Icon,
+  title,
+  tone,
+}: {
+  description: string
+  icon: typeof TriangleAlert
+  title: string
+  tone: "high" | "low" | "medium"
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border px-4 py-4",
+        tone === "high"
+          ? "border-destructive/15 bg-white"
+          : tone === "medium"
+            ? "border-[#F0DFC2] bg-white"
+            : "border-primary/15 bg-white"
+      )}
+    >
+      <div className="flex items-start gap-3">
+        <div
+          className={cn(
+            "flex size-10 shrink-0 items-center justify-center rounded-2xl",
+            tone === "high"
+              ? "bg-destructive/10 text-destructive"
+              : tone === "medium"
+                ? "bg-[#FFF5E2] text-[#A87412]"
+                : "bg-primary/10 text-primary"
+          )}
+        >
+          <Icon className="size-4.5" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-[#163042]">{title}</p>
+          <p className="mt-1 text-sm leading-6 text-[#5b7483]">{description}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function buildActionSummary({
+  aiNarrative,
+  insight,
+}: {
+  aiNarrative:
+    | Awaited<ReturnType<typeof generateCycleAiNarrative>>
+    | null
+  insight: NonNullable<ReturnType<typeof analyzeCycleOperationalInsight>>
+}) {
+  const topIssue =
+    aiNarrative?.status === "ready"
+      ? aiNarrative.analysis.probableCauses[0]?.title ??
+        insight.factors[0]?.title ??
+        "Belum ada masalah utama yang menonjol dari data saat ini."
+      : insight.factors[0]?.title ??
+        "Belum ada masalah utama yang menonjol dari data saat ini."
+
+  const todayCheck =
+    aiNarrative?.status === "ready"
+      ? aiNarrative.analysis.actionPriorities[0] ??
+        insight.recommendations[0] ??
+        "Lanjutkan pemantauan rutin kolam dan catat perubahan penting hari ini."
+      : insight.recommendations[0] ??
+        "Lanjutkan pemantauan rutin kolam dan catat perubahan penting hari ini."
+
+  const nextRecord =
+    insight.missingData[0] ??
+    "Data inti sudah cukup. Lanjutkan pencatatan rutin agar analisis berikutnya tetap akurat."
+
+  return {
+    nextRecord,
+    todayCheck,
+    topIssue,
+  }
 }
 
 function getSeverityTheme(severity: "high" | "low" | "medium") {

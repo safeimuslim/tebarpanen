@@ -86,14 +86,6 @@ export function AnalysisCycleForm({
           Generate Analisis
         </FormSubmitButton>
       </div>
-
-      {isPending ? (
-        <div className="flex items-center gap-2 text-sm text-[#5b7483]">
-          <Loader2 className="size-4 animate-spin text-[#355565]" />
-          Sistem sedang menyiapkan hasil analisis. Tampilan akan diperbarui
-          otomatis.
-        </div>
-      ) : null}
     </form>
   )
 }
