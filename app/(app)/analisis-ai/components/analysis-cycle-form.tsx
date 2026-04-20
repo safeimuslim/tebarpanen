@@ -1,6 +1,5 @@
 "use client"
 
-import { Loader2 } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { type FormEvent, useState, useTransition } from "react"
 
