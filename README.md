@@ -1,51 +1,148 @@
 ## Tebar Panen
 
-Aplikasi operasional budidaya ikan berbasis Next.js untuk mencatat siklus, mortalitas, pakan, panen, penjualan, dan laporan usaha.
+Aplikasi operasional budidaya ikan berbasis Next.js untuk mencatat siklus budidaya, mortalitas, pakan, penjualan panen, dan laporan usaha.
+
+## Stack
+
+- Next.js 16
+- Prisma 7
+- PostgreSQL
+- NextAuth credentials
+- Vercel
+- Neon
 
 ## Environment
 
-Salin `.env.example` ke `.env` lalu isi minimal variabel berikut:
+Salin `.env.example` ke `.env` untuk local development.
+
+```bash
+cp .env.example .env
+```
+
+Minimal variabel yang harus diisi:
 
 ```bash
 DATABASE_URL="postgresql://..."
-AUTH_SECRET="secret"
+DATABASE_URL_UNPOOLED="postgresql://..."
+AUTH_SECRET="secret-yang-panjang-dan-aman"
 OPENAI_API_KEY=""
 OPENAI_MODEL="gpt-4o-mini"
 ```
 
-`OPENAI_API_KEY` bersifat opsional. Jika diisi, halaman analisis mortalitas akan menampilkan ringkasan AI di atas hasil analisis rule-based.
+Catatan:
 
-## Getting Started
+- `DATABASE_URL` dipakai runtime aplikasi.
+- `DATABASE_URL_UNPOOLED` dipakai Prisma CLI untuk migration.
+- `OPENAI_API_KEY` bersifat opsional.
 
-Jalankan development server:
+## Development
+
+Install dependency lalu jalankan server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Perintah database yang umum:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run db:generate
+npm run db:migrate:dev
+npm run db:studio
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Struktur Environment Neon + Vercel
 
-## Learn More
+Disarankan memakai 3 lingkungan terpisah:
 
-To learn more about Next.js, take a look at the following resources:
+- `Development`
+  - Vercel environment: `Development`
+  - Neon branch: `dev` atau `vercel-dev`
+- `Preview`
+  - Vercel environment: `Preview`
+  - Neon preview branch otomatis per deployment/PR
+- `Production`
+  - Vercel environment: `Production`
+  - Neon branch: `main` atau `prod`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Jangan pernah memakai branch/database production untuk preview atau local development.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Setup Vercel + Neon
 
-## Deploy on Vercel
+1. Hubungkan repository ke Vercel.
+2. Pasang integrasi Neon ke project Vercel.
+3. Pastikan Vercel menerima environment variables berikut:
+   - `DATABASE_URL`
+   - `DATABASE_URL_UNPOOLED`
+   - `AUTH_SECRET`
+   - `OPENAI_API_KEY`
+   - `OPENAI_MODEL`
+4. Aktifkan preview branching di Neon untuk environment `Preview`.
+5. Buat `AUTH_SECRET` yang berbeda untuk:
+   - Development
+   - Preview
+   - Production
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Release Flow
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. Development
+
+Saat mengubah schema Prisma:
+
+```bash
+npm run db:migrate:dev
+```
+
+Commit juga folder `prisma/migrations`.
+
+### 2. Preview
+
+Setiap push ke branch/PR:
+
+- Vercel membuat preview deployment
+- Neon membuat branch preview terpisah
+- aplikasi menjalankan migration ke branch preview tersebut
+
+### 3. Production
+
+Saat merge ke branch production:
+
+- Vercel deploy ke environment `Production`
+- migration dijalankan dengan `prisma migrate deploy`
+- aplikasi build dan start dengan schema terbaru
+
+Perintah yang dipakai untuk build production:
+
+```bash
+npm run vercel-build
+```
+
+## Vercel Build Command
+
+Set build command di Vercel menjadi:
+
+```bash
+npm run vercel-build
+```
+
+Script ini akan menjalankan:
+
+1. `prisma generate`
+2. `prisma migrate deploy`
+3. `next build --webpack`
+
+## Checklist Sebelum Production
+
+- `DATABASE_URL` production mengarah ke branch/database production
+- `DATABASE_URL_UNPOOLED` production sudah terisi
+- `AUTH_SECRET` production berbeda dari preview dan development
+- migration Prisma sudah committed
+- preview deployment sudah lolos test
+- login, pembuatan siklus, penjualan, dan analisis AI sudah diuji di preview
+
+## Catatan Keamanan
+
+- Jangan simpan API key asli di `.env.example`.
+- Jika pernah ada key asli yang tercommit, segera rotate key tersebut.
+- Jangan gunakan data production sebagai sumber preview jika datanya sensitif.
