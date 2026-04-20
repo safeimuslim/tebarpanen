@@ -15,6 +15,7 @@ export type TransactionFilters = {
 export type HarvestTransactionListItem = {
   id: string
   invoiceNumber: string
+  cultureCycleId: string
   harvestDate: Date
   totalWeightKg: number
   harvestedCount: number
@@ -25,6 +26,7 @@ export type HarvestTransactionListItem = {
   paymentStatus: HarvestPaymentStatus
   notes: string | null
   createdAt: Date
+  updatedAt: Date
   cultureCycle: {
     id: string
     cycleName: string
@@ -114,6 +116,7 @@ export async function getHarvestTransactionPageData(
     buyerName: transaction.buyerName,
     createdAt: transaction.createdAt,
     cultureCycle: transaction.cultureCycle,
+    cultureCycleId: transaction.cultureCycleId,
     dueDate: transaction.dueDate,
     grossAmount: decimalToNumber(transaction.grossAmount) ?? 0,
     harvestDate: transaction.harvestDate,
@@ -124,6 +127,7 @@ export async function getHarvestTransactionPageData(
     paymentStatus: transaction.paymentStatus,
     pricePerKg: decimalToNumber(transaction.pricePerKg) ?? 0,
     totalWeightKg: transaction.totalWeightKg,
+    updatedAt: transaction.updatedAt,
   }))
 
   return {

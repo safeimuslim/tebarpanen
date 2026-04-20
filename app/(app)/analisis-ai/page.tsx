@@ -131,6 +131,11 @@ export default async function AnalisisAiPage({
   const totalFeedCostValue = totalFeedCost ?? 0
   const severityTheme = insight ? getSeverityTheme(insight.severity) : null
   const SeverityIcon = severityTheme?.Icon ?? ShieldCheck
+  const selectedCyclePondsLabel = selectedCycle
+    ? selectedCycle.ponds.length
+      ? selectedCycle.ponds.map((item) => item.pond.name).join(", ")
+      : "Belum ada kolam"
+    : "Belum ada kolam"
   const actionSummary =
     shouldGenerate && selectedCycle && insight
       ? buildActionSummary({
@@ -267,7 +272,7 @@ export default async function AnalisisAiPage({
                   </div>
                   <div>
                     <p className="text-sm text-[#5b7483]">
-                      Hasil untuk {selectedCycle.title}
+                      Hasil untuk {selectedCycle.cycleName}
                     </p>
                     <h2 className="mt-1 text-xl font-semibold tracking-tight text-[#163042] sm:text-2xl">
                       {insight?.headline}
@@ -320,7 +325,7 @@ export default async function AnalisisAiPage({
                     label="Kolam aktif"
                     note="Lingkup analisis"
                     tone={insight?.severity}
-                    value={selectedCycle.pondsLabel}
+                    value={selectedCyclePondsLabel}
                     variant="highlight"
                   />
                 </div>
@@ -405,7 +410,7 @@ export default async function AnalisisAiPage({
             <AnalysisStep
               description={
                 selectedCycle
-                  ? `Siklus ${selectedCycle.title} sudah siap dianalisis.`
+                  ? `Siklus ${selectedCycle.cycleName} sudah siap dianalisis.`
                   : "Pilih satu siklus aktif agar sistem tahu data mana yang akan dibaca."
               }
               step="1"

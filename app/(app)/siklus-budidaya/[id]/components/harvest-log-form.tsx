@@ -192,7 +192,7 @@ function FormField({
   )
 }
 
-function SelectField({
+function SelectField<TValue extends string>({
   allowEmptyOption = true,
   label,
   name,
@@ -205,11 +205,11 @@ function SelectField({
   allowEmptyOption?: boolean
   label: string
   name: string
-  onValueChange?: (value: string) => void
-  options: Array<{ label: string; value: string }>
+  onValueChange?: (value: TValue) => void
+  options: Array<{ label: string; value: TValue }>
   placeholder?: string
   required?: boolean
-  value?: string
+  value?: TValue
 }) {
   return (
     <div className="space-y-2">
@@ -220,7 +220,7 @@ function SelectField({
         className="border-input bg-white text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] focus-visible:ring-3"
         id={name}
         name={name}
-        onChange={(event) => onValueChange?.(event.target.value)}
+        onChange={(event) => onValueChange?.(event.target.value as TValue)}
         required={required}
         value={value}
       >
