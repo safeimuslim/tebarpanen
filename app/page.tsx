@@ -2,9 +2,18 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ArrowRight, ChartColumn, Fish, ReceiptText, Sparkles } from "lucide-react"
+import {
+  ArrowRight,
+  ChartColumn,
+  Fish,
+  MapPin,
+  Phone,
+  ReceiptText,
+  Sparkles,
+} from "lucide-react"
 
 import { auth } from "@/auth"
+import { getSiteUrl } from "@/app/lib/site-url"
 import {
   Accordion,
   AccordionContent,
@@ -17,6 +26,10 @@ import { cn } from "@/lib/utils"
 
 const landingPageDescription =
   "Aplikasi budidaya ikan untuk mencatat operasional kolam, penjualan, laporan laba rugi, dan Analisis AI dalam satu tempat."
+const businessPhoneDisplay = "+62 823-2923-0000"
+const businessPhoneHref = "tel:+6282329230000"
+const businessAddressLabel = "Jumantono, Karanganyar, Indonesia"
+const googleMapsUrl = "https://maps.app.goo.gl/4t6oufRPE8hjr2nq5";
 
 export const metadata: Metadata = {
   title: "Aplikasi Budidaya Ikan | Tebar Panen",
@@ -219,6 +232,7 @@ const faqItems = [
 
 export default async function HomePage() {
   const session = await auth()
+  const siteUrl = getSiteUrl()
 
   if (session?.user) {
     redirect("/dashboard")
@@ -231,6 +245,30 @@ export default async function HomePage() {
       "@type": "Organization",
       name: "Tebar Panen",
       description: landingPageDescription,
+      url: siteUrl.toString(),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      name: "Tebar Panen",
+      description: landingPageDescription,
+      url: siteUrl.toString(),
+      image: new URL("/logo-mark.svg", siteUrl).toString(),
+      telephone: businessPhoneDisplay,
+      hasMap: googleMapsUrl,
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "ID",
+        addressLocality: "Karanganyar",
+        addressRegion: "Jawa Tengah",
+        streetAddress: businessAddressLabel,
+      },
+      areaServed: "Indonesia",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        telephone: businessPhoneDisplay,
+      },
     },
     {
       "@context": "https://schema.org",
@@ -694,6 +732,47 @@ export default async function HomePage() {
                 Daftarkan Usaha Budidaya
               </Link>
             </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <article className="rounded-[1.5rem] border border-[#d9e9e4] bg-white p-5">
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/12 text-primary flex size-10 items-center justify-center rounded-2xl">
+                  <Phone className="size-4" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#163042]">Telepon</p>
+                  <a
+                    className="mt-2 inline-block text-sm text-[#355565] hover:text-primary"
+                    href={businessPhoneHref}
+                  >
+                    {businessPhoneDisplay}
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article className="rounded-[1.5rem] border border-[#d9e9e4] bg-white p-5">
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/12 text-primary flex size-10 items-center justify-center rounded-2xl">
+                  <MapPin className="size-4" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#163042]">Alamat</p>
+                  <address className="mt-2 text-sm not-italic text-[#355565]">
+                    {businessAddressLabel}
+                  </address>
+                  <a
+                    className="mt-2 inline-block text-sm text-primary hover:underline"
+                    href={googleMapsUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Lihat di Google Maps
+                  </a>
+                </div>
+              </div>
+            </article>
           </div>
 
           <footer className="px-1 pt-6 pb-2 text-sm text-[#5b7483]">
