@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   metadataBase,
   title: {
     default: "Tebar Panen",
-    template: "%s | Tebar Panen",
+    template: "%s",
   },
   description:
     "Rapikan pencatatan budidaya ikan dari kolam hingga penjualan panen dalam satu aplikasi.",
