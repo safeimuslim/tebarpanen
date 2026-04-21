@@ -3,6 +3,13 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ChartColumn, Fish, ReceiptText, Sparkles } from "lucide-react"
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -598,17 +605,24 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 lg:grid-cols-2">
-            {faqItems.map((item) => (
-              <article
-                className="rounded-[1.75rem] border border-[#d9e9e4] bg-[#fbfdfd] p-6"
+          <div className="mx-auto mt-10 max-w-4xl space-y-4">
+            {faqItems.map((item, index) => (
+              <Accordion
+                className="rounded-[1.75rem] border border-[#d9e9e4] bg-[#fbfdfd] p-2"
+                defaultValue={index === 0 ? item.question : undefined}
                 key={item.question}
               >
-                <h3 className="text-lg font-semibold">{item.question}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#5b7483]">
-                  {item.answer}
-                </p>
-              </article>
+                <AccordionItem className="border-0 bg-transparent" value={item.question}>
+                  <AccordionHeader>
+                    <AccordionTrigger className="rounded-[1.1rem] px-4 py-4 text-base font-semibold text-[#163042] hover:bg-white">
+                      {item.question}
+                    </AccordionTrigger>
+                  </AccordionHeader>
+                  <AccordionContent className="px-4 pb-4 pt-1 text-sm leading-7 text-[#5b7483]">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             ))}
           </div>
         </div>
