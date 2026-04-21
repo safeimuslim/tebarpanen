@@ -1,10 +1,14 @@
 import type { Metadata } from "next"
 
+import { getSiteUrl } from "@/app/lib/site-url"
 import { Toaster } from "@/components/ui/sonner"
 
 import "./globals.css"
 
+const metadataBase = getSiteUrl()
+
 export const metadata: Metadata = {
+  metadataBase,
   title: {
     default: "Tebar Panen",
     template: "%s | Tebar Panen",

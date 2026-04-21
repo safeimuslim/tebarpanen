@@ -15,10 +15,12 @@ import {
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
+const landingPageDescription =
+  "Aplikasi budidaya ikan untuk mencatat operasional kolam, penjualan, laporan laba rugi, dan Analisis AI dalam satu tempat."
+
 export const metadata: Metadata = {
   title: "Aplikasi Budidaya Ikan | Tebar Panen",
-  description:
-    "Aplikasi budidaya ikan untuk mencatat operasional kolam, penjualan, laporan laba rugi, dan Analisis AI dalam satu tempat.",
+  description: landingPageDescription,
   alternates: {
     canonical: "/aplikasi-budidaya-ikan",
   },
@@ -223,10 +225,51 @@ export default async function HomePage() {
   }
 
   const hasSocialProof = customerQuotes.length > 0
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Tebar Panen",
+      description: landingPageDescription,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Tebar Panen",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      description: landingPageDescription,
+      audience: {
+        "@type": "Audience",
+        audienceType: "Usaha budidaya ikan air tawar",
+      },
+      featureList: valueItems.map((item) => item.title),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems.map((item) => ({
+        "@type": "Question",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+        name: item.question,
+      })),
+    },
+  ]
 
   return (
-    <main className="bg-[#f7fbfa] text-[#163042]">
-      <header className="border-b border-[#deebe8] bg-white/92">
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+        type="application/ld+json"
+      />
+
+      <main className="bg-[#f7fbfa] text-[#163042]">
+        <header className="border-b border-[#deebe8] bg-white/92">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <Link
             className="flex items-center gap-3"
@@ -658,8 +701,9 @@ export default async function HomePage() {
             dari pencatatan harian sampai ringkasan kondisi usaha.
           </footer>
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </>
   );
 }
 
