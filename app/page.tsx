@@ -238,15 +238,26 @@ export default function HomePage() {
             </div>
           </Link>
 
-          <Link
-            className={cn(
-              buttonVariants(),
-              "h-10 rounded-xl px-4 text-sm shadow-[0_14px_30px_rgba(15,157,138,0.2)]",
-            )}
-            href="/register"
-          >
-            Daftarkan Usaha
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "h-10 rounded-xl border-[#d9e9e4] bg-white px-4 text-sm text-[#163042] hover:bg-[#f7fbfa]",
+              )}
+              href="/login"
+            >
+              Login
+            </Link>
+            <Link
+              className={cn(
+                buttonVariants(),
+                "h-10 rounded-xl px-4 text-sm shadow-[0_14px_30px_rgba(15,157,138,0.2)]",
+              )}
+              href="/register"
+            >
+              Daftarkan Usaha
+            </Link>
+          </div>
         </div>
       </header>
 
