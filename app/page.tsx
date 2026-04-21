@@ -226,12 +226,17 @@ export default function HomePage() {
     <main className="bg-[#f7fbfa] text-[#163042]">
       <header className="border-b border-[#deebe8] bg-white/92">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link className="flex items-center gap-3" href="/aplikasi-budidaya-ikan">
+          <Link
+            className="flex items-center gap-3"
+            href="/aplikasi-budidaya-ikan"
+          >
             <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-2xl">
               <Fish className="size-5" />
             </div>
             <div>
-              <p className="text-base font-semibold tracking-tight">Tebar Panen</p>
+              <p className="text-base font-semibold tracking-tight">
+                Tebar Panen
+              </p>
               <p className="text-xs text-[#5b7483]">
                 Aplikasi budidaya ikan yang lebih rapi
               </p>
@@ -265,24 +270,18 @@ export default function HomePage() {
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.88fr)] lg:px-8 lg:py-20">
           <div className="max-w-2xl space-y-6">
             <div className="inline-flex items-center rounded-full border border-[#d9e9e4] bg-white px-3 py-1.5 text-sm text-[#456473]">
-              Untuk operasional budidaya ikan yang lebih tenang
+              Untuk operasional budidaya ikan
             </div>
 
             <div className="space-y-4">
               <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                Aplikasi budidaya ikan dengan bantuan AI (Artificial Intelligence)
+                Aplikasi budidaya ikan dengan bantuan AI (Artificial
+                Intelligence)
               </h1>
               <p className="max-w-2xl text-base leading-7 text-[#4f6775] sm:text-lg">
-                Catat kolam, mortalitas, panen, penjualan, dan laporan usaha
-                dalam satu tempat, lalu gunakan Analisis AI untuk membantu
-                membaca kondisi siklus budidaya Anda.
-              </p>
-              <p className="max-w-2xl text-base leading-7 text-[#4f6775] sm:text-lg">
-                Anda bisa mulai dari kolam yang sedang aktif hari ini, lalu
-                merapikan pencatatan pelan-pelan tanpa harus mengubah semua
-                proses sekaligus. Saat data sudah mulai terkumpul, AI membantu
-                merangkum kondisi siklus agar keputusan harian terasa lebih
-                cepat dan lebih tenang.
+                Catat operasional budidaya, penjualan, dan laporan laba rugi
+                dalam satu tempat. AI membantu merangkum kondisi siklus budidaya
+                agar Anda lebih cepat membaca masalah dan mengambil tindakan.
               </p>
             </div>
 
@@ -290,28 +289,13 @@ export default function HomePage() {
               <Link
                 className={cn(
                   buttonVariants(),
-                  "h-11 w-full rounded-xl px-5 text-sm shadow-[0_16px_34px_rgba(15,157,138,0.22)] sm:w-auto",
+                  "h-12 w-full rounded-xl px-5 text-lg shadow-[0_16px_34px_rgba(15,157,138,0.22)] sm:w-auto font-medium",
                 )}
                 href="/register"
               >
                 Daftarkan Usaha Budidaya
                 <ArrowRight className="size-4" />
               </Link>
-              <p className="text-sm text-[#5b7483]">
-                Cocok untuk usaha budidaya ikan yang ingin mulai lebih rapi
-                sambil dibantu membaca data dengan AI.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              {benefitItems.map((item) => (
-                <div
-                  className="rounded-2xl border border-[#d9e9e4] bg-white px-4 py-3 text-sm text-[#355565]"
-                  key={item}
-                >
-                  {item}
-                </div>
-              ))}
             </div>
           </div>
 
@@ -336,17 +320,14 @@ export default function HomePage() {
                   <p className="text-sm text-white/72">Kolam aktif</p>
                   <p className="mt-2 text-3xl font-semibold">12</p>
                   <p className="mt-2 text-sm text-white/72">
-                    Semua siklus kolam yang berjalan bisa terlihat cepat tanpa
-                    membuka banyak file atau chat lama.
+                    Semua siklus aktif terlihat cepat dalam satu layar.
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/10 p-4">
                   <p className="text-sm text-white/72">Analisis AI terbaru</p>
                   <p className="mt-2 text-3xl font-semibold">3 prioritas</p>
                   <p className="mt-2 text-sm text-white/72">
-                    AI membantu merangkum dugaan masalah utama dan hal yang
-                    perlu dicek lebih dulu dari data siklus yang sedang
-                    berjalan.
+                    AI merangkum hal yang perlu dicek lebih dulu hari ini.
                   </p>
                 </div>
               </div>
@@ -360,7 +341,7 @@ export default function HomePage() {
                 {[
                   "Mortalitas kolam C-12 belum dicatat",
                   "Panen 10 kg siap dijual ke pembeli hari ini",
-                  "AI menyarankan cek kualitas air pada siklus aktif",
+                  "AI menyarankan cek kualitas air",
                 ].map((item) => (
                   <div
                     className="rounded-2xl border border-[#d9e9e4] bg-white px-4 py-3 text-sm text-[#355565]"
@@ -382,9 +363,9 @@ export default function HomePage() {
               Masalah yang paling sering terjadi di usaha budidaya ikan
             </h2>
             <p className="mt-4 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Jika Anda masih mencatat di buku, chat, atau spreadsheet
-              terpisah, masalahnya biasanya bukan kurang data. Masalahnya,
-              data jadi sulit dicari saat dibutuhkan cepat.
+              Jika Anda masih mencatat di buku, chat, atau spreadsheet terpisah,
+              masalahnya biasanya bukan kurang data. Masalahnya, data jadi sulit
+              dicari saat dibutuhkan cepat.
             </p>
           </div>
 
@@ -408,14 +389,16 @@ export default function HomePage() {
         <section className="border-b border-[#deebe8] bg-[#f7fbfa]">
           <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-sm font-medium text-primary">Testimoni pengguna</p>
+              <p className="text-sm font-medium text-primary">
+                Testimoni pengguna
+              </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight">
                 Pengguna Tebar Panen merasakan manfaat yang nyata
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
                 Mereka merasakan hal yang sederhana tapi penting: catatan panen
-                lebih rapi, data kolam lebih cepat dicek, dan laporan
-                penjualan lebih mudah dipahami.
+                lebih rapi, data kolam lebih cepat dicek, dan laporan penjualan
+                lebih mudah dipahami.
               </p>
             </div>
 
@@ -534,8 +517,8 @@ export default function HomePage() {
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
               Anda mungkin tidak membutuhkan sistem yang rumit. Anda butuh
-              pencatatan yang konsisten, mudah dibaca, dan bantuan AI yang
-              bisa membantu merangkum data saat usaha sedang berjalan.
+              pencatatan yang konsisten, mudah dibaca, dan bantuan AI yang bisa
+              membantu merangkum data saat usaha sedang berjalan.
             </p>
           </div>
 
@@ -623,7 +606,10 @@ export default function HomePage() {
                 defaultValue={index === 0 ? item.question : undefined}
                 key={item.question}
               >
-                <AccordionItem className="border-0 bg-transparent" value={item.question}>
+                <AccordionItem
+                  className="border-0 bg-transparent"
+                  value={item.question}
+                >
                   <AccordionHeader>
                     <AccordionTrigger className="rounded-[1.1rem] px-4 py-4 text-base font-semibold text-[#163042] hover:bg-white">
                       {item.question}
@@ -651,9 +637,9 @@ export default function HomePage() {
                 berjalan hari ini.
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/80">
-                Jika Anda ingin kolam, panen, penjualan, dan laporan usaha
-                lebih mudah dipantau, lalu dibantu AI untuk membaca kondisi
-                siklus, Anda bisa mulai dari satu langkah kecil: buka halaman
+                Jika Anda ingin kolam, panen, penjualan, dan laporan usaha lebih
+                mudah dipantau, lalu dibantu AI untuk membaca kondisi siklus,
+                Anda bisa mulai dari satu langkah kecil: buka halaman
                 pendaftaran dan isi data yang paling sering dipakai.
               </p>
             </div>
@@ -678,7 +664,7 @@ export default function HomePage() {
         </div>
       </section>
     </main>
-  )
+  );
 }
 
 function getAvatarDataUrl(name: string) {
