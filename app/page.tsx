@@ -1,40 +1,41 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, ChartColumn, Fish, ReceiptText, Waves } from "lucide-react"
+import { ArrowRight, ChartColumn, Fish, ReceiptText, Sparkles } from "lucide-react"
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
   title: "Aplikasi Budidaya Ikan | Tebar Panen",
   description:
-    "Aplikasi budidaya ikan untuk mencatat kolam, mortalitas, panen, penjualan, dan laporan usaha dalam satu tempat.",
+    "Aplikasi budidaya ikan untuk mencatat operasional kolam, penjualan, laporan laba rugi, dan Analisis AI dalam satu tempat.",
   alternates: {
     canonical: "/aplikasi-budidaya-ikan",
   },
 }
 
-const benefitItems = [
-  "Pencatatan kolam lebih rapi",
-  "Panen dan penjualan langsung terhubung",
-  "Laporan usaha lebih cepat dilihat",
-]
-
 const problemItems = [
   {
     copy:
-      "Banyak usaha budidaya ikan masih mencatat mortalitas, pakan, panen, dan penjualan di buku tulis, chat, atau spreadsheet terpisah. Saat data dibutuhkan, tim harus membuka banyak catatan dan hasilnya sering tidak sinkron.",
+      "Catatan mortalitas, pakan, panen, dan penjualan sering tersimpan di tempat yang berbeda, sehingga sulit dicari saat dibutuhkan.",
     title: "Data harian mudah tercecer",
   },
   {
     copy:
-      "Ketika kolam aktif mulai bertambah, pemilik usaha biasanya kesulitan melihat kolam mana yang perlu dicek lebih dulu, panen mana yang siap dijual, dan biaya mana yang belum masuk ke rekap.",
-    title: "Operasional kolam sulit dipantau",
+      "Saat kolam aktif bertambah, tim lebih sulit melihat kolam mana yang perlu dicek lebih dulu dan panen mana yang siap dijual.",
+    title: "Kolam yang perlu perhatian tidak terlihat cepat",
   },
   {
     copy:
-      "Laporan usaha sering baru dirapikan di akhir minggu atau akhir bulan. Akibatnya, keputusan tentang pakan, panen, dan penjualan sering dibuat tanpa data yang benar-benar lengkap.",
+      "Pendapatan dan biaya sering baru direkap di akhir periode, sehingga keputusan harian berjalan tanpa gambaran usaha yang jelas.",
     title: "Laporan usaha terlambat terlihat",
   },
 ]
@@ -42,27 +43,27 @@ const problemItems = [
 const valueItems = [
   {
     copy:
-      "Pantau tebar benih, pakan, mortalitas, sampling, dan panen ikan dalam satu alur pencatatan yang rapi sehingga tim tidak perlu memecah data ke banyak tempat.",
+      "Catat benih, pakan, mortalitas, sampling, dan panen dalam satu alur yang rapi.",
     icon: Fish,
     title: "Siklus Budidaya",
   },
   {
     copy:
-      "Catat setiap panen ikan yang dijual, pembeli, berat, harga, dan status pembayarannya agar riwayat transaksi selalu terhubung ke kolam yang tepat.",
+      "Catat penjualan panen, pembeli, berat, harga, dan status pembayaran dalam satu tempat.",
     icon: ReceiptText,
     title: "Penjualan Panen",
   },
   {
     copy:
-      "Lihat pendapatan, biaya, dan hasil usaha budidaya ikan berdasarkan periode laporan agar pemilik usaha lebih cepat membaca kondisi bisnisnya.",
+      "Lihat pendapatan, biaya, dan laporan laba rugi agar kondisi usaha lebih mudah dipantau.",
     icon: ChartColumn,
     title: "Laporan Keuangan",
   },
   {
     copy:
-      "Simpan data kolam dan alat budidaya supaya kebutuhan operasional harian tetap tertata dan tidak bergantung pada ingatan atau chat lama.",
-    icon: Waves,
-    title: "Kolam dan Alat",
+      "Ringkas kondisi budidaya dan lihat hal yang perlu diperhatikan lebih dulu.",
+    icon: Sparkles,
+    title: "Analisis AI",
   },
 ]
 
@@ -77,54 +78,69 @@ const fitItems = [
 const trustItems = [
   {
     copy:
-      "Alur pencatatan dibuat mengikuti kegiatan yang memang biasa terjadi di kolam, mulai dari pengecekan harian sampai panen dan penjualan.",
+      "Pencatatan mengikuti kegiatan harian budidaya, dari kolam aktif sampai panen dan penjualan.",
     title: "Alur kerja terasa familiar",
   },
   {
     copy:
-      "Usaha budidaya ikan bisa mulai dari satu kolam dulu. Saat operasional makin rapi, penggunaan aplikasi bisa diperluas tanpa harus mengubah cara kerja secara drastis.",
-    title: "Cocok untuk mulai bertahap",
+      "Bisa dimulai dari satu kolam dulu, lalu dipakai lebih luas saat operasional sudah makin rapi.",
+    title: "Mudah mulai dari skala kecil",
   },
   {
     copy:
-      "Data kolam, panen, penjualan, dan keuangan tetap terhubung. Ini membantu saat pemilik usaha ingin melihat kondisi operasional sekaligus hasil usahanya dalam satu alur.",
-    title: "Semua data tetap nyambung",
+      "Data kolam, penjualan, dan laporan usaha tetap nyambung sehingga lebih mudah dipantau.",
+    title: "Data tetap terhubung",
+  },
+  {
+    copy:
+      "Ringkasan kondisi budidaya lebih mudah dibaca setelah data harian tercatat.",
+    title: "Kondisi usaha lebih mudah dibaca",
   },
 ]
 
 const workflowItems = [
   {
     copy:
-      "Mulai dari data usaha, kolam, dan siklus aktif yang sedang berjalan. Tim tidak perlu menunggu semua proses sempurna untuk mulai mencatat lebih rapi.",
-    title: "Mulai dari kolam yang sedang berjalan",
+      "Masukkan data usaha, kolam, dan siklus budidaya yang sedang berjalan.",
+    title: "Mulai dari kolam aktif",
   },
   {
     copy:
-      "Catat mortalitas, pakan, sampling, biaya, dan panen ikan sesuai kegiatan lapangan. Fokusnya adalah konsisten mengisi data yang memang dipakai setiap hari.",
-    title: "Isi pencatatan seperlunya setiap hari",
+      "Isi mortalitas, pakan, sampling, biaya, dan panen sesuai aktivitas di lapangan.",
+    title: "Catat kegiatan harian",
   },
   {
     copy:
-      "Saat panen dijual, transaksi dan laporan usaha langsung ikut tersusun. Pemilik usaha tidak perlu menunggu rekap manual di akhir periode untuk membaca hasil penjualan.",
-    title: "Pantau penjualan dan hasil usaha",
+      "Setelah panen dijual, data penjualan dan laporan usaha ikut tersusun lebih rapi.",
+    title: "Pantau penjualan dan laporan",
+  },
+  {
+    copy:
+      "AI membantu merangkum kondisi budidaya dan hal yang perlu diperhatikan lebih dulu.",
+    title: "Lihat ringkasan AI",
   },
 ]
 
 const advantageItems = [
   {
     copy:
-      "Aplikasi budidaya ikan membantu tim melihat kolam aktif, kegiatan harian, dan transaksi penjualan dari satu layar. Ini jauh lebih cepat dibanding mencari data dari file yang tersebar.",
-    title: "Lebih cepat daripada catatan manual",
+      "Kolam aktif, penjualan, dan laporan usaha bisa dilihat dalam satu alur tanpa membuka banyak catatan.",
+    title: "Lebih cepat dipantau",
   },
   {
     copy:
-      "Karena data harian masuk ke alur yang sama, pemilik usaha bisa lebih mudah membandingkan biaya, hasil panen, dan penjualan tanpa harus merapikan ulang dari awal.",
-    title: "Lebih mudah dibaca saat rekap",
+      "Data yang sudah tercatat lebih mudah dibaca kembali saat Anda ingin mengecek biaya, hasil panen, dan penjualan.",
+    title: "Lebih mudah saat rekap",
   },
   {
     copy:
-      "Ketika usaha bertambah besar, kebutuhan pencatatan biasanya ikut kompleks. Sistem yang rapi sejak awal membuat transisi ke operasional yang lebih tertata jadi tidak terlalu berat.",
-    title: "Siap dipakai saat usaha berkembang",
+      "Saat jumlah kolam dan aktivitas bertambah, pencatatan tetap lebih tertata dan tidak mudah berantakan.",
+    title: "Lebih siap saat usaha berkembang",
+  },
+  {
+    copy:
+      "Masalah lebih cepat terlihat sehingga keputusan harian bisa diambil dengan lebih tenang.",
+    title: "Lebih mudah mengambil tindakan",
   },
 ]
 
@@ -162,7 +178,7 @@ const customerQuotes: SocialProofQuote[] = [
 const faqItems = [
   {
     answer:
-      "Tebar Panen membantu Anda mencatat kolam, mortalitas, pakan, panen, penjualan, dan laporan usaha harian dalam satu alur yang lebih rapi. Tujuannya sederhana: supaya kegiatan harian terasa lebih ringan dan data lebih mudah dilihat saat dibutuhkan.",
+      "Tebar Panen membantu Anda mencatat kolam, pakan, mortalitas, panen, penjualan, dan laporan usaha dalam satu alur yang lebih rapi agar operasional harian lebih mudah dipantau.",
     question: "Sebenarnya Tebar Panen ini untuk apa?",
   },
   {
@@ -179,6 +195,11 @@ const faqItems = [
     answer:
       "Anda bisa mencatat kolam aktif, tebar benih, mortalitas, pakan, sampling, biaya, panen ikan, transaksi penjualan, dan laporan usaha. Jadi, data penting tidak perlu lagi tersebar di buku, chat, atau spreadsheet yang berbeda-beda.",
     question: "Apa saja yang bisa saya catat di sini?",
+  },
+  {
+    answer:
+      "Analisis AI membantu merangkum kondisi siklus dari data yang sudah dicatat, seperti hal yang perlu dicek lebih dulu dan catatan yang masih perlu dilengkapi. Fungsinya bukan menggantikan keputusan Anda, tetapi membantu agar membaca data terasa lebih cepat.",
+    question: "Analisis AI di Tebar Panen bisa membantu apa?",
   },
   {
     answer:
@@ -199,27 +220,43 @@ export default function HomePage() {
     <main className="bg-[#f7fbfa] text-[#163042]">
       <header className="border-b border-[#deebe8] bg-white/92">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <Link className="flex items-center gap-3" href="/aplikasi-budidaya-ikan">
+          <Link
+            className="flex items-center gap-3"
+            href="/aplikasi-budidaya-ikan"
+          >
             <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-2xl">
               <Fish className="size-5" />
             </div>
             <div>
-              <p className="text-base font-semibold tracking-tight">Tebar Panen</p>
+              <p className="text-base font-semibold tracking-tight">
+                Tebar Panen
+              </p>
               <p className="text-xs text-[#5b7483]">
                 Aplikasi budidaya ikan yang lebih rapi
               </p>
             </div>
           </Link>
 
-          <Link
-            className={cn(
-              buttonVariants(),
-              "h-10 rounded-xl px-4 text-sm shadow-[0_14px_30px_rgba(15,157,138,0.2)]",
-            )}
-            href="/register"
-          >
-            Daftarkan Usaha
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "h-10 rounded-xl border-[#d9e9e4] bg-white px-4 text-sm text-[#163042] hover:bg-[#f7fbfa]",
+              )}
+              href="/login"
+            >
+              Login
+            </Link>
+            <Link
+              className={cn(
+                buttonVariants(),
+                "h-10 rounded-xl px-4 text-sm shadow-[0_14px_30px_rgba(15,157,138,0.2)]",
+              )}
+              href="/register"
+            >
+              Daftarkan Usaha
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -227,22 +264,18 @@ export default function HomePage() {
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.88fr)] lg:px-8 lg:py-20">
           <div className="max-w-2xl space-y-6">
             <div className="inline-flex items-center rounded-full border border-[#d9e9e4] bg-white px-3 py-1.5 text-sm text-[#456473]">
-              Untuk operasional budidaya ikan yang lebih tenang
+              Untuk operasional budidaya ikan
             </div>
 
             <div className="space-y-4">
               <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                Aplikasi budidaya ikan agar catatan kolam tidak tercecer.
+                Aplikasi budidaya ikan dengan bantuan AI (Artificial
+                Intelligence)
               </h1>
               <p className="max-w-2xl text-base leading-7 text-[#4f6775] sm:text-lg">
-                Tebar Panen membantu usaha budidaya ikan mencatat kolam aktif,
-                mortalitas, pakan, panen ikan, penjualan, dan laporan usaha
-                dalam satu tempat yang lebih rapi.
-              </p>
-              <p className="max-w-2xl text-base leading-7 text-[#4f6775] sm:text-lg">
-                Anda bisa mulai dari kolam yang sedang aktif hari ini, lalu
-                merapikan pencatatan pelan-pelan tanpa harus mengubah semua
-                proses sekaligus.
+                Catat operasional budidaya, penjualan, dan laporan laba rugi
+                dalam satu tempat. AI membantu merangkum kondisi siklus budidaya
+                agar Anda lebih cepat membaca masalah dan mengambil tindakan.
               </p>
             </div>
 
@@ -250,28 +283,13 @@ export default function HomePage() {
               <Link
                 className={cn(
                   buttonVariants(),
-                  "h-11 w-full rounded-xl px-5 text-sm shadow-[0_16px_34px_rgba(15,157,138,0.22)] sm:w-auto",
+                  "h-12 w-full rounded-xl px-5 text-lg shadow-[0_16px_34px_rgba(15,157,138,0.22)] sm:w-auto font-medium",
                 )}
                 href="/register"
               >
                 Daftarkan Usaha Budidaya
                 <ArrowRight className="size-4" />
               </Link>
-              <p className="text-sm text-[#5b7483]">
-                Cocok untuk usaha budidaya ikan yang ingin mulai lebih rapi
-                dari satu kolam dulu.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              {benefitItems.map((item) => (
-                <div
-                  className="rounded-2xl border border-[#d9e9e4] bg-white px-4 py-3 text-sm text-[#355565]"
-                  key={item}
-                >
-                  {item}
-                </div>
-              ))}
             </div>
           </div>
 
@@ -296,16 +314,14 @@ export default function HomePage() {
                   <p className="text-sm text-white/72">Kolam aktif</p>
                   <p className="mt-2 text-3xl font-semibold">12</p>
                   <p className="mt-2 text-sm text-white/72">
-                    Semua siklus kolam yang berjalan bisa terlihat cepat tanpa
-                    membuka banyak file atau chat lama.
+                    Semua siklus aktif terlihat cepat dalam satu layar.
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/10 p-4">
-                  <p className="text-sm text-white/72">Penjualan bulan ini</p>
-                  <p className="mt-2 text-3xl font-semibold">Rp84,5 jt</p>
+                  <p className="text-sm text-white/72">Analisis AI terbaru</p>
+                  <p className="mt-2 text-3xl font-semibold">3 prioritas</p>
                   <p className="mt-2 text-sm text-white/72">
-                    Panen ikan yang terjual langsung masuk ke catatan usaha dan
-                    lebih mudah direkap kapan pun dibutuhkan.
+                    AI merangkum hal yang perlu dicek lebih dulu hari ini.
                   </p>
                 </div>
               </div>
@@ -319,7 +335,7 @@ export default function HomePage() {
                 {[
                   "Mortalitas kolam C-12 belum dicatat",
                   "Panen 10 kg siap dijual ke pembeli hari ini",
-                  "Biaya pakan minggu ini sudah masuk ke laporan",
+                  "AI menyarankan cek kualitas air",
                 ].map((item) => (
                   <div
                     className="rounded-2xl border border-[#d9e9e4] bg-white px-4 py-3 text-sm text-[#355565]"
@@ -338,12 +354,11 @@ export default function HomePage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight">
-              Masalah yang paling sering terjadi di usaha budidaya ikan
+              Masalah yang sering terjadi di usaha budidaya ikan
             </h2>
             <p className="mt-4 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Jika Anda masih mencatat di buku, chat, atau spreadsheet
-              terpisah, masalahnya biasanya bukan kurang data. Masalahnya,
-              data jadi sulit dicari saat dibutuhkan cepat.
+              Saat data masih tersebar di buku, chat, atau spreadsheet,
+              operasional harian jadi lebih sulit dipantau.
             </p>
           </div>
 
@@ -367,14 +382,16 @@ export default function HomePage() {
         <section className="border-b border-[#deebe8] bg-[#f7fbfa]">
           <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <p className="text-sm font-medium text-primary">Testimoni pengguna</p>
+              <p className="text-sm font-medium text-primary">
+                Testimoni pengguna
+              </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight">
                 Pengguna Tebar Panen merasakan manfaat yang nyata
               </h2>
               <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
                 Mereka merasakan hal yang sederhana tapi penting: catatan panen
-                lebih rapi, data kolam lebih cepat dicek, dan laporan
-                penjualan lebih mudah dipahami.
+                lebih rapi, data kolam lebih cepat dicek, dan laporan penjualan
+                lebih mudah dipahami.
               </p>
             </div>
 
@@ -415,12 +432,11 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-medium text-primary">Fitur utama</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Fitur inti untuk operasional budidaya ikan harian
+              Fitur inti untuk operasional budidaya ikan
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Anda tidak butuh fitur yang rumit untuk mulai rapi. Yang penting,
-              data kolam, panen, penjualan, dan laporan usaha tercatat dalam
-              alur yang terasa ringan dipakai setiap hari.
+              Fitur yang Anda butuhkan untuk mencatat budidaya, penjualan,
+              laporan keuangan, dan memahami kondisi usaha dengan lebih cepat.
             </p>
           </div>
 
@@ -451,9 +467,8 @@ export default function HomePage() {
               Dibuat khusus untuk budidaya ikan air tawar
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Aplikasi ini mengikuti alur kerja yang umum dipakai di usaha air
-              tawar, termasuk budidaya lele, nila, patin, dan gurame, supaya
-              terasa akrab sejak awal dipakai.
+              Tebar Panen dirancang untuk budidaya ikan air tawar, dengan alur
+              kerja yang familiar agar lebih mudah dipakai sejak awal.
             </p>
           </div>
 
@@ -468,7 +483,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-4">
             {trustItems.map((item) => (
               <article
                 className="rounded-[1.5rem] border border-[#d9e9e4] bg-white p-5"
@@ -489,16 +504,16 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-medium text-primary">Keunggulan</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Kenapa sistem yang rapi lebih efektif daripada catatan manual
+              Kenapa lebih praktis daripada catatan manual
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Anda mungkin tidak membutuhkan sistem yang rumit. Anda butuh
-              pencatatan yang konsisten, mudah dibaca, dan tidak memecah data
-              ke banyak tempat saat usaha sedang berjalan.
+              Untuk budidaya ikan yang berjalan setiap hari, pencatatan yang
+              rapi membantu Anda melihat kondisi usaha lebih cepat dan
+              mengambil keputusan dengan lebih tenang.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-4">
             {advantageItems.map((item) => (
               <article
                 className="rounded-[1.5rem] border border-[#d9e9e4] bg-[#fbfdfd] p-5"
@@ -515,34 +530,45 @@ export default function HomePage() {
       </section>
 
       <section className="border-b border-[#deebe8] bg-[#f7fbfa]">
-        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(0,0.74fr)_minmax(0,1.26fr)] lg:px-8">
-          <div className="max-w-md space-y-4">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)] lg:items-start lg:px-8">
+          <div className="space-y-4 rounded-[1.75rem] border border-[#d9e9e4] bg-white p-6 lg:sticky lg:top-24">
             <p className="text-sm font-medium text-primary">Cara kerja</p>
             <h2 className="text-3xl font-semibold tracking-tight">
-              Cara kerja yang sederhana untuk tim budidaya
+              Cara kerja yang sederhana untuk budidaya ikan
             </h2>
             <p className="text-sm leading-7 text-[#5b7483] sm:text-base">
-              Anda tidak perlu mengganti semua proses sekaligus. Mulailah dari
-              kolam yang sedang berjalan, lalu isi pencatatan yang memang
-              dipakai tim setiap hari.
+              Mulai dari kolam yang sedang berjalan, catat kegiatan harian,
+              lalu lihat ringkasan kondisi budidaya agar lebih mudah dipahami.
             </p>
+            <div className="rounded-2xl border border-[#d9e9e4] bg-[#f7fbfa] px-4 py-3 text-sm text-[#355565]">
+              Mulai dari data yang paling sering dipakai dulu. Setelah alurnya
+              terasa nyaman, langkah berikutnya akan mengikuti lebih mudah.
+            </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="relative space-y-4 md:pl-14">
+            <div className="absolute top-0 bottom-0 left-5 hidden w-px bg-[#d9e9e4] md:block" />
             {workflowItems.map((item, index) => (
               <article
-                className="rounded-[1.75rem] border border-[#d9e9e4] bg-white p-5"
+                className="relative rounded-[1.75rem] border border-[#d9e9e4] bg-white p-5 md:p-6"
                 key={item.title}
               >
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                  <div className="hidden md:absolute md:top-6 md:-left-14 md:block">
+                    <div className="bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold shadow-[0_10px_24px_rgba(15,157,138,0.18)]">
+                      {index + 1}
+                    </div>
+                  </div>
+                  <div className="bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-full text-sm font-semibold md:hidden">
                     {index + 1}
                   </div>
-                  <h3 className="font-semibold">{item.title}</h3>
+                  <div>
+                    <h3 className="text-lg font-semibold">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-[#5b7483]">
+                      {item.copy}
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-4 text-sm leading-7 text-[#5b7483]">
-                  {item.copy}
-                </p>
               </article>
             ))}
           </div>
@@ -562,17 +588,27 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 lg:grid-cols-2">
-            {faqItems.map((item) => (
-              <article
-                className="rounded-[1.75rem] border border-[#d9e9e4] bg-[#fbfdfd] p-6"
+          <div className="mx-auto mt-10 max-w-4xl space-y-4">
+            {faqItems.map((item, index) => (
+              <Accordion
+                className="rounded-[1.75rem] border border-[#d9e9e4] bg-[#fbfdfd] p-2"
+                defaultValue={index === 0 ? item.question : undefined}
                 key={item.question}
               >
-                <h3 className="text-lg font-semibold">{item.question}</h3>
-                <p className="mt-3 text-sm leading-7 text-[#5b7483]">
-                  {item.answer}
-                </p>
-              </article>
+                <AccordionItem
+                  className="border-0 bg-transparent"
+                  value={item.question}
+                >
+                  <AccordionHeader>
+                    <AccordionTrigger className="rounded-[1.1rem] px-4 py-4 text-base font-semibold text-[#163042] hover:bg-white">
+                      {item.question}
+                    </AccordionTrigger>
+                  </AccordionHeader>
+                  <AccordionContent className="px-4 pb-4 pt-1 text-sm leading-7 text-[#5b7483]">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             ))}
           </div>
         </div>
@@ -590,10 +626,9 @@ export default function HomePage() {
                 berjalan hari ini.
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/80">
-                Jika Anda ingin kolam, panen, penjualan, dan laporan usaha
-                lebih mudah dipantau, Anda bisa mulai dari satu langkah kecil:
-                buka halaman pendaftaran dan mulai dari data yang paling sering
-                dipakai.
+                Jika Anda ingin kolam, penjualan, dan laporan usaha lebih mudah
+                dipantau, Anda bisa mulai dari satu langkah kecil: buka halaman
+                pendaftaran dan isi data yang paling sering dipakai.
               </p>
             </div>
 
@@ -612,12 +647,12 @@ export default function HomePage() {
 
           <footer className="px-1 pt-6 pb-2 text-sm text-[#5b7483]">
             Tebar Panen membantu operasional budidaya ikan jadi lebih sederhana
-            dan terpusat.
+            dari pencatatan harian sampai ringkasan kondisi usaha.
           </footer>
         </div>
       </section>
     </main>
-  )
+  );
 }
 
 function getAvatarDataUrl(name: string) {
