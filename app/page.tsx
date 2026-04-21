@@ -358,7 +358,7 @@ export default async function HomePage() {
 
             <div className="space-y-4">
               <h1 className="max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                Aplikasi budidaya ikan dengan bantuan AI (Artificial
+                Aplikasi budidaya ikan berbasis AI (Artificial
                 Intelligence)
               </h1>
               <p className="max-w-2xl text-base leading-7 text-[#4f6775] sm:text-lg">
