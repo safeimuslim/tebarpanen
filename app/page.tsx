@@ -1,8 +1,10 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import { ArrowRight, ChartColumn, Fish, ReceiptText, Sparkles } from "lucide-react"
 
+import { auth } from "@/auth"
 import {
   Accordion,
   AccordionContent,
@@ -213,7 +215,13 @@ const faqItems = [
   },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth()
+
+  if (session?.user) {
+    redirect("/dashboard")
+  }
+
   const hasSocialProof = customerQuotes.length > 0
 
   return (
@@ -592,7 +600,7 @@ export default function HomePage() {
             {faqItems.map((item, index) => (
               <Accordion
                 className="rounded-[1.75rem] border border-[#d9e9e4] bg-[#fbfdfd] p-2"
-                defaultValue={index === 0 ? item.question : undefined}
+                defaultValue={index === 0 ? [item.question] : []}
                 key={item.question}
               >
                 <AccordionItem
