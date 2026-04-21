@@ -457,7 +457,7 @@ export default async function HomePage() {
                 className="rounded-[1.75rem] border border-[#d9e9e4] bg-[#fbfdfd] p-6"
                 key={item.title}
               >
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="text-lg font-semibold">{item.title}</p>
                 <p className="mt-3 text-sm leading-7 text-[#5b7483]">
                   {item.copy}
                 </p>
@@ -500,7 +500,7 @@ export default async function HomePage() {
                       width={56}
                     />
                     <div>
-                      <h3 className="font-semibold">{item.name}</h3>
+                      <p className="font-semibold">{item.name}</p>
                       <p className="text-sm text-[#5b7483]">
                         {item.role} • {item.company}
                       </p>
@@ -538,7 +538,7 @@ export default async function HomePage() {
                 <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-2xl">
                   <item.icon className="size-5" />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{item.title}</h3>
+                <p className="mt-5 text-lg font-semibold">{item.title}</p>
                 <p className="mt-3 text-sm leading-7 text-[#5b7483]">
                   {item.copy}
                 </p>
@@ -578,7 +578,7 @@ export default async function HomePage() {
                 className="rounded-[1.5rem] border border-[#d9e9e4] bg-white p-5"
                 key={item.title}
               >
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="text-lg font-semibold">{item.title}</p>
                 <p className="mt-3 text-sm leading-7 text-[#5b7483]">
                   {item.copy}
                 </p>
@@ -608,7 +608,7 @@ export default async function HomePage() {
                 className="rounded-[1.5rem] border border-[#d9e9e4] bg-[#fbfdfd] p-5"
                 key={item.title}
               >
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="text-lg font-semibold">{item.title}</p>
                 <p className="mt-3 text-sm leading-7 text-[#5b7483]">
                   {item.copy}
                 </p>
@@ -652,7 +652,7 @@ export default async function HomePage() {
                     {index + 1}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">{item.title}</h3>
+                    <p className="text-lg font-semibold">{item.title}</p>
                     <p className="mt-3 text-sm leading-7 text-[#5b7483]">
                       {item.copy}
                     </p>
@@ -688,7 +688,7 @@ export default async function HomePage() {
                   className="border-0 bg-transparent"
                   value={item.question}
                 >
-                  <AccordionHeader>
+                  <AccordionHeader render={<div />}>
                     <AccordionTrigger className="rounded-[1.1rem] px-4 py-4 text-base font-semibold text-[#163042] hover:bg-white">
                       {item.question}
                     </AccordionTrigger>
