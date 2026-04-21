@@ -16,32 +16,26 @@ import { cn } from "@/lib/utils"
 export const metadata: Metadata = {
   title: "Aplikasi Budidaya Ikan | Tebar Panen",
   description:
-    "Aplikasi budidaya ikan dengan bantuan AI untuk mencatat kolam, panen, penjualan, laporan usaha, dan membaca kondisi siklus lebih mudah.",
+    "Aplikasi budidaya ikan untuk mencatat operasional kolam, penjualan, laporan laba rugi, dan Analisis AI dalam satu tempat.",
   alternates: {
     canonical: "/aplikasi-budidaya-ikan",
   },
 }
 
-const benefitItems = [
-  "Pencatatan kolam lebih rapi",
-  "Panen dan penjualan langsung terhubung",
-  "AI membantu membaca kondisi siklus",
-]
-
 const problemItems = [
   {
     copy:
-      "Banyak usaha budidaya ikan masih mencatat mortalitas, pakan, panen, dan penjualan di buku tulis, chat, atau spreadsheet terpisah. Saat data dibutuhkan, tim harus membuka banyak catatan dan hasilnya sering tidak sinkron.",
+      "Catatan mortalitas, pakan, panen, dan penjualan sering tersimpan di tempat yang berbeda, sehingga sulit dicari saat dibutuhkan.",
     title: "Data harian mudah tercecer",
   },
   {
     copy:
-      "Ketika kolam aktif mulai bertambah, pemilik usaha biasanya kesulitan melihat kolam mana yang perlu dicek lebih dulu, panen mana yang siap dijual, dan biaya mana yang belum masuk ke rekap.",
-    title: "Operasional kolam sulit dipantau",
+      "Saat kolam aktif bertambah, tim lebih sulit melihat kolam mana yang perlu dicek lebih dulu dan panen mana yang siap dijual.",
+    title: "Kolam yang perlu perhatian tidak terlihat cepat",
   },
   {
     copy:
-      "Laporan usaha sering baru dirapikan di akhir minggu atau akhir bulan. Akibatnya, keputusan tentang pakan, panen, dan penjualan sering dibuat tanpa data yang benar-benar lengkap.",
+      "Pendapatan dan biaya sering baru direkap di akhir periode, sehingga keputusan harian berjalan tanpa gambaran usaha yang jelas.",
     title: "Laporan usaha terlambat terlihat",
   },
 ]
@@ -49,25 +43,25 @@ const problemItems = [
 const valueItems = [
   {
     copy:
-      "Pantau tebar benih, pakan, mortalitas, sampling, dan panen ikan dalam satu alur pencatatan yang rapi sehingga tim tidak perlu memecah data ke banyak tempat.",
+      "Catat benih, pakan, mortalitas, sampling, dan panen dalam satu alur yang rapi.",
     icon: Fish,
     title: "Siklus Budidaya",
   },
   {
     copy:
-      "Catat setiap panen ikan yang dijual, pembeli, berat, harga, dan status pembayarannya agar riwayat transaksi selalu terhubung ke kolam yang tepat.",
+      "Catat penjualan panen, pembeli, berat, harga, dan status pembayaran dalam satu tempat.",
     icon: ReceiptText,
     title: "Penjualan Panen",
   },
   {
     copy:
-      "Lihat pendapatan, biaya, dan hasil usaha budidaya ikan berdasarkan periode laporan agar pemilik usaha lebih cepat membaca kondisi bisnisnya.",
+      "Lihat pendapatan, biaya, dan laporan laba rugi agar kondisi usaha lebih mudah dipantau.",
     icon: ChartColumn,
     title: "Laporan Keuangan",
   },
   {
     copy:
-      "Gunakan Analisis AI untuk merangkum pola mortalitas, kondisi siklus, dan hal-hal yang perlu dicek lebih dulu berdasarkan data yang sudah dicatat tim.",
+      "Ringkas kondisi budidaya dan lihat hal yang perlu diperhatikan lebih dulu.",
     icon: Sparkles,
     title: "Analisis AI",
   },
@@ -84,69 +78,69 @@ const fitItems = [
 const trustItems = [
   {
     copy:
-      "Alur pencatatan dibuat mengikuti kegiatan yang memang biasa terjadi di kolam, mulai dari pengecekan harian sampai panen dan penjualan.",
+      "Pencatatan mengikuti kegiatan harian budidaya, dari kolam aktif sampai panen dan penjualan.",
     title: "Alur kerja terasa familiar",
   },
   {
     copy:
-      "Usaha budidaya ikan bisa mulai dari satu kolam dulu. Saat operasional makin rapi, penggunaan aplikasi bisa diperluas tanpa harus mengubah cara kerja secara drastis.",
-    title: "Cocok untuk mulai bertahap",
+      "Bisa dimulai dari satu kolam dulu, lalu dipakai lebih luas saat operasional sudah makin rapi.",
+    title: "Mudah mulai dari skala kecil",
   },
   {
     copy:
-      "Data kolam, panen, penjualan, dan keuangan tetap terhubung. Ini membantu saat pemilik usaha ingin melihat kondisi operasional sekaligus hasil usahanya dalam satu alur.",
-    title: "Semua data tetap nyambung",
+      "Data kolam, penjualan, dan laporan usaha tetap nyambung sehingga lebih mudah dipantau.",
+    title: "Data tetap terhubung",
   },
   {
     copy:
-      "Saat data harian sudah mulai rutin dicatat, Analisis AI bisa membantu merangkum kondisi siklus dengan bahasa yang lebih mudah dipahami, terutama untuk pemilik usaha yang tidak selalu ada di lapangan.",
-    title: "Ada ringkasan AI yang membantu membaca data",
+      "Ringkasan kondisi budidaya lebih mudah dibaca setelah data harian tercatat.",
+    title: "Kondisi usaha lebih mudah dibaca",
   },
 ]
 
 const workflowItems = [
   {
     copy:
-      "Mulai dari data usaha, kolam, dan siklus aktif yang sedang berjalan. Tim tidak perlu menunggu semua proses sempurna untuk mulai mencatat lebih rapi.",
-    title: "Mulai dari kolam yang sedang berjalan",
+      "Masukkan data usaha, kolam, dan siklus budidaya yang sedang berjalan.",
+    title: "Mulai dari kolam aktif",
   },
   {
     copy:
-      "Catat mortalitas, pakan, sampling, biaya, dan panen ikan sesuai kegiatan lapangan. Fokusnya adalah konsisten mengisi data yang memang dipakai setiap hari.",
-    title: "Isi pencatatan seperlunya setiap hari",
+      "Isi mortalitas, pakan, sampling, biaya, dan panen sesuai aktivitas di lapangan.",
+    title: "Catat kegiatan harian",
   },
   {
     copy:
-      "Saat panen dijual, transaksi dan laporan usaha langsung ikut tersusun. Pemilik usaha tidak perlu menunggu rekap manual di akhir periode untuk membaca hasil penjualan.",
-    title: "Pantau penjualan dan hasil usaha",
+      "Setelah panen dijual, data penjualan dan laporan usaha ikut tersusun lebih rapi.",
+    title: "Pantau penjualan dan laporan",
   },
   {
     copy:
-      "Ketika data harian sudah cukup, gunakan Analisis AI untuk melihat dugaan masalah utama, apa yang perlu dicek hari ini, dan catatan apa yang masih perlu dilengkapi berikutnya.",
-    title: "Gunakan Analisis AI sebagai ringkasan tindakan",
+      "AI membantu merangkum kondisi budidaya dan hal yang perlu diperhatikan lebih dulu.",
+    title: "Lihat ringkasan AI",
   },
 ]
 
 const advantageItems = [
   {
     copy:
-      "Aplikasi budidaya ikan membantu tim melihat kolam aktif, kegiatan harian, dan transaksi penjualan dari satu layar. Ini jauh lebih cepat dibanding mencari data dari file yang tersebar.",
-    title: "Lebih cepat daripada catatan manual",
+      "Kolam aktif, penjualan, dan laporan usaha bisa dilihat dalam satu alur tanpa membuka banyak catatan.",
+    title: "Lebih cepat dipantau",
   },
   {
     copy:
-      "Karena data harian masuk ke alur yang sama, pemilik usaha bisa lebih mudah membandingkan biaya, hasil panen, dan penjualan tanpa harus merapikan ulang dari awal.",
-    title: "Lebih mudah dibaca saat rekap",
+      "Data yang sudah tercatat lebih mudah dibaca kembali saat Anda ingin mengecek biaya, hasil panen, dan penjualan.",
+    title: "Lebih mudah saat rekap",
   },
   {
     copy:
-      "Ketika usaha bertambah besar, kebutuhan pencatatan biasanya ikut kompleks. Sistem yang rapi sejak awal membuat transisi ke operasional yang lebih tertata jadi tidak terlalu berat.",
-    title: "Siap dipakai saat usaha berkembang",
+      "Saat jumlah kolam dan aktivitas bertambah, pencatatan tetap lebih tertata dan tidak mudah berantakan.",
+    title: "Lebih siap saat usaha berkembang",
   },
   {
     copy:
-      "Analisis AI tidak menggantikan keputusan lapangan, tetapi membantu pemilik usaha membaca pola dari data yang sudah tercatat sehingga tindak lanjut harian bisa ditentukan lebih cepat.",
-    title: "Data lebih mudah diubah jadi tindakan",
+      "Masalah lebih cepat terlihat sehingga keputusan harian bisa diambil dengan lebih tenang.",
+    title: "Lebih mudah mengambil tindakan",
   },
 ]
 
@@ -184,7 +178,7 @@ const customerQuotes: SocialProofQuote[] = [
 const faqItems = [
   {
     answer:
-      "Tebar Panen membantu Anda mencatat kolam, mortalitas, pakan, panen, penjualan, dan laporan usaha harian dalam satu alur yang lebih rapi. Tujuannya sederhana: supaya kegiatan harian terasa lebih ringan dan data lebih mudah dilihat saat dibutuhkan.",
+      "Tebar Panen membantu Anda mencatat kolam, pakan, mortalitas, panen, penjualan, dan laporan usaha dalam satu alur yang lebih rapi agar operasional harian lebih mudah dipantau.",
     question: "Sebenarnya Tebar Panen ini untuk apa?",
   },
   {
@@ -204,7 +198,7 @@ const faqItems = [
   },
   {
     answer:
-      "Analisis AI membantu Anda membaca ringkasan kondisi siklus dari data yang sudah dicatat, seperti pola mortalitas, hal yang perlu dicek hari ini, dan catatan yang masih perlu dilengkapi. Fungsinya bukan menggantikan keputusan Anda, tetapi membantu supaya membaca data terasa lebih cepat dan ringan.",
+      "Analisis AI membantu merangkum kondisi siklus dari data yang sudah dicatat, seperti hal yang perlu dicek lebih dulu dan catatan yang masih perlu dilengkapi. Fungsinya bukan menggantikan keputusan Anda, tetapi membantu agar membaca data terasa lebih cepat.",
     question: "Analisis AI di Tebar Panen bisa membantu apa?",
   },
   {
@@ -360,12 +354,11 @@ export default function HomePage() {
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight">
-              Masalah yang paling sering terjadi di usaha budidaya ikan
+              Masalah yang sering terjadi di usaha budidaya ikan
             </h2>
             <p className="mt-4 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Jika Anda masih mencatat di buku, chat, atau spreadsheet terpisah,
-              masalahnya biasanya bukan kurang data. Masalahnya, data jadi sulit
-              dicari saat dibutuhkan cepat.
+              Saat data masih tersebar di buku, chat, atau spreadsheet,
+              operasional harian jadi lebih sulit dipantau.
             </p>
           </div>
 
@@ -439,12 +432,11 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-medium text-primary">Fitur utama</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Fitur inti untuk operasional budidaya ikan harian
+              Fitur inti untuk operasional budidaya ikan
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Anda tidak butuh fitur yang rumit untuk mulai rapi. Yang penting,
-              data kolam, panen, penjualan, laporan usaha, dan bantuan AI
-              tersusun dalam alur yang terasa ringan dipakai setiap hari.
+              Fitur yang Anda butuhkan untuk mencatat budidaya, penjualan,
+              laporan keuangan, dan memahami kondisi usaha dengan lebih cepat.
             </p>
           </div>
 
@@ -475,9 +467,8 @@ export default function HomePage() {
               Dibuat khusus untuk budidaya ikan air tawar
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Aplikasi ini mengikuti alur kerja yang umum dipakai di usaha air
-              tawar, termasuk budidaya lele, nila, patin, dan gurame, supaya
-              terasa akrab sejak awal dipakai.
+              Tebar Panen dirancang untuk budidaya ikan air tawar, dengan alur
+              kerja yang familiar agar lebih mudah dipakai sejak awal.
             </p>
           </div>
 
@@ -513,12 +504,12 @@ export default function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-medium text-primary">Keunggulan</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-              Kenapa sistem yang rapi lebih efektif daripada catatan manual
+              Kenapa lebih praktis daripada catatan manual
             </h2>
             <p className="mt-3 text-sm leading-7 text-[#5b7483] sm:text-base">
-              Anda mungkin tidak membutuhkan sistem yang rumit. Anda butuh
-              pencatatan yang konsisten, mudah dibaca, dan bantuan AI yang bisa
-              membantu merangkum data saat usaha sedang berjalan.
+              Untuk budidaya ikan yang berjalan setiap hari, pencatatan yang
+              rapi membantu Anda melihat kondisi usaha lebih cepat dan
+              mengambil keputusan dengan lebih tenang.
             </p>
           </div>
 
@@ -543,13 +534,11 @@ export default function HomePage() {
           <div className="space-y-4 rounded-[1.75rem] border border-[#d9e9e4] bg-white p-6 lg:sticky lg:top-24">
             <p className="text-sm font-medium text-primary">Cara kerja</p>
             <h2 className="text-3xl font-semibold tracking-tight">
-              Cara kerja yang sederhana untuk tim budidaya
+              Cara kerja yang sederhana untuk budidaya ikan
             </h2>
             <p className="text-sm leading-7 text-[#5b7483] sm:text-base">
-              Anda tidak perlu mengganti semua proses sekaligus. Mulailah dari
-              kolam yang sedang berjalan, lalu isi pencatatan yang memang
-              dipakai tim setiap hari. Setelah itu, biarkan AI membantu
-              merangkum data yang sudah masuk agar lebih mudah dibaca.
+              Mulai dari kolam yang sedang berjalan, catat kegiatan harian,
+              lalu lihat ringkasan kondisi budidaya agar lebih mudah dipahami.
             </p>
             <div className="rounded-2xl border border-[#d9e9e4] bg-[#f7fbfa] px-4 py-3 text-sm text-[#355565]">
               Mulai dari data yang paling sering dipakai dulu. Setelah alurnya
@@ -637,9 +626,8 @@ export default function HomePage() {
                 berjalan hari ini.
               </h2>
               <p className="mt-3 text-sm leading-7 text-white/80">
-                Jika Anda ingin kolam, panen, penjualan, dan laporan usaha lebih
-                mudah dipantau, lalu dibantu AI untuk membaca kondisi siklus,
-                Anda bisa mulai dari satu langkah kecil: buka halaman
+                Jika Anda ingin kolam, penjualan, dan laporan usaha lebih mudah
+                dipantau, Anda bisa mulai dari satu langkah kecil: buka halaman
                 pendaftaran dan isi data yang paling sering dipakai.
               </p>
             </div>
@@ -659,7 +647,7 @@ export default function HomePage() {
 
           <footer className="px-1 pt-6 pb-2 text-sm text-[#5b7483]">
             Tebar Panen membantu operasional budidaya ikan jadi lebih sederhana
-            dan lebih mudah dipahami dari pencatatan sampai Analisis AI.
+            dari pencatatan harian sampai ringkasan kondisi usaha.
           </footer>
         </div>
       </section>
