@@ -4,9 +4,9 @@ import { redirect } from "next/navigation"
 import { Building2, KeyRound, Mail, MapPin, Phone } from "lucide-react"
 
 import { auth } from "@/auth"
-import { hashPassword } from "@/app/lib/password"
-import { prisma } from "@/app/lib/prisma"
-import { AuthShell } from "@/components/auth/auth-shell"
+import { hashPassword } from "@/lib/password"
+import { prisma } from "@/lib/prisma"
+import { AuthShell } from "@/components/layout/auth-shell"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {

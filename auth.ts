@@ -2,9 +2,9 @@ import NextAuth, { type DefaultSession } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { NextResponse } from "next/server"
 
-import { prisma } from "@/app/lib/prisma"
-import { verifyPassword } from "@/app/lib/password"
-import type { AppRole } from "@/app/lib/authz"
+import { prisma } from "@/lib/prisma"
+import { verifyPassword } from "@/lib/password"
+import type { AppRole } from "@/lib/authz"
 
 declare module "next-auth" {
   interface Session {

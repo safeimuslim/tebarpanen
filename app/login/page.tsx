@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
 import { KeyRound, Mail } from "lucide-react"
 
 import { auth, signIn } from "@/auth"
-import { AuthShell } from "@/components/auth/auth-shell"
+import { AuthShell } from "@/components/layout/auth-shell"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {

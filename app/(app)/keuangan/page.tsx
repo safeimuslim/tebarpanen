@@ -33,10 +33,16 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 
-import { FinanceReportActions } from "./components/finance-report-actions"
-import { MonthField } from "./components/month-field"
-import { FinanceTrendChart } from "./components/finance-trend-chart"
-import { getFinancePageData } from "./queries"
+import { FinanceReportActions } from "@/features/keuangan/components/finance-report-actions"
+import { MonthField } from "@/features/keuangan/components/month-field"
+import { FinanceTrendChart } from "@/features/keuangan/components/finance-trend-chart"
+import { InfoCard } from "@/features/keuangan/components/info-card"
+import { getFinancePageData } from "@/features/keuangan/queries"
+import {
+  formatCurrency,
+  formatNumber,
+  getProfitValueClassName,
+} from "@/features/keuangan/utils/formatters"
 
 export default async function KeuanganPage({
   searchParams,
@@ -422,43 +428,4 @@ export default async function KeuanganPage({
       </Card>
     </div>
   )
-}
-
-function InfoCard({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
-  return (
-    <div className="border-border bg-background rounded-md border px-3 py-3">
-      <p className="font-medium">{title}</p>
-      <p className="text-muted-foreground mt-1 text-sm">{description}</p>
-    </div>
-  )
-}
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    currency: "IDR",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(value)
-}
-
-function formatNumber(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value)
-}
-
-function getProfitValueClassName(value: number) {
-  if (value > 0) {
-    return "text-primary"
-  }
-
-  if (value < 0) {
-    return "text-destructive"
-  }
-
-  return undefined
 }

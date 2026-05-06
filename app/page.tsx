@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 
 import { auth } from "@/auth"
-import { getSiteUrl } from "@/app/lib/site-url"
+import { getSiteUrl } from "@/lib/site-url"
 import {
   Accordion,
   AccordionContent,

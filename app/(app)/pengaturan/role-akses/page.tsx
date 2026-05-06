@@ -8,8 +8,8 @@ import {
 } from "lucide-react"
 import { redirect } from "next/navigation"
 
-import { requireSessionUser } from "@/app/lib/authz"
-import { prisma } from "@/app/lib/prisma"
+import { requireSessionUser } from "@/lib/authz"
+import { prisma } from "@/lib/prisma"
 
 const permissions = [
   {

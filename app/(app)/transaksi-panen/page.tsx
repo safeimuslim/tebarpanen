@@ -6,16 +6,15 @@ import {
   Search,
 } from "lucide-react"
 
-import { createHarvestTransaction, updateHarvestTransaction } from "@/app/(app)/siklus-budidaya/[id]/actions"
-import { HarvestTransactionDetailContent } from "@/app/(app)/siklus-budidaya/[id]/components/harvest-log-detail-content"
-import { HarvestTransactionForm } from "@/app/(app)/siklus-budidaya/[id]/components/harvest-log-form"
+import { createHarvestTransaction, updateHarvestTransaction } from "@/features/siklus-budidaya/detail/actions"
+import { HarvestTransactionDetailContent } from "@/features/siklus-budidaya/detail/components/harvest-log-detail-content"
+import { HarvestTransactionForm } from "@/features/siklus-budidaya/detail/components/harvest-log-form"
 import {
   formatCurrency,
   formatDate,
   formatNumber,
-} from "@/app/(app)/siklus-budidaya/utils"
-import { HarvestPaymentStatus } from "@/app/generated/prisma/enums"
-import { CrudRowActions } from "@/components/crud-row-actions"
+} from "@/features/siklus-budidaya/utils"
+import { CrudRowActions } from "@/shared/components/crud-row-actions"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Card,
@@ -34,11 +33,12 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
-import { deleteHarvestTransaction } from "./actions"
+import { deleteHarvestTransaction } from "@/features/transaksi-panen/actions"
+import { TransactionMetric } from "@/features/transaksi-panen/components/transaction-metric"
 import {
   getHarvestTransactionPageData,
-  type HarvestTransactionListItem,
-} from "./queries"
+} from "@/features/transaksi-panen/queries"
+import { getPaymentStatusMeta } from "@/features/transaksi-panen/utils/payment-status"
 
 export default async function TransaksiPanenPage({
   searchParams,
@@ -277,55 +277,6 @@ export default async function TransaksiPanenPage({
           )}
         </CardContent>
       </Card>
-    </div>
-  )
-}
-
-function getPaymentStatusMeta(transaction: HarvestTransactionListItem) {
-  if (transaction.paymentStatus === HarvestPaymentStatus.PAID) {
-    return {
-      className: "bg-primary/12 text-primary",
-      label: "Lunas",
-    }
-  }
-
-  if (transaction.paymentStatus === HarvestPaymentStatus.PARTIALLY_PAID) {
-    return {
-      className: "bg-[#E5A93D]/15 text-[#A87412]",
-      label: "DP",
-    }
-  }
-
-  if (transaction.dueDate && transaction.dueDate >= startOfDay(new Date())) {
-    return {
-      className: "bg-[#125E8A]/12 text-[#125E8A]",
-      label: "Belum jatuh tempo",
-    }
-  }
-
-  return {
-    className: "bg-destructive/10 text-destructive",
-    label: "Belum lunas",
-  }
-}
-
-function startOfDay(value: Date) {
-  const date = new Date(value)
-  date.setHours(0, 0, 0, 0)
-  return date
-}
-
-function TransactionMetric({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
-  return (
-    <div>
-      <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd className="mt-1 font-medium">{value}</dd>
     </div>
   )
 }

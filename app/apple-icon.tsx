@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og"
 
-import { BrandIcon } from "@/app/lib/brand-icon"
+import { BrandIcon } from "@/lib/brand-icon"
 
 export const size = {
   width: 180,

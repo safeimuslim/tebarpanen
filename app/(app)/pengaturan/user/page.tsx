@@ -1,12 +1,12 @@
 import { Plus, UserRound } from "lucide-react"
 import { redirect } from "next/navigation"
 
-import { createWorker, deleteWorker, updateWorker } from "./actions"
-import { prisma } from "@/app/lib/prisma"
-import { requireSessionUser } from "@/app/lib/authz"
-import { ActionForm } from "@/components/action-form"
-import { CrudRowActions } from "@/components/crud-row-actions"
-import { FormSubmitButton } from "@/components/form-submit-button"
+import { createWorker, deleteWorker, updateWorker } from "@/features/pengaturan/user/actions"
+import { prisma } from "@/lib/prisma"
+import { requireSessionUser } from "@/lib/authz"
+import { ActionForm } from "@/shared/components/action-form"
+import { CrudRowActions } from "@/shared/components/crud-row-actions"
+import { FormSubmitButton } from "@/shared/components/form-submit-button"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { SummaryCard } from "@/components/ui/summary-card"
 import {

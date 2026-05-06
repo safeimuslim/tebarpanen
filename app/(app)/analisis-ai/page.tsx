@@ -23,18 +23,18 @@ import {
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
-import { generateCycleAiNarrative } from "../siklus-budidaya/[id]/ai-analysis"
-import { analyzeCycleOperationalInsight } from "../siklus-budidaya/[id]/analysis"
-import { CycleAiAnalysisCard } from "../siklus-budidaya/[id]/components/cycle-ai-analysis-card"
-import { CycleOperationalInsightCard } from "../siklus-budidaya/[id]/components/cycle-operational-insight-card"
+import { generateCycleAiNarrative } from "@/features/siklus-budidaya/detail/ai-analysis"
+import { analyzeCycleOperationalInsight } from "@/features/siklus-budidaya/detail/analysis"
+import { CycleAiAnalysisCard } from "@/features/siklus-budidaya/detail/components/cycle-ai-analysis-card"
+import { CycleOperationalInsightCard } from "@/features/siklus-budidaya/detail/components/cycle-operational-insight-card"
 import {
   formatCurrency,
   formatDate,
   formatNumber,
   getSurvivalRate,
-} from "../siklus-budidaya/utils"
-import { AnalysisCycleForm } from "./components/analysis-cycle-form"
-import { getAiAnalysisPageData } from "./queries"
+} from "@/features/siklus-budidaya/utils"
+import { AnalysisCycleForm } from "@/features/analisis-ai/components/analysis-cycle-form"
+import { getAiAnalysisPageData } from "@/features/analisis-ai/queries"
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24
 

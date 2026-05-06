@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 
 import { auth } from "@/auth"
-import { AppShell } from "@/components/app-shell"
+import { AppShell } from "@/components/layout/app-shell"
 import { redirect } from "next/navigation"
 
 export default async function AppLayout({

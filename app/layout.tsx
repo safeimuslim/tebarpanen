@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 
-import { getSiteUrl } from "@/app/lib/site-url"
+import { getSiteUrl } from "@/lib/site-url"
 import { Toaster } from "@/components/ui/sonner"
 
 import "./globals.css"

@@ -2,51 +2,24 @@ import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 
 import { auth } from "@/auth"
-import { hashPassword, verifyPassword } from "@/app/lib/password"
-import { prisma } from "@/app/lib/prisma"
+import { hashPassword, verifyPassword } from "@/lib/password"
+import { prisma } from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
+import {
+  getProfileMessage,
+  isPrismaUniqueError,
+  readText,
+} from "@/features/profile/utils/profile-page"
 
 type ProfileSearchParams = Promise<{
   status?: string
   error?: string
 }>
 
-function readText(formData: FormData, key: string) {
-  return formData.get(key)?.toString().trim() ?? ""
-}
-
 function profileRedirect(params: Record<string, string>): never {
   const query = new URLSearchParams(params)
 
   redirect(`/profile?${query.toString()}`)
-}
-
-function getProfileMessage(status?: string, error?: string) {
-  if (status === "updated") {
-    return {
-      tone: "success",
-      text: "Profile berhasil diperbarui.",
-    }
-  }
-
-  if (!error) {
-    return null
-  }
-
-  const messages: Record<string, string> = {
-    required: "Nama, email, dan nomor HP wajib diisi.",
-    password_mismatch: "Konfirmasi password baru tidak sesuai.",
-    current_password_required: "Password saat ini wajib diisi.",
-    current_password_invalid: "Password saat ini tidak sesuai.",
-    user_not_found: "User tidak ditemukan.",
-    duplicate: "Email atau nomor HP sudah digunakan user lain.",
-    update_failed: "Profile gagal diperbarui.",
-  }
-
-  return {
-    tone: "error",
-    text: messages[error] ?? messages.update_failed,
-  }
 }
 
 export default async function ProfilePage({
@@ -268,14 +241,5 @@ export default async function ProfilePage({
         <Button type="submit">Simpan Perubahan</Button>
       </form>
     </div>
-  )
-}
-
-function isPrismaUniqueError(error: unknown) {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "code" in error &&
-    error.code === "P2002"
   )
 }
