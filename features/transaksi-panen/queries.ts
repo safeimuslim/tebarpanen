@@ -1,6 +1,6 @@
 import type { Prisma } from "@/app/generated/prisma/client"
 import { HarvestPaymentStatus } from "@/app/generated/prisma/enums"
-import { requireSessionUser } from "@/lib/authz"
+import { getFarmScopeWhere, requireFarmId, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 import { decimalToNumber } from "../siklus-budidaya/utils"
@@ -50,9 +50,9 @@ export async function getHarvestTransactionPageData(
   const params = await searchParams
   const filters = readFilters(params)
   const relationWhere =
-    user.role === "SUPER_ADMIN" || !user.farmId
+    user.role === "SUPER_ADMIN"
       ? {}
-      : { cultureCycle: { farmId: user.farmId } }
+      : { cultureCycle: { farmId: requireFarmId(user) } }
   const where: Prisma.HarvestTransactionWhereInput = {
     ...relationWhere,
     ...readPeriodWhere(filters.period),
@@ -100,10 +100,7 @@ export async function getHarvestTransactionPageData(
       },
     }),
     prisma.cultureCycle.findMany({
-      where:
-        user.role === "SUPER_ADMIN" || !user.farmId
-          ? {}
-          : { farmId: user.farmId },
+      where: getFarmScopeWhere(user),
       orderBy: [{ status: "asc" }, { startDate: "desc" }, { cycleName: "asc" }],
       select: {
         cycleName: true,

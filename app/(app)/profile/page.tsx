@@ -1,10 +1,10 @@
 import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 
-import { auth } from "@/auth"
 import { hashPassword, verifyPassword } from "@/lib/password"
 import { prisma } from "@/lib/prisma"
 import { Button } from "@/components/ui/button"
+import { requireSessionUser } from "@/lib/authz"
 import {
   getProfileMessage,
   isPrismaUniqueError,
@@ -27,14 +27,10 @@ export default async function ProfilePage({
 }: {
   searchParams: ProfileSearchParams
 }) {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    redirect("/login")
-  }
+  const sessionUser = await requireSessionUser()
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: sessionUser.id },
   })
 
   if (!user) {
@@ -47,11 +43,7 @@ export default async function ProfilePage({
   async function updateProfile(formData: FormData) {
     "use server"
 
-    const session = await auth()
-
-    if (!session?.user?.id) {
-      redirect("/login")
-    }
+    const sessionUser = await requireSessionUser()
 
     const name = readText(formData, "name")
     const email = readText(formData, "email").toLowerCase()
@@ -69,7 +61,7 @@ export default async function ProfilePage({
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: sessionUser.id },
     })
 
     if (!currentUser) {

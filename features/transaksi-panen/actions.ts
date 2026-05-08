@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache"
 
 import { actionError, actionSuccess, type ActionState } from "@/lib/action-state"
-import { requireSessionUser } from "@/lib/authz"
+import { requireFarmId, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 export async function deleteHarvestTransaction(
@@ -11,6 +11,10 @@ export async function deleteHarvestTransaction(
   formData: FormData
 ): Promise<ActionState> {
   const user = await requireSessionUser()
+  const farmScope =
+    user.role === "SUPER_ADMIN"
+      ? {}
+      : { cultureCycle: { farmId: requireFarmId(user) } }
 
   try {
     const transactionId = formData.get("id")?.toString().trim()
@@ -22,9 +26,7 @@ export async function deleteHarvestTransaction(
     const transaction = await prisma.harvestTransaction.findFirst({
       where: {
         id: transactionId,
-        ...(user.role === "SUPER_ADMIN" || !user.farmId
-          ? {}
-          : { cultureCycle: { farmId: user.farmId } }),
+        ...farmScope,
       },
       select: {
         cultureCycleId: true,

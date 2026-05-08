@@ -1,4 +1,4 @@
-import { requireSessionUser } from "@/lib/authz"
+import { getFarmScopeWhere, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 import { getCycleById } from "../siklus-budidaya/queries"
@@ -15,10 +15,10 @@ export type AiAnalysisCycleOption = {
 
 export async function getAiAnalysisPageData(selectedCycleId?: string) {
   const user = await requireSessionUser()
-  const cycleWhere =
-    user.role === "SUPER_ADMIN" || !user.farmId
-      ? { status: "ACTIVE" as const }
-      : { farmId: user.farmId, status: "ACTIVE" as const }
+  const cycleWhere = {
+    ...getFarmScopeWhere(user),
+    status: "ACTIVE" as const,
+  }
 
   const cycles = await prisma.cultureCycle.findMany({
     where: cycleWhere,

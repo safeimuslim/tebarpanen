@@ -4,9 +4,10 @@ import { AuthError } from "next-auth"
 import { redirect } from "next/navigation"
 import { KeyRound, Mail } from "lucide-react"
 
-import { auth, signIn } from "@/auth"
+import { signIn } from "@/auth"
 import { AuthShell } from "@/components/layout/auth-shell"
 import { Button } from "@/components/ui/button"
+import { getSessionUser } from "@/lib/authz"
 
 export const metadata: Metadata = {
   title: "Login | Tebar Panen",
@@ -33,11 +34,11 @@ export default async function LoginPage({
 }: {
   searchParams: LoginSearchParams
 }) {
-  const session = await auth()
+  const sessionUser = await getSessionUser()
   const params = await searchParams
   const callbackUrl = getSafeRedirectPath(params.callbackUrl)
 
-  if (session?.user) {
+  if (sessionUser) {
     redirect(callbackUrl)
   }
 

@@ -1,5 +1,5 @@
 import { type Prisma } from "@/app/generated/prisma/client"
-import { getFarmScopeWhere, requireSessionUser } from "@/lib/authz"
+import { getFarmScopeWhere, requireFarmId, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 type MonthPeriod = {
@@ -77,9 +77,9 @@ export async function getFinancePageData(
   const range = readFinanceRange(params.start, params.end)
   const cycleWhere = getFarmScopeWhere<Prisma.CultureCycleWhereInput>(user)
   const farmRelationWhere =
-    user.role === "SUPER_ADMIN" || !user.farmId
+    user.role === "SUPER_ADMIN"
       ? {}
-      : { cultureCycle: { farmId: user.farmId } }
+      : { cultureCycle: { farmId: requireFarmId(user) } }
   const pondWhere = getFarmScopeWhere<Prisma.PondWhereInput>(user)
   const equipmentWhere = getFarmScopeWhere<Prisma.EquipmentWhereInput>(user)
 

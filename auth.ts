@@ -95,7 +95,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     authorized({ auth, request }) {
-      if (auth?.user) {
+      if (auth?.user?.isActive) {
         return true
       }
 

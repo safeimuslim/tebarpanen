@@ -8,7 +8,7 @@ import {
 } from "lucide-react"
 import { redirect } from "next/navigation"
 
-import { requireSessionUser } from "@/lib/authz"
+import { requireFarmId, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 const permissions = [
@@ -213,7 +213,7 @@ async function getRoleCounts(user: Awaited<ReturnType<typeof requireSessionUser>
     }
   }
 
-  const farmId = user.farmId
+  const farmId = requireFarmId(user)
 
   const [farmAdminCount, workerCount] = await Promise.all([
     prisma.user.count({

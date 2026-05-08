@@ -1,4 +1,4 @@
-import { requireSessionUser } from "@/lib/authz"
+import { getFarmScopeWhere, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 import { ACTIVE_CYCLE_STATUS } from "../siklus-budidaya/constants"
@@ -47,8 +47,7 @@ export type DashboardPageData = {
 
 export async function getDashboardPageData(): Promise<DashboardPageData> {
   const user = await requireSessionUser()
-  const farmWhere =
-    user.role === "SUPER_ADMIN" || !user.farmId ? {} : { farmId: user.farmId }
+  const farmWhere = getFarmScopeWhere(user)
   const todayRange = getJakartaDayRange(new Date())
 
   const [activePondsCount, cycles] = await Promise.all([

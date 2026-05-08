@@ -1,4 +1,4 @@
-import { requireSessionUser } from "@/lib/authz"
+import { getFarmScopeWhere, requireSessionUser } from "@/lib/authz"
 import { prisma } from "@/lib/prisma"
 
 import { ACTIVE_CYCLE_STATUS } from "./constants"
@@ -11,8 +11,7 @@ import { decimalToNumber, getEstimatedAlive } from "./utils"
 
 export async function getCyclePageData(): Promise<CyclePageData> {
   const user = await requireSessionUser()
-  const cycleWhere =
-    user.role === "SUPER_ADMIN" || !user.farmId ? {} : { farmId: user.farmId }
+  const cycleWhere = getFarmScopeWhere(user)
 
   const [cycles, availablePonds] = await Promise.all([
     prisma.cultureCycle.findMany({
@@ -78,12 +77,11 @@ export async function getCyclePageData(): Promise<CyclePageData> {
 
 export async function getSelectablePonds(excludeCycleId?: string): Promise<CycleFormPondOption[]> {
   const user = await requireSessionUser()
-  const pondWhere =
-    user.role === "SUPER_ADMIN" || !user.farmId ? {} : { farmId: user.farmId }
+  const pondWhere = getFarmScopeWhere(user)
   const activeCyclePondWhere = {
     isActive: true,
     cycle: {
-      ...(user.role === "SUPER_ADMIN" || !user.farmId ? {} : { farmId: user.farmId }),
+      ...getFarmScopeWhere(user),
       status: ACTIVE_CYCLE_STATUS,
       ...(excludeCycleId ? { id: { not: excludeCycleId } } : {}),
     },
@@ -120,7 +118,7 @@ export async function getCycleById(id: string): Promise<CycleDetailData | null> 
   return prisma.cultureCycle.findFirst({
     where: {
       id,
-      ...(user.role === "SUPER_ADMIN" || !user.farmId ? {} : { farmId: user.farmId }),
+      ...getFarmScopeWhere(user),
     },
     include: {
       farm: true,

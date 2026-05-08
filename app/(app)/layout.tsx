@@ -1,8 +1,7 @@
 import { Suspense } from "react"
 
-import { auth } from "@/auth"
 import { AppShell } from "@/components/layout/app-shell"
-import { redirect } from "next/navigation"
+import { requireSessionUser } from "@/lib/authz"
 
 export default async function AppLayout({
   children,
@@ -21,13 +20,9 @@ async function AuthenticatedAppShell({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const session = await auth()
+  const user = await requireSessionUser()
 
-  if (!session?.user) {
-    redirect("/login")
-  }
-
-  return <AppShell user={session.user}>{children}</AppShell>
+  return <AppShell user={user}>{children}</AppShell>
 }
 
 function AppLoadingShell() {

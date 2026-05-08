@@ -3,11 +3,11 @@ import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { Building2, KeyRound, Mail, MapPin, Phone } from "lucide-react"
 
-import { auth } from "@/auth"
 import { hashPassword } from "@/lib/password"
 import { prisma } from "@/lib/prisma"
 import { AuthShell } from "@/components/layout/auth-shell"
 import { Button } from "@/components/ui/button"
+import { getSessionUser } from "@/lib/authz"
 
 export const metadata: Metadata = {
   title: "Registrasi Farm | Tebar Panen",
@@ -62,9 +62,9 @@ export default async function RegisterPage({
 }: {
   searchParams: RegisterSearchParams
 }) {
-  const session = await auth()
+  const sessionUser = await getSessionUser()
 
-  if (session?.user) {
+  if (sessionUser) {
     redirect("/dashboard")
   }
 

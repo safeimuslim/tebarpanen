@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from "lucide-react"
 
-import { auth } from "@/auth"
+import { getSessionUser } from "@/lib/authz"
 import { getSiteUrl } from "@/lib/site-url"
 import {
   Accordion,
@@ -231,10 +231,10 @@ const faqItems = [
 ]
 
 export default async function HomePage() {
-  const session = await auth()
+  const sessionUser = await getSessionUser()
   const siteUrl = getSiteUrl()
 
-  if (session?.user) {
+  if (sessionUser) {
     redirect("/dashboard")
   }
 
